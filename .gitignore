@@ -1,0 +1,12 @@
+# Node modules
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# environment variables
+.env*
+
+# credenciales sensibles
+credentials.json*
