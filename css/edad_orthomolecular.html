@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Edad Ortomolecular</title>
+  <link rel="stylesheet" href="edad_orthomolecular.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-atom"></i> Test Edad Ortomolecular</h1>
+  </header>
+  
+  <div class="container">
+    <form id="orthomolecular-form">
+      <h2>Datos del Test</h2>
+      <div class="form-grid">
+        <div class="form-group"><label for="aluminio">Aluminio</label><input type="number" id="aluminio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="antimonio">Antimonio</label><input type="number" id="antimonio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="arsenico">Arsénico</label><input type="number" id="arsenico" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="bario">Bario</label><input type="number" id="bario" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="berilio">Berilio</label><input type="number" id="berilio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="bismuto">Bismuto</label><input type="number" id="bismuto" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="cadmio">Cadmio</label><input type="number" id="cadmio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="mercurio">Mercurio</label><input type="number" id="mercurio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="niquel">Níquel</label><input type="number" id="niquel" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="plata">Plata</label><input type="number" id="plata" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="platino">Platino</label><input type="number" id="platino" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="plomo">Plomo</label><input type="number" id="plomo" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="talio">Talio</label><input type="number" id="talio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="tinio">Tinio</label><input type="number" id="tinio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="titanio">Titanio</label><input type="number" id="titanio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="torio">Torio</label><input type="number" id="torio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="uranio">Uranio</label><input type="number" id="uranio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="calcio">Calcio</label><input type="number" id="calcio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="magnesio">Magnesio</label><input type="number" id="magnesio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="sodio">Sodio</label><input type="number" id="sodio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="potasio">Potasio</label><input type="number" id="potasio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="cobre">Cobre</label><input type="number" id="cobre" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="zinc">Zinc</label><input type="number" id="zinc" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="manganeso">Manganeso</label><input type="number" id="manganeso" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="cromo">Cromo</label><input type="number" id="cromo" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="vanadio">Vanadio</label><input type="number" id="vanadio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="molibdeno">Molibdeno</label><input type="number" id="molibdeno" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="boro">Boro</label><input type="number" id="boro" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="yodo">Yodo</label><input type="number" id="yodo" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="litio">Litio</label><input type="number" id="litio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="phosphoro">Phosphoro</label><input type="number" id="phosphoro" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="selenio">Selenio</label><input type="number" id="selenio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="estronio">Estronio</label><input type="number" id="estronio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="azufre">Azufre</label><input type="number" id="azufre" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="cobalto">Cobalto</label><input type="number" id="cobalto" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="hierro">Hierro</label><input type="number" id="hierro" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="germanio">Germanio</label><input type="number" id="germanio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="rubidio">Rubidio</label><input type="number" id="rubidio" placeholder="Ingrese valor"></div>
+        <div class="form-group"><label for="zirconio">Zirconio</label><input type="number" id="zirconio" placeholder="Ingrese valor"></div>
+      </div>
+      
+      <h2>Resultados</h2>
+      <div class="result-fields">
+        <div class="result-field">
+          <label>Edad Cronológica</label>
+          <input type="number" id="edadCrono" value="47" readonly>
+        </div>
+        <div class="result-field">
+          <label>Edad Orthomolecular</label>
+          <input type="number" id="edadOrtho" value="0" readonly>
+        </div>
+        <div class="result-field">
+          <label>Edad Diferencial</label>
+          <input type="text" id="edadDiferencial" value="0 Menos" readonly>
+        </div>
+      </div>
+      
+      <div class="form-buttons center">
+        <button type="button" onclick="calcularEdadOrtho()"><i class="fas fa-calculator"></i> Calcular</button>
+        <button type="submit"><i class="fas fa-save"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    function calcularEdadOrtho() {
+      const edadCrono = parseFloat(document.getElementById('edadCrono').value);
+      const campos = [
+        'aluminio', 'antimonio', 'arsenico', 'bario', 'berilio', 'bismuto', 
+        'cadmio', 'mercurio', 'niquel', 'plata', 'platino', 'plomo', 
+        'talio', 'tinio', 'titanio', 'torio', 'uranio', 'calcio', 
+        'magnesio', 'sodio', 'potasio', 'cobre', 'zinc', 'manganeso', 
+        'cromo', 'vanadio', 'molibdeno', 'boro', 'yodo', 'litio', 
+        'phosphoro', 'selenio', 'estronio', 'azufre', 'cobalto', 
+        'hierro', 'germanio', 'rubidio', 'zirconio'
+      ];
+      
+      let suma = 0, count = 0;
+      campos.forEach(id => {
+        const val = parseFloat(document.getElementById(id).value);
+        if (!isNaN(val)) { suma += val; count++; }
+      });
+      
+      const edadOrtho = count ? (suma / count) : 0;
+      document.getElementById('edadOrtho').value = edadOrtho.toFixed(2);
+      const diferencial = (edadOrtho - edadCrono).toFixed(2);
+      document.getElementById('edadDiferencial').value = diferencial + (diferencial < 0 ? ' Menos' : ' Más');
+    }
+
+    document.getElementById('orthomolecular-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Datos de Edad Ortomolecular guardados (simulado).');
+    });
+  </script>
+</body>
+</html>

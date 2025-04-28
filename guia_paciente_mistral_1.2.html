@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Paciente - Antienvejecimiento (v4 - Completo)</title>
+    <!-- FontAwesome y Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Variables de Color y Estilo (Originales) --- */
+        :root {
+            --primary-color: rgb(35, 188, 239);       /* Azul Claro/Cian */
+            --dark-blue: rgb(41, 59, 100);            /* Azul Oscuro */
+            --bright-white: #FFFFFF;
+            --light-pearly-gray: #F0F4F8;
+            --success-color: #28a745;                 /* Verde */
+            --danger-color: #dc3545;                  /* Rojo (Añadido para botón eliminar) */
+            --shadow-light-color: rgba(255, 255, 255, 0.8);
+            --shadow-dark-color: rgba(163, 177, 198, 0.6);
+            --base-font-size: 16px;
+            --border-radius: 10px;
+            --card-padding: 25px;
+            --input-padding: 12px 15px;
+            --button-padding: 12px 25px;
+        }
+
+        /* --- Estilos Base (Originales) --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif; font-size: var(--base-font-size);
+            background: var(--light-pearly-gray); color: var(--dark-blue); line-height: 1.7;
+        }
+
+        /* --- Contenedor Principal (Original) --- */
+        .container {
+            max-width: 1000px; margin: 30px auto; padding: 30px;
+            background: var(--bright-white); border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Info Paciente (Original) --- */
+        .patient-info {
+            background: var(--primary-color); color: var(--bright-white); padding: 20px;
+            border-radius: var(--border-radius); margin-bottom: 30px; display: flex;
+            justify-content: space-between; align-items: center; flex-wrap: wrap;
+        }
+        .patient-info .form-group { display: flex; align-items: center; gap: 10px; margin: 0; }
+        .patient-info .form-group i { font-size: 1.2em; }
+        .patient-info .form-group label { font-weight: 600; color: var(--bright-white); }
+        .patient-info .form-group input {
+            background: var(--bright-white); color: var(--dark-blue); border: none;
+            border-radius: 8px; padding: 10px; width: 200px;
+        }
+
+        /* --- Secciones Colapsables (Original + Mejoras Transición) --- */
+        .collapsible { margin-bottom: 20px; }
+        .collapsible legend {
+            cursor: pointer; padding: 15px 20px; background: var(--dark-blue);
+            color: var(--bright-white); border-radius: 8px; display: flex;
+            justify-content: space-between; align-items: center; transition: background 0.3s ease;
+            font-weight: 600;
+        }
+        .collapsible legend:hover { background: var(--primary-color); }
+        .collapsible legend i.fa-chevron-down { transition: transform 0.3s ease; } /* Target específico */
+        .collapsible.collapsed legend i.fa-chevron-down { transform: rotate(-90deg); } /* Rotación estándar */
+        .collapsible fieldset {
+            border: none; padding: 20px; background: var(--light-pearly-gray);
+            border-radius: 0 0 8px 8px; margin-top: -5px; /* Solapar un poco */
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out, opacity 0.3s ease-out, border 0.5s ease-out;
+            max-height: 5000px; /* Suficiente altura */
+            overflow: hidden; opacity: 1;
+            border: 1px solid transparent; /* Para transición suave del borde */
+        }
+        .collapsible.collapsed fieldset {
+            max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0;
+            overflow: hidden; border-width: 0; /* Ocultar borde */
+        }
+
+        /* --- Formularios Editables (Originales) --- */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; color: var(--dark-blue); margin-bottom: 5px; }
+        input[type="text"], input[type="number"], input[type="date"], textarea, select {
+            width: 100%; padding: var(--input-padding); border: 1px solid #DDE2E8; /* Borde más claro */
+            border-radius: 8px; background: var(--bright-white);
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.05); /* Sombra sutil */
+            transition: border-color 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+             outline: none; border-color: var(--primary-color);
+             box-shadow: 0 0 0 2px rgba(35, 188, 239, 0.2);
+        }
+        input[type="checkbox"] { accent-color: var(--primary-color); margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;}
+        .checkbox-group { display: flex; flex-direction: column; gap: 15px; }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            padding: 10px; background: var(--bright-white); border-radius: 8px;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .checkbox-item label { font-weight: 400; flex: 1 1 200px; cursor: pointer; margin-bottom: 0;}
+        .checkbox-item .quantity-input { width: 70px; padding: 6px 10px; text-align: center; flex-basis: 70px;}
+        .frequency-select, .custom-supplement { width: 200px; margin-left: 10px; flex: 1 1 150px; padding: 8px 10px; min-width: 150px;}
+
+
+        /* --- Botones (Originales + Nuevos) --- */
+        .action-buttons { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
+        .btn {
+            padding: var(--button-padding); font-size: 1rem; font-weight: 600;
+            border-radius: 25px; border: none; cursor: pointer; transition: all 0.3s ease;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(145deg, var(--primary-color), var(--dark-blue)); color: var(--bright-white); }
+        .btn-primary:hover { background: linear-gradient(145deg, var(--dark-blue), var(--primary-color)); }
+        .btn-success { background: linear-gradient(145deg, var(--success-color), #218838); color: var(--bright-white); }
+        .btn-success:hover { background: linear-gradient(145deg, #218838, var(--success-color)); }
+
+        /* Botón general para añadir items (NUEVO) */
+        .btn-add-item {
+            background: var(--success-color); color: var(--bright-white); padding: 10px 20px;
+            border-radius: 8px; font-size: 0.9rem; margin-top: 25px;
+            width: 100%; justify-content: center; border: none; /* Asegurar sin borde */
+            font-weight: 500; /* Ligeramente menos grueso que botones principales */
+        }
+        .btn-add-item:hover { background: #218838; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(40,167,69,0.3); } /* Efecto hover sutil */
+
+        /* Botón para eliminar items (NUEVO) */
+        .btn-remove-item {
+            background: var(--danger-color); color: var(--bright-white); padding: 5px 10px;
+            font-size: 0.8rem; border-radius: 5px; line-height: 1; border: none;
+            position: absolute; top: 10px; right: 10px; /* Posicionamiento */
+            cursor: pointer;
+        }
+        .btn-remove-item:hover { background: #c82333; }
+        .btn-remove-item i { margin-right: 3px;} /* Espacio icono */
+
+
+        /* --- Contenedor y Wrappers de Items Dinámicos (NUEVO) --- */
+        .custom-item-container { margin-top: 20px; padding-top: 20px; }
+        .dynamic-item-wrapper {
+            background: rgba(255, 255, 255, 0.8); padding: 20px; margin-bottom: 15px;
+            border-radius: 8px; border: 1px solid #E0E6ED; position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .dynamic-item-wrapper .form-group { margin-bottom: 10px; }
+         /* Para el caso especial de Formulas Naturales que no tiene el wrapper */
+         #formulas-naturales-container > .form-group {
+             position: relative; /* Para posible botón eliminar */
+             padding-right: 50px; /* Espacio para botón eliminar si se añade */
+         }
+
+
+        /* --- Vista Previa (Original + mejoras) --- */
+        #patient-preview { display: none; margin-top: 30px; padding: var(--card-padding); background: var(--light-pearly-gray); border-radius: var(--border-radius); border: 1px solid #E0E6ED;}
+        #patient-preview h3 { color: var(--dark-blue); margin-bottom: 15px; border-bottom: 2px solid var(--primary-color); padding-bottom: 5px; }
+        #preview-content h4 { margin-top: 15px; margin-bottom: 5px; color: var(--dark-blue); font-weight: 600; }
+        #preview-content ul { list-style: none; padding-left: 0; margin-bottom: 15px; }
+        #preview-content li { margin-bottom: 8px; padding-left: 20px; position: relative; line-height: 1.5; }
+        #preview-content li::before { content: "\f0da"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--primary-color); position: absolute; left: 0; top: 5px; }
+        #preview-content .custom-item-list li::before { content: "\f101"; } /* Icono diferente para personalizados */
+
+        /* --- Modal de Envío (NUEVO - Básico) --- */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background-color: #fff; margin: auto; padding: 30px; border-radius: 10px;
+            width: 90%; max-width: 500px; text-align: center; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-close {
+            position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 28px;
+            font-weight: bold; cursor: pointer;
+        }
+        .modal-close:hover, .modal-close:focus { color: #333; text-decoration: none; }
+        .modal h3 { margin-bottom: 20px; color: var(--dark-blue); }
+        .modal-buttons { display: flex; flex-direction: column; gap: 15px; }
+        .modal-buttons .btn { width: 100%; justify-content: center; border-radius: 8px; } /* Botones rectos */
+        .modal-buttons .btn-whatsapp { background: #25D366; color: white;}
+        .modal-buttons .btn-whatsapp:hover { background: #1DAE54; }
+        .modal-buttons .btn-email { background: #D44638; color: white; }
+        .modal-buttons .btn-email:hover { background: #B03A2E; }
+        .modal-buttons .btn-app { background: var(--dark-blue); color: white; }
+        .modal-buttons .btn-app:hover { background: var(--primary-color); }
+
+
+        /* --- Responsividad (Original + ajustes) --- */
+        @media (max-width: 768px) {
+            .container { margin: 15px; padding: 20px; }
+            .patient-info { flex-direction: column; align-items: flex-start; }
+            .patient-info .form-group { width: 100%; margin-bottom: 10px; }
+            .checkbox-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .checkbox-item label { flex-basis: auto; width: 100%; }
+            .checkbox-item .quantity-input, .frequency-select, .custom-supplement { width: 100%; flex-basis: auto; margin-left: 0; }
+            .action-buttons { justify-content: center; flex-direction: column; gap: 10px;}
+            .btn { width: 100%; justify-content: center;}
+            .dynamic-item-wrapper .btn-remove-item { top: 5px; right: 5px; padding: 3px 6px; font-size: 0.7rem; }
+            .modal-content { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="patient-form">
+            <!-- Información del Paciente Estilizada -->
+            <div class="patient-info">
+                 <div class="form-group"> <i class="fas fa-user"></i> <label for="patient-name">Nombre del Paciente</label> <input type="text" id="patient-name" name="patient_name" placeholder="Ingrese nombre"> </div>
+                 <div class="form-group"> <i class="fas fa-calendar"></i> <label for="date">Fecha</label> <input type="date" id="date" name="date"> </div>
+            </div>
+
+            <!-- Fase de Remoción -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Fase de Remoción <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                    <div class="form-group"> <label for="remocion-cucharadas">Cucharadas al acostarse (1 sola vez)</label> <textarea id="remocion-cucharadas" name="remocion_cucharadas" rows="2" placeholder="Indicar producto y dosis..."></textarea> </div>
+                    <div class="form-group"> <label for="remocion-detox">Detoxificación Alcalina Vegetariana (Semanas)</label> <input type="number" id="remocion-detox" name="remocion_detox_semanas" min="0" step="1" placeholder="Ej: 1"> </div>
+                    <div class="checkbox-group"> <label><input type="checkbox" name="terapia_nino"> Niño</label> <label><input type="checkbox" name="terapia_antiage"> Anti-envejecimiento</label> <label><input type="checkbox" name="terapia_metabolica"> Metabólica</label> <label><input type="checkbox" name="terapia_citostatica"> Citostática</label> <label><input type="checkbox" name="terapia_renal"> Renal</label> </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-remocion-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-remocion-container', 'remocion', 'Elemento Adicional Remoción', 'Descripción/Instrucciones')"><i class="fas fa-plus"></i> Añadir Elemento de Remoción</button>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Primarios -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Nutracéuticos Primarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                     <div class="checkbox-group">
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_mega_gh4" name="nutra_mega_gh4"> <label for="nutra_mega_gh4">MegaGH4 (Fórmula Antienvejecimiento)</label> <input type="number" class="quantity-input" name="nutra_mega_gh4_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_mega_gh4_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_mega_gh4_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_stemcell" name="nutra_stemcell"> <label for="nutra_stemcell">StemCell Enhancer (Revierte la oxidación)</label> <input type="number" class="quantity-input" name="nutra_stemcell_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_stemcell_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_stemcell_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_transfer" name="nutra_transfer"> <label for="nutra_transfer">Transfer Tri Factor (Modulador celular)</label> <input type="number" class="quantity-input" name="nutra_transfer_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_transfer_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_transfer_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_telomeres" name="nutra_telomeres"> <label for="nutra_telomeres">Telomeros (Activador de la Telomerasa)</label> <input type="number" class="quantity-input" name="nutra_telomeres_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_telomeres_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_telomeres_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                     </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-primarios-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-primarios-container', 'primario', 'Nutracéutico Primario Adicional', 'Dosis/Instrucciones')"><i class="fas fa-plus"></i> Añadir Nutracéutico Primario</button>
+                </fieldset>
+            </div>
+
+            <!-- Activador Metabólico -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                 <legend>Activador Metabólico <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                    <div class="checkbox-item"> <input type="checkbox" id="activador_bioterapico" name="activador_bioterapico"> <label for="activador_bioterapico">Bioterápico + Bach (gotas, veces al día debajo de la lengua)</label> <input type="number" class="quantity-input" name="activador_bioterapico_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="activador_bioterapico_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="activador_bioterapico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                    <div class="checkbox-group" style="margin-left: 28px; columns: 2; -webkit-columns: 2; -moz-columns: 2;"> <label><input type="checkbox" name="cardiovascular"> Cardiovascular</label> <label><input type="checkbox" name="respiratorio"> Respiratorio</label> <label><input type="checkbox" name="digestivo"> Digestivo</label> <label><input type="checkbox" name="neuro"> Neuro</label> <label><input type="checkbox" name="inmune"> Inmune</label> <label><input type="checkbox" name="inflamacion"> Inflamación</label> <label><input type="checkbox" name="glicolisis"> Glicólisis(m)</label> <label><input type="checkbox" name="ciclo_krebs"> Ciclo Krebs(t)</label> <label><input type="checkbox" name="cadena_resp"> Cadena Resp(n)</label> <label><input type="checkbox" name="degeneracion"> Degeneración</label> <label><input type="checkbox" name="humorales"> Humorales</label> <label><input type="checkbox" name="excrecion"> Excreción</label> <label><input type="checkbox" name="mesenquimaticos"> Mesenquimáticos</label> <label><input type="checkbox" name="celulares"> Celulares</label> <label><input type="checkbox" name="nervioso"> SN Central</label> <label><input type="checkbox" name="sn_autonomo"> SN Autónomo</label> <label><input type="checkbox" name="ansiedad"> Ansiedad</label> <label><input type="checkbox" name="depresion"> Depresión</label> <label><input type="checkbox" name="vision"> Visión</label> <label><input type="checkbox" name="audicion"> Audición</label> <label><input type="checkbox" name="olfato"> Olfato</label> <label><input type="checkbox" name="gusto"> Gusto</label> <label><input type="checkbox" name="sangre"> Sangre</label> <label><input type="checkbox" name="corazon"> Corazón</label> <label><input type="checkbox" name="superior"> Superior</label> <label><input type="checkbox" name="inferior"> Inferior</label> <label><input type="checkbox" name="huesos"> Huesos</label> <label><input type="checkbox" name="cartilagos"> Cartílagos y Lig.</label> </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-activador-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-activador-container', 'activador', 'Activador/Componente Adicional', 'Dosis/Notas')"><i class="fas fa-plus"></i> Añadir Activador Metabólico</button>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Secundarios -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Nutracéuticos Secundarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                     <div class="checkbox-group">
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_anti_stress" name="nutra_anti_stress"> <label for="nutra_anti_stress">Anti stress (Energizante)</label> <input type="number" class="quantity-input" name="nutra_anti_stress_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_anti_stress_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_anti_stress_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_cardiovascular" name="nutra_cardiovascular"> <label for="nutra_cardiovascular">Cardiovascular (Mejora la circulación)</label> <input type="number" class="quantity-input" name="nutra_cardiovascular_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_cardiovascular_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_cardiovascular_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_digestivo" name="nutra_digestivo"> <label for="nutra_digestivo">Digestivo (Gases / Estreñimiento)</label> <input type="number" class="quantity-input" name="nutra_digestivo_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_digestivo_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_digestivo_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_femenino" name="nutra_femenino"> <label for="nutra_femenino">Femenino (Precursor hormonal mujer)</label> <input type="number" class="quantity-input" name="nutra_femenino_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_femenino_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_femenino_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_osteo_articular" name="nutra_osteo_articular"> <label for="nutra_osteo_articular">Osteo Articular (Regenerador Articular)</label> <input type="number" class="quantity-input" name="nutra_osteo_articular_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_osteo_articular_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_osteo_articular_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_inmune_booster" name="nutra_inmune_booster"> <label for="nutra_inmune_booster">Inmune Booster (Estimula las defensas)</label> <input type="number" class="quantity-input" name="nutra_inmune_booster_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_inmune_booster_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_inmune_booster_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_inmune_modulador" name="nutra_inmune_modulador"> <label for="nutra_inmune_modulador">Inmune Modulador (Regulador Inflamatorio)</label> <input type="number" class="quantity-input" name="nutra_inmune_modulador_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_inmune_modulador_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_inmune_modulador_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_masculino" name="nutra_masculino"> <label for="nutra_masculino">Masculino (Precursor hormonal masc)</label> <input type="number" class="quantity-input" name="nutra_masculino_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_masculino_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_masculino_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_neuro_central" name="nutra_neuro_central"> <label for="nutra_neuro_central">Neuro Central (Regenerador Cerebral)</label> <input type="number" class="quantity-input" name="nutra_neuro_central_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_neuro_central_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_neuro_central_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_neuro_emocional" name="nutra_neuro_emocional"> <label for="nutra_neuro_emocional">Neuro Emocional (Restaurador Emocional)</label> <input type="number" class="quantity-input" name="nutra_neuro_emocional_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_neuro_emocional_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_neuro_emocional_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="nutra_prostata" name="nutra_prostata"> <label for="nutra_prostata">Próstata (Regenerador prostático)</label> <input type="number" class="quantity-input" name="nutra_prostata_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_prostata_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_prostata_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                    </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-secundarios-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-secundarios-container', 'secundario', 'Nutracéutico Secundario Adicional', 'Dosis/Instrucciones')"><i class="fas fa-plus"></i> Añadir Nutracéutico Secundario</button>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Complementarios -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Nutracéuticos Complementarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                     <div class="checkbox-group">
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_omega" name="nutra_complementario_omega"> <label for="nutra_complementario_omega">Omega 3 (Salud cerebral y cardíaca)</label> <input type="number" class="quantity-input" name="nutra_complementario_omega_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_omega_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_omega_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_vitamina_d" name="nutra_complementario_vitamina_d"> <label for="nutra_complementario_vitamina_d">Vitamina D (Refuerzo inmunológico)</label> <input type="number" class="quantity-input" name="nutra_complementario_vitamina_d_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_vitamina_d_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_vitamina_d_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_aloe_vera" name="nutra_complementario_aloe_vera"> <label for="nutra_complementario_aloe_vera">Aloe Vera</label> <input type="number" class="quantity-input" name="nutra_complementario_aloe_vera_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_aloe_vera_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_aloe_vera_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_antioxidante" name="nutra_complementario_antioxidante"> <label for="nutra_complementario_antioxidante">Antioxidante (Revierte la oxidación)</label> <input type="number" class="quantity-input" name="nutra_complementario_antioxidante_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_antioxidante_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_antioxidante_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_colageno" name="nutra_complementario_colageno"> <label for="nutra_complementario_colageno">Colágeno</label> <input type="number" class="quantity-input" name="nutra_complementario_colageno_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_colageno_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_colageno_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_energy" name="nutra_complementario_energy"> <label for="nutra_complementario_energy">Energy</label> <input type="number" class="quantity-input" name="nutra_complementario_energy_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_energy_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_energy_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_immune_spray" name="nutra_complementario_immune_spray"> <label for="nutra_complementario_immune_spray">Immune Spray</label> <input type="number" class="quantity-input" name="nutra_complementario_immune_spray_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_immune_spray_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_immune_spray_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_magnesio_quelatado" name="nutra_complementario_magnesio_quelatado"> <label for="nutra_complementario_magnesio_quelatado">Magnesio Quelatado</label> <input type="number" class="quantity-input" name="nutra_complementario_magnesio_quelatado_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_magnesio_quelatado_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_magnesio_quelatado_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_vit_c_zinc" name="nutra_complementario_vit_c_zinc"> <label for="nutra_complementario_vit_c_zinc">Vit C c/Zinc</label> <input type="number" class="quantity-input" name="nutra_complementario_vit_c_zinc_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_vit_c_zinc_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_vit_c_zinc_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_vit_e_selenio" name="nutra_complementario_vit_e_selenio"> <label for="nutra_complementario_vit_e_selenio">Vit E c/Selenio</label> <input type="number" class="quantity-input" name="nutra_complementario_vit_e_selenio_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_vit_e_selenio_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_vit_e_selenio_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="nutra_complementario_zinc_quelatado" name="nutra_complementario_zinc_quelatado"> <label for="nutra_complementario_zinc_quelatado">Zinc Quelatado</label> <input type="number" class="quantity-input" name="nutra_complementario_zinc_quelatado_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="nutra_complementario_zinc_quelatado_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="nutra_complementario_zinc_quelatado_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                    </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-complementarios-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-complementarios-container', 'complem', 'Nutracéutico Complementario Adicional', 'Dosis/Instrucciones')"><i class="fas fa-plus"></i> Añadir Nutracéutico Complementario</button>
+                </fieldset>
+            </div>
+
+            <!-- Cosmecéuticos -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Cosmecéuticos <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                     <div class="checkbox-group">
+                         <div class="checkbox-item"> <input type="checkbox" id="cosme_colageno" name="cosme_colageno"> <label for="cosme_colageno">Colágeno Hidrolizado (Elasticidad de la piel)</label> <input type="number" class="quantity-input" name="cosme_colageno_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="cosme_colageno_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="cosme_colageno_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="cosme_hialuronico" name="cosme_hialuronico"> <label for="cosme_hialuronico">Ácido Hialurónico (Hidratación profunda)</label> <input type="number" class="quantity-input" name="cosme_hialuronico_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="cosme_hialuronico_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="cosme_hialuronico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                    </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                     <div class="custom-item-container" id="custom-cosmeceuticos-container"></div>
+                     <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-cosmeceuticos-container', 'cosme', 'Cosmecéutico Adicional', 'Instrucciones de Uso')"><i class="fas fa-plus"></i> Añadir Cosmecéutico</button>
+                </fieldset>
+            </div>
+
+            <!-- Fórmulas Naturales -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Fórmulas Naturales <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original (Ya preparado para añadir dinámicamente) -->
+                    <div id="formulas-naturales-container">
+                        <!-- Se mantiene la estructura original con el primer elemento como ejemplo -->
+                        <!-- Se podría eliminar este primer elemento si se prefiere añadir siempre desde cero -->
+                        <div class="form-group">
+                            <label for="formula-nat-1-nombre">Fórmula</label>
+                            <input type="text" id="formula-nat-1-nombre" name="formula_nat_nombre[]" placeholder="Ej: Infusión de Valeriana">
+                        </div>
+                        <div class="form-group">
+                            <label for="formula-nat-1-instr">Instrucciones</label>
+                            <textarea id="formula-nat-1-instr" name="formula_nat_instr[]" rows="3" placeholder="Ej: Tomar 1 taza 1 hora antes de dormir..."></textarea>
+                        </div>
+                    </div>
+                    <!-- Botón Original (Se mantiene) -->
+                    <button type="button" class="btn btn-success" onclick="addFormula('formulas-naturales-container', 'nat')"><i class="fas fa-plus"></i> Añadir Fórmula Natural</button>
+                </fieldset>
+            </div>
+
+            <!-- Sueros - Shot Antivejez -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Sueros - Shot Antivejez <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                     <!-- Contenido Original -->
+                      <div class="checkbox-group">
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_adipolitico" name="suero_adipolitico"> <label for="suero_adipolitico">Adipolítico (Reducción de grasa)</label> <input type="number" class="quantity-input" name="suero_adipolitico_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_adipolitico_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_adipolitico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_detox" name="suero_detox"> <label for="suero_detox">Detox (Limpieza interna)</label> <input type="number" class="quantity-input" name="suero_detox_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_detox_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_detox_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_antianemico" name="suero_antianemico"> <label for="suero_antianemico">Antianémico</label> <input type="number" class="quantity-input" name="suero_antianemico_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_antianemico_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_antianemico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_pro_vital" name="suero_pro_vital"> <label for="suero_pro_vital">Pro Vital o Antienvejecimiento</label> <input type="number" class="quantity-input" name="suero_pro_vital_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_pro_vital_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_pro_vital_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_antiviral" name="suero_antiviral"> <label for="suero_antiviral">Antiviral c/Ozono</label> <input type="number" class="quantity-input" name="suero_antiviral_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_antiviral_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_antiviral_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_bioxigenacion" name="suero_bioxigenacion"> <label for="suero_bioxigenacion">Bioxigenación</label> <input type="number" class="quantity-input" name="suero_bioxigenacion_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_bioxigenacion_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_bioxigenacion_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_cardiovascular" name="suero_cardiovascular"> <label for="suero_cardiovascular">CardioVascular</label> <input type="number" class="quantity-input" name="suero_cardiovascular_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_cardiovascular_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_cardiovascular_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_energizante" name="suero_energizante"> <label for="suero_energizante">Energizante</label> <input type="number" class="quantity-input" name="suero_energizante_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_energizante_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_energizante_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_inmuno_estimulante" name="suero_inmuno_estimulante"> <label for="suero_inmuno_estimulante">Inmuno Estimulante</label> <input type="number" class="quantity-input" name="suero_inmuno_estimulante_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_inmuno_estimulante_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_inmuno_estimulante_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_inmuno_modular" name="suero_inmuno_modular"> <label for="suero_inmuno_modular">Inmuno Modular</label> <input type="number" class="quantity-input" name="suero_inmuno_modular_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_inmuno_modular_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_inmuno_modular_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_mega_vitamina_c" name="suero_mega_vitamina_c"> <label for="suero_mega_vitamina_c">Mega Vitamina C</label> <input type="number" class="quantity-input" name="suero_mega_vitamina_c_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_mega_vitamina_c_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_mega_vitamina_c_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_metabolico" name="suero_metabolico"> <label for="suero_metabolico">Metabólico</label> <input type="number" class="quantity-input" name="suero_metabolico_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_metabolico_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_metabolico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_osteo_articular" name="suero_osteo_articular"> <label for="suero_osteo_articular">Osteo Articular</label> <input type="number" class="quantity-input" name="suero_osteo_articular_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_osteo_articular_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_osteo_articular_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_ozono" name="suero_ozono"> <label for="suero_ozono">Ozono</label> <input type="number" class="quantity-input" name="suero_ozono_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_ozono_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_ozono_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_pre_natal" name="suero_pre_natal"> <label for="suero_pre_natal">Pre Natal</label> <input type="number" class="quantity-input" name="suero_pre_natal_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_pre_natal_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_pre_natal_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                        <div class="checkbox-item"> <input type="checkbox" id="suero_quelacion" name="suero_quelacion"> <label for="suero_quelacion">Quelación</label> <input type="number" class="quantity-input" name="suero_quelacion_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="suero_quelacion_freq"><option value="">Frecuencia...</option><option value="dia">Día</option><option value="semana">Semana</option><option value="quincena">Quincena</option><option value="mes">Mes</option></select> <input type="text" class="custom-supplement" name="suero_quelacion_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                     </div>
+                    <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-sueros-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-sueros-container', 'suero', 'Suero/Shot Adicional', 'Dosis/Frecuencia/Notas')"><i class="fas fa-plus"></i> Añadir Suero / Shot</button>
+                </fieldset>
+            </div>
+
+            <!-- Terapias Antienvejecimiento -->
+            <div class="collapsible collapsed"> <!-- Añadido collapsed -->
+                <legend>Terapias Antienvejecimiento <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <!-- Contenido Original -->
+                     <div class="checkbox-group">
+                         <div class="checkbox-item"> <input type="checkbox" id="terapia_autovacuna" name="terapia_autovacuna"> <label for="terapia_autovacuna">Autovacuna (Inmunoterapia)</label> <input type="number" class="quantity-input" name="terapia_autovacuna_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="terapia_autovacuna_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="terapia_autovacuna_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                         <div class="checkbox-item"> <input type="checkbox" id="terapia_ozono" name="terapia_ozono"> <label for="terapia_ozono">Ozonoterapia (Oxigenación celular)</label> <input type="number" class="quantity-input" name="terapia_ozono_qty" min="0" placeholder="Cant."> <select class="frequency-select" name="terapia_ozono_freq"><option value="">Frecuencia...</option><option value="mañana">Mañana</option><option value="noche">Noche</option><option value="antes_desayuno">Antes Desayuno</option><option value="antes_cena">Antes Cena</option><option value="otros">Otros</option></select> <input type="text" class="custom-supplement" name="terapia_ozono_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)"> </div>
+                     </div>
+                     <!-- Contenedor y Botón Añadir (NUEVO) -->
+                    <div class="custom-item-container" id="custom-terapias-container"></div>
+                    <button type="button" class="btn btn-add-item" onclick="addCustomItem('custom-terapias-container', 'terapia', 'Terapia Adicional', 'Detalles/Frecuencia/Sesiones')"><i class="fas fa-plus"></i> Añadir Terapia</button>
+                </fieldset>
+            </div>
+
+            <!-- Vista Previa (Original - el contenido se llena con JS) -->
+            <section id="patient-preview">
+                <h3><i class="fas fa-eye"></i> Vista Previa de la Guía</h3>
+                <div id="preview-content"></div>
+            </section>
+
+            <!-- Botones de Acción (Originales) -->
+            <div class="action-buttons">
+                <button type="button" class="btn btn-success" id="preview-button"><i class="fas fa-eye"></i> Vista Previa</button>
+                <button type="submit" class="btn btn-primary" id="save-send-button"><i class="fas fa-paper-plane"></i> Guardar y Enviar</button>
+            </div>
+        </form>
+
+        <!-- Modal de Envío (NUEVO) -->
+        <div id="send-modal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal('send-modal')">×</span>
+                <h3>Enviar Guía del Paciente</h3>
+                <p>Guía guardada. Seleccione cómo desea enviarla:</p>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-whatsapp" onclick="sendViaWhatsapp()">
+                        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                    </button>
+                    <button type="button" class="btn btn-email" onclick="sendViaEmail()">
+                        <i class="fas fa-envelope"></i> Enviar por Correo Electrónico
+                    </button>
+                    <button type="button" class="btn btn-app" onclick="sendToApp()">
+                        <i class="fas fa-mobile-alt"></i> Enviar a App Integrada (si aplica)
+                    </button>
+                     <button type="button" class="btn btn-primary" onclick="downloadPDF()" style="background: var(--dark-blue);">
+                        <i class="fas fa-file-pdf"></i> Descargar como PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Fin .container -->
+
+    <script>
+        // Inicialización (Original + Colapso)
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('date');
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+             // Colapsar todas las secciones por defecto
+             document.querySelectorAll('.collapsible').forEach(section => {
+                section.classList.add('collapsed');
+            });
+        });
+
+        // Colapsar/Expandir Secciones (Original)
+        document.querySelectorAll('.collapsible legend').forEach(legend => {
+            legend.addEventListener('click', (event) => {
+                 // Evitar que el click en botones dentro de la leyenda active el colapso
+                 if (event.target !== legend && !event.target.closest('i.fa-chevron-down')) {
+                    return;
+                }
+                const parent = legend.parentElement;
+                parent.classList.toggle('collapsed');
+            });
+        });
+
+        // --- Funciones Añadir/Eliminar Items ---
+
+        // Añadir Fórmulas Naturales (Función Original - Mantenida)
+        let formulaNatCounter = 1; // Contador específico para Fórmulas Naturales
+        function addFormula(containerId, typePrefix) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            formulaNatCounter++;
+            const card = document.createElement('div');
+            // Añadir clase y botón eliminar a la fórmula natural añadida
+            card.classList.add('dynamic-item-wrapper'); // Usar el wrapper para consistencia visual y botón
+            card.id = `item-${typePrefix}-${formulaNatCounter}`; // ID único
+            card.innerHTML = `
+                <button type="button" class="btn btn-remove-item" onclick="removeItem(this)">
+                    <i class="fas fa-times"></i> Eliminar
+                </button>
+                <div class="form-group">
+                    <label for="formula-${typePrefix}-${formulaNatCounter}-nombre">Fórmula #${formulaNatCounter}</label>
+                    <input type="text" id="formula-${typePrefix}-${formulaNatCounter}-nombre" name="formula_${typePrefix}_nombre[]" placeholder="Ej: Infusión de Valeriana">
+                </div>
+                <div class="form-group">
+                    <label for="formula-${typePrefix}-${formulaNatCounter}-instr">Instrucciones</label>
+                    <textarea id="formula-${typePrefix}-${formulaNatCounter}-instr" name="formula_${typePrefix}_instr[]" rows="3" placeholder="Ej: Tomar 1 taza 1 hora antes de dormir..."></textarea>
+                </div>
+            `;
+            container.appendChild(card);
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+
+        // Añadir Items Personalizados (Función Genérica - NUEVA)
+        let customItemCounter = 0; // Contador global para otros items
+        function addCustomItem(containerId, typePrefix, namePlaceholder, detailsPlaceholder) {
+            const container = document.getElementById(containerId);
+            if (!container) { console.error(`Contenedor ${containerId} no encontrado.`); return; }
+            customItemCounter++;
+            const itemId = `${typePrefix}-custom-${customItemCounter}`;
+            const itemWrapper = document.createElement('div');
+            itemWrapper.classList.add('dynamic-item-wrapper');
+            itemWrapper.id = `item-${itemId}`;
+            itemWrapper.innerHTML = `
+                <button type="button" class="btn btn-remove-item" onclick="removeItem(this)">
+                    <i class="fas fa-times"></i> Eliminar
+                </button>
+                <div class="form-group">
+                    <label for="item-${itemId}-nombre">${namePlaceholder} #${customItemCounter}</label>
+                    <input type="text" id="item-${itemId}-nombre" name="custom_${typePrefix}_nombre[]" placeholder="${namePlaceholder}">
+                </div>
+                <div class="form-group">
+                    <label for="item-${itemId}-detalles">Detalles/Instrucciones</label>
+                    <textarea id="item-${itemId}-detalles" name="custom_${typePrefix}_detalles[]" rows="2" placeholder="${detailsPlaceholder}"></textarea>
+                </div>
+            `;
+            container.appendChild(itemWrapper);
+            itemWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Eliminar Item (Genérico - NUEVO)
+        function removeItem(button) {
+            const itemWrapper = button.closest('.dynamic-item-wrapper');
+            if (itemWrapper) {
+                itemWrapper.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                itemWrapper.style.opacity = '0'; itemWrapper.style.transform = 'scale(0.95)';
+                setTimeout(() => { itemWrapper.remove(); }, 300);
+            }
+        }
+
+        // Mostrar mensaje al editar suplemento personalizado (Original)
+        function showCustomSupplementMessage(input) {
+            const message = "Elemento Incluido al Tratamiento";
+            // Cambiar placeholder puede ser confuso, usar title o clase es mejor
+            if (input.value.trim() !== '') {
+                input.setAttribute('title', message);
+                // input.classList.add('has-custom'); // Opcional: añadir clase para estilo
+            } else {
+                input.removeAttribute('title');
+                // input.classList.remove('has-custom');
+            }
+             // Mantenemos el cambio de placeholder original si se desea, aunque no es ideal
+             // input.setAttribute('placeholder', message);
+        }
+
+
+        // --- Generar Vista Previa (Original + Adaptado a items custom) ---
+        document.getElementById('preview-button').addEventListener('click', () => {
+            const previewSection = document.getElementById('patient-preview');
+            const previewContent = document.getElementById('preview-content');
+            let previewHTML = '';
+            const form = document.getElementById('patient-form');
+
+            const patientName = form.elements['patient_name']?.value || 'N/A';
+            const dateValue = form.elements['date']?.value;
+            const formattedDate = dateValue ? new Date(dateValue + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+            previewHTML += `<p><strong>Paciente:</strong> ${patientName}</p>`;
+            previewHTML += `<p><strong>Fecha:</strong> ${formattedDate}</p><hr>`;
+
+            // Helper para items predefinidos (checkboxes)
+            const generateCheckboxListPreview = (sectionTitle, sectionSelector) => { /* ... (igual que versión anterior) ... */
+                let listHTML = '';
+                const items = form.querySelectorAll(`${sectionSelector} .checkbox-item input[type="checkbox"]:checked`);
+                 if (items.length > 0) {
+                     listHTML += `<h4>${sectionTitle} (Predefinidos):</h4><ul>`;
+                     items.forEach(cb => {
+                         const itemDiv = cb.closest('.checkbox-item');
+                         const label = itemDiv.querySelector('label')?.textContent.trim() || 'Item';
+                         const qty = itemDiv.querySelector('.quantity-input')?.value;
+                         const freq = itemDiv.querySelector('.frequency-select')?.value;
+                         const supplement = itemDiv.querySelector('.custom-supplement')?.value;
+                         let details = '';
+                         if (qty) details += `Cant: ${qty}`;
+                         if (freq) details += `${details ? ', ' : ''}Frec: ${freq}`;
+                         if (supplement) details += `${details ? ' | ' : ''}Supl: ${supplement}`;
+                         listHTML += `<li>${label}${details ? ` (${details})` : ''}</li>`;
+                     });
+                     listHTML += '</ul>';
+                 }
+                 return listHTML;
+             };
+             // Helper para items personalizados (añadidos)
+             const generateCustomItemListPreview = (sectionTitle, containerId) => { /* ... (igual que versión anterior) ... */
+                 let listHTML = '';
+                 const items = form.querySelectorAll(`#${containerId} .dynamic-item-wrapper`);
+                 if (items.length > 0) {
+                     listHTML += `<h4>${sectionTitle} (Personalizados):</h4><ul class="custom-item-list">`;
+                     items.forEach(item => {
+                         const name = item.querySelector('input[type="text"]')?.value;
+                         const details = item.querySelector('textarea')?.value;
+                         if (name) {
+                             listHTML += `<li><strong>${name}:</strong> ${details || 'Sin detalles'}</li>`;
+                         }
+                     });
+                     listHTML += '</ul>';
+                 }
+                 return listHTML;
+            };
+             // Helper específico para Fórmulas Naturales (usa nombres de campos originales)
+             const generateFormulaNaturalListPreview = (sectionTitle, containerId) => {
+                 let listHTML = '';
+                 // Los items pueden estar directamente en el container o dentro de wrappers si se usa addFormula modificado
+                 const items = form.querySelectorAll(`#${containerId} input[name="formula_nat_nombre[]"]`);
+                 if (items.length > 0) {
+                    // Verificar si el primer item (si existe) tiene valor antes de mostrar el título
+                    let hasContent = false;
+                    items.forEach(input => { if (input.value) hasContent = true; });
+
+                    if(hasContent){
+                        listHTML += `<h4>${sectionTitle}:</h4><ul class="custom-item-list">`;
+                        items.forEach(input => {
+                            const nombre = input.value;
+                            if (nombre) {
+                                // Encontrar la instrucción correspondiente
+                                const instrTextarea = input.closest('.dynamic-item-wrapper, .form-group').parentElement.querySelector(`textarea[name="formula_nat_instr[]"][id^="${input.id.replace('-nombre', '-instr')}"]`);
+                                // Fallback si la estructura es simple (original addFormula sin wrapper)
+                                if (!instrTextarea) {
+                                    const parentDiv = input.closest('#formulas-naturales-container');
+                                    const textareas = parentDiv.querySelectorAll('textarea[name="formula_nat_instr[]"]');
+                                    const inputs = parentDiv.querySelectorAll('input[name="formula_nat_nombre[]"]');
+                                    const index = Array.from(inputs).indexOf(input);
+                                    if (textareas[index]) {
+                                        instrTextarea = textareas[index];
+                                    }
+                                }
+                                const instr = instrTextarea?.value || 'Sin instrucciones';
+                                listHTML += `<li><strong>${nombre}:</strong> ${instr}</li>`;
+                            }
+                        });
+                        listHTML += '</ul>';
+                    }
+                 }
+                 return listHTML;
+            };
+
+
+            // --- Generar Contenido de Vista Previa por Sección ---
+            // 1. Fase de Remoción
+            let remocionHTML = '<h4>Fase de Remoción:</h4><ul>';
+            const cucharadas = form.elements['remocion_cucharadas']?.value; if (cucharadas) remocionHTML += `<li>Cucharadas: ${cucharadas}</li>`;
+            const detoxSemanas = form.elements['remocion_detox_semanas']?.value; if (detoxSemanas) remocionHTML += `<li>Detox semanas: ${detoxSemanas}</li>`;
+            const terapias = Array.from(form.querySelectorAll('input[name^="terapia_"]:checked')).map(cb => cb.parentElement.textContent.trim()); if (terapias.length) remocionHTML += `<li>Terapias: ${terapias.join(', ')}</li>`;
+            remocionHTML += '</ul>';
+            remocionHTML += generateCustomItemListPreview('Fase de Remoción', 'custom-remocion-container'); // Items personalizados
+            previewHTML += remocionHTML;
+
+            // 2. Nutracéuticos Primarios
+            previewHTML += generateCheckboxListPreview('Nutracéuticos Primarios', '.collapsible:nth-of-type(2)');
+            previewHTML += generateCustomItemListPreview('Nutracéuticos Primarios', 'custom-primarios-container');
+
+            // 3. Activador Metabólico
+            let activadorHTML = '<h4>Activador Metabólico:</h4><ul>';
+            const bioChecked = form.elements['activador_bioterapico']?.checked; /* ... (resto lógica igual) ...*/
+             if (bioChecked) {
+                 const itemDiv = form.elements['activador_bioterapico'].closest('.checkbox-item');
+                 const label = itemDiv.querySelector('label')?.textContent.trim() || 'Bioterápico + Bach';
+                 const qty = itemDiv.querySelector('.quantity-input')?.value;
+                 const freq = itemDiv.querySelector('.frequency-select')?.value;
+                 const supplement = itemDiv.querySelector('.custom-supplement')?.value;
+                 let details = '';
+                 if (qty) details += `Gotas: ${qty}`; if (freq) details += `${details ? ', ' : ''}Frec: ${freq}`; if (supplement) details += `${details ? ' | ' : ''}Supl: ${supplement}`;
+                 activadorHTML += `<li>${label}${details ? ` (${details})` : ''}</li>`;
+             }
+            const sistemas = Array.from(form.querySelectorAll('.collapsible:nth-of-type(3) .checkbox-group input[type="checkbox"]:checked')).map(cb => cb.parentElement.textContent.trim()); if (sistemas.length) activadorHTML += `<li>Sistemas: ${sistemas.join(', ')}</li>`;
+            activadorHTML += '</ul>';
+            activadorHTML += generateCustomItemListPreview('Activador Metabólico', 'custom-activador-container');
+            previewHTML += activadorHTML;
+
+            // 4. Nutracéuticos Secundarios
+            previewHTML += generateCheckboxListPreview('Nutracéuticos Secundarios', '.collapsible:nth-of-type(4)');
+            previewHTML += generateCustomItemListPreview('Nutracéuticos Secundarios', 'custom-secundarios-container');
+
+            // 5. Nutracéuticos Complementarios
+            previewHTML += generateCheckboxListPreview('Nutracéuticos Complementarios', '.collapsible:nth-of-type(5)');
+            previewHTML += generateCustomItemListPreview('Nutracéuticos Complementarios', 'custom-complementarios-container');
+
+            // 6. Cosmecéuticos
+            previewHTML += generateCheckboxListPreview('Cosmecéuticos', '.collapsible:nth-of-type(6)');
+            previewHTML += generateCustomItemListPreview('Cosmecéuticos', 'custom-cosmeceuticos-container');
+
+            // 7. Fórmulas Naturales (Usa su helper específico)
+            previewHTML += generateFormulaNaturalListPreview('Fórmulas Naturales', 'formulas-naturales-container');
+
+            // 8. Sueros - Shot Antivejez
+            previewHTML += generateCheckboxListPreview('Sueros - Shot Antivejez', '.collapsible:nth-of-type(8)');
+            previewHTML += generateCustomItemListPreview('Sueros - Shot Antivejez', 'custom-sueros-container');
+
+            // 9. Terapias Antienvejecimiento
+            previewHTML += generateCheckboxListPreview('Terapias Antienvejecimiento', '.collapsible:nth-of-type(9)');
+            previewHTML += generateCustomItemListPreview('Terapias Antienvejecimiento', 'custom-terapias-container');
+
+            // --- Fin de generación de contenido ---
+            previewContent.innerHTML = previewHTML;
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // --- Funcionalidad Guardar y Enviar (NUEVO) ---
+        document.getElementById('patient-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log("Intentando guardar y enviar...");
+
+            // 1. Aquí iría la lógica para guardar los datos en el backend (simulado con un timeout)
+            // const formData = new FormData(e.target);
+            // try {
+            //     const response = await fetch('/api/save-guide', { method: 'POST', body: formData });
+            //     if (!response.ok) throw new Error('Error al guardar');
+            //     const result = await response.json();
+            //     console.log("Guardado exitoso:", result);
+
+                 // 2. Si el guardado es exitoso, mostrar el modal de envío
+                 openModal('send-modal');
+
+            // } catch (error) {
+            //     console.error("Error en el guardado:", error);
+            //     alert("Hubo un error al guardar la guía. Intente de nuevo.");
+            // }
+
+            // --- Simulación sin backend ---
+             alert("Guía 'guardada' localmente (simulación). Abriendo opciones de envío...");
+             openModal('send-modal');
+             // --- Fin Simulación ---
+        });
+
+        // --- Funciones del Modal (NUEVO) ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+             const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Cerrar modal si se hace clic fuera del contenido
+        window.onclick = function(event) {
+            const modal = document.getElementById('send-modal');
+            if (event.target == modal) {
+                closeModal('send-modal');
+            }
+        }
+
+        // Funciones de Envío (Simuladas)
+        function getGuideContentForSharing() {
+            // Generar un resumen simple del contenido para compartir
+            // En una implementación real, podría ser un enlace a una versión web/PDF
+            // o un texto más elaborado.
+            const patientName = document.getElementById('patient-name')?.value || 'Paciente';
+            let content = `Guía para ${patientName}:\n`;
+             // Simplificado: Añadir solo un par de secciones como ejemplo
+             content += "*Fase Remoción:* " + (document.getElementById('remocion-cucharadas')?.value ? 'Sí' : 'No') + "\n";
+             content += "*Nutra. Primarios Seleccionados:* " + document.querySelectorAll('.collapsible:nth-of-type(2) input[type="checkbox"]:checked').length + "\n";
+             // ... añadir más secciones ...
+             content += "\nConsulta la guía completa adjunta o en el enlace.";
+            return encodeURIComponent(content); // Codificar para URL
+        }
+
+        function sendViaWhatsapp() {
+            console.log("Enviando via WhatsApp...");
+            const message = getGuideContentForSharing();
+            // Número de teléfono (opcional, si se tiene guardado o se pide)
+            // const phoneNumber = "1234567890";
+            // window.open(`whatsapp://send?phone=${phoneNumber}&text=${message}`, '_blank');
+            window.open(`whatsapp://send?text=${message}`, '_blank'); // Abre WhatsApp para elegir contacto
+            closeModal('send-modal');
+        }
+
+        function sendViaEmail() {
+            console.log("Enviando via Email...");
+            const subject = encodeURIComponent(`Guía del Paciente - ${document.getElementById('patient-name')?.value || 'Paciente'}`);
+            const body = getGuideContentForSharing();
+            // Dirección de correo (opcional)
+            // const emailAddress = "paciente@ejemplo.com";
+            // window.location.href = `mailto:${emailAddress}?subject=${subject}&body=${body}`;
+            window.location.href = `mailto:?subject=${subject}&body=${body}`; // Abre cliente de correo
+            closeModal('send-modal');
+        }
+
+        function sendToApp() {
+            console.log("Enviando a App Integrada...");
+            // Aquí iría la lógica específica para interactuar con la API de la app
+            alert("Funcionalidad 'Enviar a App' no implementada en esta simulación.");
+            // closeModal('send-modal'); // No cerrar hasta confirmar éxito
+        }
+
+         function downloadPDF() {
+            console.log("Descargando PDF...");
+            // --- Lógica de Generación de PDF (Requiere librería como jsPDF o html2pdf) ---
+             alert("La generación de PDF requiere una librería externa (ej: jsPDF) y no está implementada aquí. Se simulará la descarga.");
+
+             // Ejemplo básico usando jsPDF (si estuviera incluida)
+             /*
+             if (typeof jsPDF !== 'undefined') {
+                 const { jsPDF } = window.jspdf;
+                 const doc = new jsPDF();
+                 const previewContent = document.getElementById('preview-content');
+
+                 // Opcion 1: Usar html2pdf para capturar el HTML de la vista previa
+                 // html2pdf(previewContent).save('guia_paciente.pdf');
+
+                 // Opcion 2: Generar texto manualmente con jsPDF
+                 doc.setFontSize(18);
+                 doc.text(`Guía del Paciente: ${document.getElementById('patient-name')?.value || 'N/A'}`, 10, 10);
+                 doc.setFontSize(12);
+                 doc.text(`Fecha: ${document.getElementById('date')?.value || 'N/A'}`, 10, 20);
+                 doc.line(10, 22, 200, 22); // Línea separadora
+                 let yPos = 30;
+                 previewContent.querySelectorAll('h4, ul, li').forEach(el => {
+                     if (yPos > 280) { // Salto de página aproximado
+                         doc.addPage();
+                         yPos = 10;
+                     }
+                     if (el.tagName === 'H4') {
+                         doc.setFont('helvetica', 'bold');
+                         doc.text(el.textContent, 10, yPos);
+                         yPos += 7;
+                     } else if (el.tagName === 'LI') {
+                         doc.setFont('helvetica', 'normal');
+                         // Quitar el bullet point si se añade manualmente
+                          let text = el.textContent;
+                          // Añadir bullet manual
+                          doc.text(`• ${text}`, 15, yPos);
+                         yPos += 6;
+                     }
+                 });
+
+                 doc.save('guia_paciente.pdf');
+             } else {
+                 console.error("jsPDF no está cargado.");
+                 alert("Error: Librería jsPDF no encontrada para generar PDF.");
+             }
+             */
+             // --- Fin Lógica PDF ---
+
+            closeModal('send-modal');
+        }
+
+    </script>
+</body>
+</html>

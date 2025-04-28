@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longevity Agent AI - Dashboard</title>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* --- Variables --- */
+        :root {
+            --primary-color: #3a7bd5; /* Un azul más tecnológico */
+            --secondary-color: #3aafa9; /* Verde azulado complementario */
+            --accent-color: #f7b733; /* Amarillo/Naranja para alertas o énfasis */
+            --background-color: #f4f7fc;
+            --card-background: #ffffff;
+            --text-color: #2c3e50; /* Azul oscuro/Gris */
+            --text-light: #7f8c8d; /* Gris claro */
+            --border-color: #e8edf3;
+            --shadow-color: rgba(0, 0, 0, 0.07);
+
+            --status-optimal: #2ecc71; /* Verde */
+            --status-caution: #f39c12; /* Naranja */
+            --status-alert: #e74c3c;   /* Rojo */
+            --status-neutral: #3498db; /* Azul */
+
+            --status-optimal-bg: rgba(46, 204, 113, 0.1);
+            --status-caution-bg: rgba(243, 156, 18, 0.1);
+            --status-alert-bg: rgba(231, 76, 60, 0.1);
+            --status-neutral-bg: rgba(52, 152, 219, 0.1);
+        }
+
+        /* --- Reset & Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* --- Layout & Container --- */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr); /* 12-column grid */
+            grid-template-rows: auto;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header i {
+            color: var(--primary-color);
+            font-size: 1.4em;
+            width: 30px; /* Fixed width for alignment */
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.25em;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .card-content { flex-grow: 1; } /* Allows content to fill space */
+
+        /* --- Specific Card Spanning --- */
+        .agent-status-card { grid-column: span 12; /* Full width */ }
+        .monitoring-card { grid-column: span 4; }
+        .aging-clocks-card { grid-column: span 8; }
+        .insights-card { grid-column: span 6; }
+        .digital-twin-card { grid-column: span 6; }
+        .recommendations-card { grid-column: span 7; }
+        .ai-interface-card { grid-column: span 5; }
+
+        /* --- Agent Status Card --- */
+        .agent-status-card .card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .agent-summary p { margin: 0; color: var(--text-light); }
+        .agent-summary strong { color: var(--primary-color); font-weight: 600; }
+        .agent-status-indicator {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .agent-status-optimal { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .agent-status-monitoring { background-color: var(--status-neutral-bg); color: var(--status-neutral); }
+        .agent-status-intervention { background-color: var(--status-caution-bg); color: var(--status-caution); }
+
+        /* --- Monitoring Card --- */
+        .monitoring-sources ul { list-style: none; padding: 0; margin-top: 10px; }
+        .monitoring-sources li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95em;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .monitoring-sources li:last-child { border-bottom: none; }
+        .monitoring-sources li i { color: var(--secondary-color); margin-right: 10px; width: 20px; text-align: center;}
+        .source-status { font-size: 0.8em; font-weight: 500; padding: 3px 8px; border-radius: 10px; }
+        .status-connected { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .status-pending { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .status-error { background-color: var(--status-alert-bg); color: var(--status-alert); }
+        .monitoring-card .button { margin-top: 20px; width: 100%; text-align: center; padding: 10px;}
+
+        /* --- Aging Clocks Card --- */
+        .aging-clocks-card .card-content {
+            position: relative;
+            min-height: 250px; /* Ensure space for chart */
+        }
+        /* Styles for chart canvas are implicit via Chart.js */
+
+        /* --- Insights Card --- */
+        .insights-list ul { list-style: none; padding: 0; }
+        .insights-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .insights-list li:last-child { border-bottom: none; }
+        .insights-list li i {
+            width: 20px; text-align: center; font-size: 1.1em;
+        }
+        .insight-positive i { color: var(--status-optimal); }
+        .insight-negative i { color: var(--status-alert); }
+        .insight-neutral i { color: var(--status-neutral); }
+
+        /* --- Digital Twin Card --- */
+        .digital-twin-summary p { margin-bottom: 15px; font-size: 0.95em; }
+        .digital-twin-projection {
+            background-color: var(--background-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .projection-scenario { font-weight: 600; margin-bottom: 5px; }
+        .projection-outcome { color: var(--status-optimal); font-weight: 500; }
+        .projection-outcome.negative { color: var(--status-caution); }
+
+        /* --- Recommendations Card --- */
+        .recommendations-list ul { list-style: none; padding: 0; }
+        .recommendations-list li {
+            background-color: var(--background-color);
+            border-left: 4px solid var(--secondary-color);
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .recommendation-action { flex-grow: 1; margin-right: 10px; }
+        .recommendation-priority {
+            font-size: 0.8em;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+        .priority-high { background-color: var(--status-alert-bg); color: var(--status-alert); }
+        .priority-medium { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .priority-low { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+
+        /* --- AI Interface Card --- */
+        .ai-chat-history {
+            height: 200px; /* Fixed height for chat */
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: var(--background-color);
+            font-size: 0.9em;
+        }
+        .chat-message { margin-bottom: 12px; }
+        .user-message { text-align: right; color: var(--text-color); }
+        .agent-message { text-align: left; color: var(--primary-color); font-weight: 500; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: none; /* Prevent manual resizing */
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9em;
+            height: 45px; /* Fixed height for single line + padding */
+            overflow: hidden; /* Hide overflow initially */
+        }
+        .chat-input-area button {
+             padding: 0 15px; /* Adjust padding for icon button */
+             min-width: 45px; /* Ensure button has width */
+             height: 45px;
+             font-size: 1.2em;
+        }
+
+        /* --- General Button --- */
+        .button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px; /* Pill shape */
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(58, 123, 213, 0.2);
+            text-align: center;
+        }
+        .button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(58, 123, 213, 0.3); }
+        .button:active { transform: translateY(0px); box-shadow: 0 4px 10px rgba(58, 123, 213, 0.2); }
+        .button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; }
+        .button i { margin-right: 8px; }
+
+        /* --- Responsive --- */
+        @media (max-width: 1100px) {
+             .monitoring-card { grid-column: span 6; }
+             .aging-clocks-card { grid-column: span 6; }
+             .recommendations-card { grid-column: span 12; }
+             .ai-interface-card { grid-column: span 12; }
+        }
+         @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; } /* Single column */
+             /* Reset all spans for single column */
+            .agent-status-card, .monitoring-card, .aging-clocks-card,
+            .insights-card, .digital-twin-card, .recommendations-card,
+            .ai-interface-card { grid-column: span 1; }
+
+             .agent-status-card .card-content { justify-content: center; }
+         }
+
+         /* Utility Classes */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px; /* Match card */
+            z-index: 10;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Agent Status -->
+        <section class="card agent-status-card">
+            <div class="card-header">
+                <i class="fas fa-shield-heart"></i>
+                <h2>Agente de Longevidad AI</h2>
+            </div>
+            <div class="card-content">
+                <div class="agent-summary">
+                    <p>Monitorizando tu bienestar 24/7.</p>
+                    <p>Último análisis: <strong id="lastAnalysisTime">Nunca</strong></p>
+                </div>
+                <div class="agent-status-indicator agent-status-monitoring" id="agentStatusIndicator">
+                    Estado: Monitorizando
+                </div>
+                 <button class="button" id="runAnalysisBtn"><i class="fas fa-play-circle"></i> Ejecutar Análisis Completo</button>
+            </div>
+        </section>
+
+        <!-- Continuous Monitoring -->
+        <section class="card monitoring-card">
+            <div class="card-header">
+                <i class="fas fa-satellite-dish"></i>
+                <h2>Monitoreo Continuo</h2>
+            </div>
+            <div class="card-content monitoring-sources">
+                 <p style="font-size: 0.9em; color: var(--text-light); margin-bottom: 15px;">Fuentes de datos activas:</p>
+                 <ul id="monitoringSourcesList">
+                     <li><i class="fas fa-watch"></i> Reloj Inteligente <span class="source-status status-connected">Conectado</span></li>
+                     <li><i class="fas fa-weight-scale"></i> Báscula Smart <span class="source-status status-connected">Conectado</span></li>
+                     <li><i class="fas fa-vial"></i> Últimos Labs <span class="source-status status-pending">Pendiente</span></li>
+                     <li><i class="fas fa-dna"></i> Datos Genómicos <span class="source-status status-connected">Cargado</span></li>
+                     <li><i class="fas fa-clipboard-question"></i> Cuestionarios <span class="source-status status-connected">Completo</span></li>
+                 </ul>
+                 <button class="button" id="syncSourcesBtn" style="font-size: 0.85em;"><i class="fas fa-sync-alt"></i> Sincronizar Fuentes</button>
+            </div>
+        </section>
+
+        <!-- Aging Clocks -->
+        <section class="card aging-clocks-card">
+            <div class="card-header">
+                <i class="fas fa-clock"></i>
+                <h2>Relojes de Envejecimiento</h2>
+            </div>
+            <div class="card-content">
+                 <p style="font-size: 0.9em; color: var(--text-light); margin-bottom: 15px;">Estimación multi-factorial del ritmo de envejecimiento.</p>
+                 <div style="position: relative; height: 250px;">
+                     <canvas id="agingClocksChart"></canvas>
+                     <div id="agingClockLoader" class="loading-overlay hidden"><div class="spinner"></div></div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Key Insights -->
+        <section class="card insights-card">
+            <div class="card-header">
+                <i class="fas fa-magnifying-glass-chart"></i>
+                <h2>Insights Clave (IA)</h2>
+            </div>
+            <div class="card-content insights-list">
+                <ul id="insightsList">
+                    <li><i class="fas fa-info-circle insight-neutral"></i> Ejecute el análisis para ver insights.</li>
+                    <!-- Insights generated by JS -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Digital Twin -->
+        <section class="card digital-twin-card">
+            <div class="card-header">
+                <i class="fas fa-vr-cardboard"></i> <!-- O fas fa-twins -->
+                <h2>Gemelo Digital (Simulado)</h2>
+            </div>
+            <div class="card-content digital-twin-summary">
+                <p>Modelo virtual para simular intervenciones y proyecciones.</p>
+                <div id="digitalTwinStatus">Estado actual: <strong>Estable</strong>.</div>
+                <div class="digital-twin-projection" id="digitalTwinProjection">
+                    <div class="projection-scenario">Proyección (Ej: +Ejercicio 3x/sem):</div>
+                    <div class="projection-outcome" id="projectionOutcome"> Mejora estimada Edad Biológica: -1.5 años en 6 meses.</div>
+                </div>
+                 <button class="button" id="runSimulationBtn" style="font-size: 0.85em; margin-top: 15px;"><i class="fas fa-project-diagram"></i> Simular Intervención</button>
+            </div>
+        </section>
+
+        <!-- Recommendations -->
+        <section class="card recommendations-card">
+            <div class="card-header">
+                <i class="fas fa-list-check"></i>
+                <h2>Plan de Acción Personalizado</h2>
+            </div>
+            <div class="card-content recommendations-list">
+                <ul id="recommendationsList">
+                     <li><div class="recommendation-action">Ejecute el análisis para obtener recomendaciones.</div></li>
+                    <!-- Recommendations generated by JS -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- AI Interface -->
+        <section class="card ai-interface-card">
+             <div class="card-header">
+                 <i class="fas fa-comments"></i>
+                <h2>Consulta a tu Agente IA</h2>
+            </div>
+            <div class="card-content">
+                <div class="ai-chat-history" id="aiChatHistory">
+                    <div class="chat-message agent-message">Hola! Soy tu Agente de Longevidad. ¿En qué puedo ayudarte hoy?</div>
+                    <!-- Chat messages appended here -->
+                </div>
+                <div class="chat-input-area">
+                    <textarea id="chatInput" placeholder="Escribe tu pregunta..." rows="1"></textarea>
+                    <button class="button" id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const lastAnalysisTimeEl = document.getElementById('lastAnalysisTime');
+            const agentStatusIndicatorEl = document.getElementById('agentStatusIndicator');
+            const runAnalysisBtn = document.getElementById('runAnalysisBtn');
+            const monitoringSourcesListEl = document.getElementById('monitoringSourcesList'); // Placeholder for future dynamic updates
+            const syncSourcesBtn = document.getElementById('syncSourcesBtn');
+            const agingClockLoader = document.getElementById('agingClockLoader');
+            const insightsListEl = document.getElementById('insightsList');
+            const digitalTwinStatusEl = document.getElementById('digitalTwinStatus');
+            const projectionOutcomeEl = document.getElementById('projectionOutcome');
+            const runSimulationBtn = document.getElementById('runSimulationBtn');
+            const recommendationsListEl = document.getElementById('recommendationsList');
+            const aiChatHistoryEl = document.getElementById('aiChatHistory');
+            const chatInputEl = document.getElementById('chatInput');
+            const sendChatBtn = document.getElementById('sendChatBtn');
+            const agingClocksCanvas = document.getElementById('agingClocksChart');
+
+            // --- State Variables ---
+            let chronoAge = 50; // Default or fetched from profile
+            let currentBioAge = 55; // Default or last calculated
+            let lastAnalysisDate = null;
+            let isAnalyzing = false;
+
+             // --- Get CSS Colors ---
+             const rootStyle = getComputedStyle(document.documentElement);
+             const COLOR_OPTIMAL = rootStyle.getPropertyValue('--status-optimal').trim();
+             const COLOR_CAUTION = rootStyle.getPropertyValue('--status-caution').trim();
+             const COLOR_ALERT = rootStyle.getPropertyValue('--status-alert').trim();
+             const COLOR_NEUTRAL = rootStyle.getPropertyValue('--status-neutral').trim();
+
+            // --- Chart.js Initialization (Aging Clocks - Bar Chart Example) ---
+            const agingClocksCtx = agingClocksCanvas.getContext('2d');
+            let agingClocksChart = new Chart(agingClocksCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Cronológica', 'Biológica Gral.', 'Epigenética*', 'Metabólica*', 'Telomérica*'],
+                    datasets: [{
+                        label: 'Edad Estimada (años)',
+                        data: [chronoAge, null, null, null, null], // Initial data, nulls for placeholders
+                        backgroundColor: [
+                            COLOR_NEUTRAL, // Chronological
+                            COLOR_NEUTRAL, // Biological (will be updated)
+                            'rgba(153, 102, 255, 0.7)', // Epigenetic (Purple)
+                            'rgba(255, 159, 64, 0.7)', // Metabolic (Orange)
+                            'rgba(75, 192, 192, 0.7)' // Telomeric (Teal)
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 1,
+                         barThickness: 30, // Adjust bar thickness
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, max: MAX_AGE, title: { display: true, text: 'Edad (Años)' } },
+                        y: { ticks: { autoSkip: false } } // Ensure all labels show
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true },
+                        title: { display: true, text: '*Estimaciones simuladas' }
+                    }
+                }
+            });
+
+             // --- Event Listeners ---
+            syncSourcesBtn.addEventListener('click', simulateSync);
+            runAnalysisBtn.addEventListener('click', simulateFullAnalysis);
+            runSimulationBtn.addEventListener('click', simulateDigitalTwin);
+            sendChatBtn.addEventListener('click', handleChatSend);
+            chatInputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // Prevent newline
+                    handleChatSend();
+                }
+            });
+
+             // --- Simulation Functions ---
+
+            function simulateSync() {
+                 showTemporaryButtonState(syncSourcesBtn, 'Sincronizando...', 1500);
+                 // In real app, trigger backend sync
+                 console.log("Simulating data source sync...");
+            }
+
+            function simulateFullAnalysis() {
+                if (isAnalyzing) return;
+                isAnalyzing = true;
+                runAnalysisBtn.disabled = true;
+                runAnalysisBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analizando...`;
+                agingClockLoader.classList.remove('hidden');
+                // Clear previous results display slightly delayed for visual feedback
+                setTimeout(() => {
+                    insightsListEl.innerHTML = '<li><i class="fas fa-spinner fa-spin"></i> Generando insights...</li>';
+                    recommendationsListEl.innerHTML = '<li><div class="recommendation-action">Generando plan...</div></li>';
+                    digitalTwinStatusEl.textContent = 'Actualizando modelo...';
+                    projectionOutcomeEl.textContent = 'Calculando proyección...';
+                }, 200);
+
+
+                // Simulate delay
+                setTimeout(() => {
+                    lastAnalysisDate = new Date();
+                    lastAnalysisTimeEl.textContent = lastAnalysisDate.toLocaleTimeString();
+
+                    // Generate new simulated data
+                    const randomFactor = (Math.random() - 0.5) * 20; // +/- 10 years deviation
+                    currentBioAge = Math.max(18, Math.min(MAX_AGE, Math.round(chronoAge + randomFactor))); // Clamp 18-120
+
+                    const statusInfo = getOverallStatus(currentBioAge, chronoAge);
+                    const simulatedClocks = generateSimulatedClocks(chronoAge, currentBioAge);
+                    const simulatedInsights = generateSimulatedInsights(simulatedClocks);
+                    const simulatedRecommendations = generateSimulatedRecommendations(statusInfo.status, simulatedInsights);
+
+                    // Update UI
+                    updateAgentStatus(statusInfo.statusText, statusInfo.statusClass);
+                    updateAgingClocksChart(simulatedClocks);
+                    updateInsightsList(simulatedInsights);
+                    updateRecommendationsList(simulatedRecommendations);
+                    updateDigitalTwinStatus(statusInfo.status); // Update twin based on overall status
+
+                    // Finish up
+                    agingClockLoader.classList.add('hidden');
+                    runAnalysisBtn.disabled = false;
+                    runAnalysisBtn.innerHTML = `<i class="fas fa-play-circle"></i> Ejecutar Análisis Completo`;
+                    isAnalyzing = false;
+
+                }, 3000); // 3 second simulation
+            }
+
+             function simulateDigitalTwin() {
+                if (isAnalyzing) return; // Don't simulate while analyzing
+                 showTemporaryButtonState(runSimulationBtn, 'Simulando...', 1500);
+                 setTimeout(() => {
+                     const improvementFactor = -(Math.random() * 2 + 0.5).toFixed(1); // Simulate -0.5 to -2.5 years improvement
+                     const timeframe = Math.random() > 0.5 ? "6 meses" : "1 año";
+                     projectionOutcomeEl.textContent = ` Mejora estimada Edad Biológica: ${improvementFactor} años en ${timeframe}.`;
+                 }, 1400);
+             }
+
+             function handleChatSend() {
+                 const userMessage = chatInputEl.value.trim();
+                 if (!userMessage) return;
+
+                 appendChatMessage(userMessage, 'user');
+                 chatInputEl.value = ''; // Clear input
+
+                 // Simulate agent thinking and responding
+                 setTimeout(() => {
+                     const agentResponse = generateChatResponse(userMessage);
+                     appendChatMessage(agentResponse, 'agent');
+                 }, 800 + Math.random() * 500); // Variable delay
+             }
+
+
+            // --- UI Update Functions ---
+
+            function updateAgentStatus(text, cssClass) {
+                 agentStatusIndicatorEl.textContent = `Estado: ${text}`;
+                 // Reset classes first
+                 agentStatusIndicatorEl.classList.remove('agent-status-optimal', 'agent-status-monitoring', 'agent-status-intervention');
+                 agentStatusIndicatorEl.classList.add(cssClass);
+            }
+
+             function updateAgingClocksChart(clockData) {
+                agingClocksChart.data.datasets[0].data = [
+                    clockData.chrono,
+                    clockData.biological,
+                    clockData.epigenetic,
+                    clockData.metabolic,
+                    clockData.telomere
+                ];
+                // Update biological age bar color based on status
+                const statusInfo = getOverallStatus(clockData.biological, clockData.chrono);
+                agingClocksChart.data.datasets[0].backgroundColor[1] = statusInfo.color; // Update color for Bio Age bar
+
+                agingClocksChart.update();
+            }
+
+             function updateInsightsList(insights) {
+                 insightsListEl.innerHTML = insights.map(insight => `
+                     <li class="insight-${insight.type}">
+                         <i class="fas ${getInsightIcon(insight.type)}"></i>
+                         <span>${insight.text}</span>
+                     </li>`).join('');
+             }
+
+              function updateRecommendationsList(recommendations) {
+                  recommendationsListEl.innerHTML = recommendations.map(rec => `
+                      <li>
+                          <div class="recommendation-action">${rec.action}</div>
+                          <span class="recommendation-priority priority-${rec.priority}">${rec.priority}</span>
+                      </li>
+                  `).join('');
+              }
+
+             function updateDigitalTwinStatus(status) {
+                  let twinStatusText = "Estable";
+                  if (status === 'aged') twinStatusText = "Requiere Atención";
+                  if (status === 'rejuvenated') twinStatusText = "Óptimo";
+                  digitalTwinStatusEl.innerHTML = `Estado actual: <strong>${twinStatusText}</strong>.`;
+             }
+
+             function appendChatMessage(message, sender) {
+                  const messageDiv = document.createElement('div');
+                  messageDiv.classList.add('chat-message', `${sender}-message`);
+                  messageDiv.textContent = message;
+                  aiChatHistoryEl.appendChild(messageDiv);
+                  // Scroll to bottom
+                  aiChatHistoryEl.scrollTop = aiChatHistoryEl.scrollHeight;
+             }
+
+              function showTemporaryButtonState(button, text, duration) {
+                 const originalText = button.innerHTML;
+                 button.disabled = true;
+                 button.innerHTML = text;
+                 setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                 }, duration);
+              }
+
+
+            // --- Data Generation Helpers (SIMULATED) ---
+
+            function getOverallStatus(biological, chronological) {
+                const difference = biological - chronological;
+                if (difference <= -5) return { status: 'rejuvenated', statusText: 'Óptimo', statusClass: 'agent-status-optimal', color: COLOR_OPTIMAL };
+                if (difference >= 5) return { status: 'aged', statusText: 'Intervención Sugerida', statusClass: 'agent-status-intervention', color: COLOR_ALERT };
+                return { status: 'normal', statusText: 'Estable', statusClass: 'agent-status-monitoring', color: COLOR_NEUTRAL };
+            }
+
+            function generateSimulatedClocks(chrono, bio) {
+                // Simulate other clocks based loosely on the main biological age deviation
+                const deviation = bio - chrono;
+                const epigenetic = Math.max(18, Math.min(MAX_AGE, Math.round(chrono + deviation * 1.1 + (Math.random()-0.5)*4))); // More sensitive
+                const metabolic = Math.max(18, Math.min(MAX_AGE, Math.round(chrono + deviation * 0.8 + (Math.random()-0.5)*6))); // Less sensitive, more noisy
+                const telomere = Math.max(18, Math.min(MAX_AGE, Math.round(chrono + deviation * 1.0 + (Math.random()-0.5)*5))); // Similar deviation, different noise
+                 return { chrono, biological: bio, epigenetic, metabolic, telomere };
+            }
+
+             function generateSimulatedInsights(clocks) {
+                 const insights = [];
+                 const bioDiff = clocks.biological - clocks.chrono;
+
+                 if (bioDiff <= -5) insights.push({ type: 'positive', text: 'Edad biológica significativamente menor a la cronológica. ¡Excelente!' });
+                 else if (bioDiff >= 5) insights.push({ type: 'negative', text: 'Edad biológica elevada comparada con la cronológica. Requiere atención.' });
+                 else insights.push({ type: 'neutral', text: 'Edad biológica acorde a la edad cronológica.' });
+
+                 if (clocks.epigenetic > clocks.biological + 3) insights.push({ type: 'negative', text: 'Reloj epigenético acelerado detectado.' });
+                 if (clocks.metabolic > clocks.biological + 4) insights.push({ type: 'negative', text: 'Indicadores metabólicos sugieren revisión.' });
+                 else if (clocks.metabolic < clocks.biological - 3) insights.push({ type: 'positive', text: 'Buen perfil metabólico observado.' });
+
+                 if (clocks.telomere > clocks.biological + 3) insights.push({ type: 'negative', text: 'Posible acortamiento telomérico acelerado.' });
+
+                 // Add a random positive/neutral one
+                 const randomInsights = [
+                     { type: 'positive', text: 'Niveles de actividad física recientes óptimos.' },
+                     { type: 'neutral', text: 'Calidad del sueño estable según wearables.' },
+                     { type: 'positive', text: 'Buena variabilidad de frecuencia cardíaca (HRV) detectada.'},
+                     { type: 'neutral', text: 'Datos genómicos sin variantes de alto riesgo inmediato.'}
+                 ];
+                 if(insights.length < 4) insights.push(randomInsights[Math.floor(Math.random() * randomInsights.length)]);
+
+                 return insights.slice(0, 4); // Limit insights displayed
+             }
+
+             function getInsightIcon(type) {
+                 switch(type) {
+                     case 'positive': return 'fa-check-circle';
+                     case 'negative': return 'fa-exclamation-triangle';
+                     case 'neutral': return 'fa-info-circle';
+                     default: return 'fa-question-circle';
+                 }
+             }
+
+             function generateSimulatedRecommendations(status, insights) {
+                 const recs = [];
+                 let priority = 'low';
+
+                 // Base recommendations
+                 recs.push({ action: "Revisar patrones de sueño y buscar consistencia.", priority: 'medium' });
+                 recs.push({ action: "Asegurar hidratación adecuada (2L+ agua/día).", priority: 'low' });
+                 recs.push({ action: "Incluir 3-5 porciones de vegetales variados diariamente.", priority: 'medium' });
+
+                 // Status-based recommendations
+                 if (status === 'aged') {
+                     priority = 'high';
+                     recs.unshift({ action: "Priorizar manejo del estrés (mindfulness, respiración).", priority: priority });
+                     recs.unshift({ action: "Consultar médico sobre marcadores inflamatorios.", priority: priority });
+                     if (insights.some(i => i.text.includes('metabólicos'))) {
+                         recs.push({ action: "Reducir azúcares añadidos y carbohidratos refinados.", priority: 'high'});
+                     }
+                 } else if (status === 'rejuvenated') {
+                      recs.unshift({ action: "Mantener rutina de ejercicio actual.", priority: 'low' });
+                      recs.push({ action: "Explorar optimización de micronutrientes (Vit D, Magnesio).", priority: 'low' });
+                 } else { // Normal
+                     recs.unshift({ action: "Incrementar ligeramente actividad física si es posible.", priority: 'medium' });
+                 }
+
+                 // Insight-based adjustments (simple example)
+                 if (insights.some(i => i.text.includes('epigenético'))) {
+                     recs.push({ action: "Considerar suplementos de folato/B12 (consultar médico).", priority: status === 'aged' ? 'high' : 'medium'});
+                 }
+                 if (insights.some(i => i.text.includes('telomérico'))) {
+                     recs.push({ action: "Aumentar consumo de antioxidantes (frutos rojos, té verde).", priority: status === 'aged' ? 'high' : 'medium'});
+                 }
+
+
+                 return recs.slice(0, 5); // Limit recommendations
+             }
+
+             function generateChatResponse(userInput) {
+                 const lowerInput = userInput.toLowerCase();
+                 if (lowerInput.includes("edad biológica")) {
+                     return `Tu última edad biológica estimada es ${currentBioAge} años. Se calcula usando múltiples factores, incluyendo biomarcadores y datos de wearables.`;
+                 } else if (lowerInput.includes("recomienda") || lowerInput.includes("sugiere")) {
+                     const recs = generateSimulatedRecommendations(getOverallStatus(currentBioAge, chronoAge).status, generateSimulatedInsights(generateSimulatedClocks(chronoAge, currentBioAge)));
+                     return `Basado en tu perfil actual, te sugiero priorizar: ${recs[0]?.action || 'Mantener hábitos saludables.'}. ¿Quieres detalles sobre alguna recomendación específica?`;
+                 } else if (lowerInput.includes("mejorar") || lowerInput.includes("reducir edad")) {
+                     return "Podemos explorar varias estrategias. Enfocarnos en nutrición antiinflamatoria, optimizar el sueño y manejar el estrés suelen tener un buen impacto. ¿Quieres simular el efecto de alguna intervención específica?";
+                 } else if (lowerInput.includes("hola") || lowerInput.includes("saludos")) {
+                     return "¡Hola! Estoy aquí para ayudarte a optimizar tu salud y longevidad. ¿Qué te gustaría revisar hoy?";
+                 } else {
+                     // Default response
+                     const defaults = [
+                         "Entendido. Estoy analizando tus datos más recientes para darte una respuesta más precisa.",
+                         "Gracias por tu consulta. ¿Hay algún área específica de tu salud (sueño, nutrición, estrés) que te interese discutir?",
+                         "Estoy procesando tu pregunta. Mientras tanto, ¿revisaste tus insights clave recientes?"
+                     ];
+                     return defaults[Math.floor(Math.random() * defaults.length)];
+                 }
+             }
+
+            // --- Initial State ---
+            // Optionally run analysis on load, or wait for user action
+            // simulateFullAnalysis(); // Uncomment to run on load (might be too much)
+            updateAgentStatus("Monitorizando", "agent-status-monitoring"); // Set initial status text
+
+        });
+    </script>
+
+</body>
+</html>

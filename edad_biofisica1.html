@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edad Biofísica - Cálculo</title>
+    <!-- Enlazar CSS Centralizado (Si existe) -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- FontAwesome y Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Doughnut Label Plugin (Opcional, para texto en el centro) -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+
+    <style>
+        /* --- Variables de Color y Base --- */
+        :root {
+            --primary-color: rgb(41, 59, 100);       /* Azul Oscuro */
+            --accent-color: rgb(35, 188, 239);      /* Azul Claro/Cian */
+            --light-gray-start: #f8f9fa;
+            --light-gray-end: #e9ecef;
+            --white: #ffffff;
+            --text-dark: #343a40;
+            --text-medium: #495057;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --success-darker: #218838;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --shadow-light-color: rgba(255, 255, 255, 0.8);
+            --shadow-dark-color: rgba(163, 177, 198, 0.6);
+
+            /* Dark Mode */
+            --dark-bg: #2c2c2c;
+            --dark-card-bg: #3a3a3a;
+            --dark-text-primary: #e0e0e0;
+            --dark-text-secondary: #b0bec5;
+            --dark-border: #444;
+            --dark-shadow-light: rgba(68, 68, 68, 0.8);
+            --dark-shadow-dark: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, var(--light-gray-start), var(--light-gray-end));
+            color: var(--text-dark);
+            margin: 0;
+            padding-top: 70px;
+            padding-left: 60px;
+            transition: padding-left 0.3s ease, background 0.3s ease;
+            box-sizing: border-box;
+        }
+        body.sidebar-expanded { padding-left: 250px; }
+
+        /* Estilos Header/Sidebar (Simplificados - Asume que existen en styles.css) */
+        header { position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: var(--white); display: flex; align-items: center; padding: 0 20px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); z-index: 1000; box-sizing: border-box; }
+        .sidebar { position: fixed; top: 60px; left: 0; width: 60px; height: calc(100vh - 60px); background: var(--primary-color); color: var(--white); overflow: hidden; transition: width 0.3s ease; z-index: 999; }
+        .sidebar.expanded { width: 250px; }
+        .sidebar-toggle, .header-actions i, .menu-item { /* Estilos básicos */ cursor: pointer; }
+        /* ... Resto de estilos básicos de header/sidebar ... */
+        .sidebar-toggle { background: none; border: none; font-size: 1.3rem; color: var(--primary-color); margin-right: 15px;}
+        .header-logo { margin-right: auto; } .logo { height: 40px; }
+        .header-search input { border: 1px solid #ccc; border-radius: 4px; padding: 8px; min-width: 250px;}
+        .header-actions { display: flex; gap: 20px; align-items: center; font-size: 1.2rem; color: var(--primary-color); }
+        .menu-item { display: flex; align-items: center; padding: 15px; white-space: nowrap; color: var(--white); text-decoration: none; box-sizing: border-box;}
+        .menu-item i { font-size: 1.2rem; min-width: 30px; text-align: center; }
+        .menu-item span { margin-left: 15px; opacity: 0; transition: opacity 0.2s ease; display: none; }
+        .sidebar.expanded .menu-item span { opacity: 1; display: inline;}
+        .menu-item:hover, .menu-item.active { background-color: rgba(255, 255, 255, 0.1); }
+
+
+        /* --- Contenido Principal y Sección Bio --- */
+        .main-content { padding: 25px; box-sizing: border-box; width: 100%; }
+        .main-content h2 { color: var(--primary-color); margin-top: 0; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .bio-section {
+            margin-bottom: 30px;
+            background: linear-gradient(145deg, var(--light-gray-end), var(--light-gray-start));
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 6px 6px 12px var(--shadow-dark-color), -6px -6px 12px var(--shadow-light-color);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+         .bio-section > p { color: var(--text-medium); line-height: 1.7; margin-bottom: 25px; }
+
+        /* Grid para las filas de métricas */
+        .metrics-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* NUEVA ESTRUCTURA: Fila para Card + Chart */
+        .metric-row {
+            display: flex;
+            flex-direction: row; /* Lado a lado */
+            gap: 25px; /* Espacio entre card y chart */
+            align-items: flex-start; /* Alinear elementos arriba */
+            /* Mover el fondo y la sombra aquí si se prefiere un contenedor visual único */
+            /* background: linear-gradient(145deg, var(--light-gray-start), var(--light-gray-end)); */
+            /* padding: 20px; */
+            /* border-radius: 10px; */
+            /* box-shadow: 5px 5px 10px var(--shadow-dark-color), -5px -5px 10px var(--shadow-light-color); */
+            /* border-left: 5px solid var(--accent-color); */
+        }
+
+        /* --- Estilo Mejorado para .metric-card (Columna Izquierda) --- */
+        .metric-card {
+            flex: 2; /* Más espacio para los inputs */
+            min-width: 300px; /* Ancho mínimo razonable */
+            background: linear-gradient(145deg, var(--light-gray-start), var(--light-gray-end));
+            padding: 25px;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 5px 5px 10px var(--shadow-dark-color), -5px -5px 10px var(--shadow-light-color);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transition: box-shadow 0.3s ease;
+             border-left: 5px solid var(--accent-color); /* Borde izquierdo corporativo */
+        }
+        .metric-card:hover { box-shadow: 7px 7px 14px var(--shadow-dark-color), -7px -7px 14px var(--shadow-light-color); }
+        .metric-card h3 { margin: 0 0 15px 0; font-size: 1.25rem; font-weight: 600; color: var(--primary-color); border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .metric-card h3 i { color: var(--accent-color); }
+
+
+        /* --- Estilo para .chart-container (Columna Derecha) --- */
+        .chart-container {
+            flex: 1; /* Menos espacio */
+            max-width: 220px; /* Ancho máximo para el gráfico */
+            min-width: 180px;
+            padding: 15px;
+            background: linear-gradient(145deg, var(--light-gray-start), var(--light-gray-end));
+            border-radius: 10px;
+            box-shadow: 5px 5px 10px var(--shadow-dark-color), -5px -5px 10px var(--shadow-light-color);
+            display: flex;
+            flex-direction: column; /* Para título opcional y canvas */
+            align-items: center;
+            justify-content: center;
+             aspect-ratio: 1 / 1; /* Hacerlo cuadrado o ajustar según se necesite */
+        }
+        .chart-container canvas {
+             max-width: 100%;
+             max-height: 100%;
+        }
+        /* Opcional: Título para el gráfico */
+        .chart-container .chart-title {
+             font-size: 0.85rem;
+             font-weight: 500;
+             color: var(--text-medium);
+             margin-bottom: 8px;
+             text-align: center;
+        }
+
+
+        /* Responsividad para apilar en pantallas pequeñas */
+        @media (max-width: 992px) {
+            .metric-row { flex-direction: column; gap: 20px; }
+            .metric-card { min-width: unset; flex-basis: auto; }
+            .chart-container {
+                 flex-basis: auto;
+                 max-width: 300px; /* Permitir que sea más ancho cuando está debajo */
+                 width: 100%; /* Ocupar ancho disponible */
+                 margin-left: 0; /* Resetear margen */
+                 aspect-ratio: 16 / 9; /* Cambiar aspect ratio si se desea */
+                 min-height: 180px; /* Altura mínima */
+             }
+        }
+
+        /* --- Estilos Formularios y Botones (Mejorados con Neumorfismo) --- */
+        .form-group label { font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; color: var(--text-medium); display: block; }
+        .form-group input[type="number"],
+        .form-group select { font-size: 0.95rem; padding: 10px 14px; width: 100%; border: none; border-radius: 8px; background-color: var(--light-gray-end); color: var(--text-dark); box-shadow: inset 3px 3px 6px var(--shadow-dark-color), inset -3px -3px 6px var(--shadow-light-color); transition: box-shadow 0.2s ease; }
+        .form-group input[type="number"]:focus,
+        .form-group select:focus { outline: none; box-shadow: inset 4px 4px 8px var(--shadow-dark-color), inset -4px -4px 8px var(--shadow-light-color), 0 0 0 2px var(--accent-color); }
+        .form-group input[readonly] { background-color: var(--light-gray-start); box-shadow: none; color: var(--text-light); cursor: not-allowed; border: 1px dashed var(--border-color); }
+        .form-group small { font-size: 0.75rem; font-weight: 300; color: var(--text-light); display: block; margin-top: 5px; }
+
+         .result-section { margin-top: 40px; padding: 25px; border-top: none; background: linear-gradient(145deg, var(--light-gray-start), var(--light-gray-end)); border-radius: 10px; box-shadow: 5px 5px 10px var(--shadow-dark-color), -5px -5px 10px var(--shadow-light-color); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+         .result-section h3 { grid-column: 1 / -1; text-align: center; margin-bottom: 20px; font-size: 1.4rem; font-weight: 600; color: var(--primary-color); }
+         .result-section .form-group input { font-weight: 700; font-size: 1.3rem; text-align: center; background-color: var(--white); box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); padding: 12px 10px; }
+         .result-section .form-group label { text-align: center; font-size: 0.95rem; margin-bottom: 8px; }
+
+
+        .action-buttons { display: flex; flex-direction: row; justify-content: center; gap: 25px; align-items: center; margin-top: 40px; flex-wrap: wrap; }
+        .btn { padding: 12px 28px; font-size: 1rem; font-weight: 600; border-radius: 25px; border: none; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; box-shadow: 4px 4px 8px var(--shadow-dark-color), -4px -4px 8px var(--shadow-light-color); }
+        .btn:hover { box-shadow: 6px 6px 12px var(--shadow-dark-color), -6px -6px 12px var(--shadow-light-color); transform: translateY(-2px); }
+        .btn:active { box-shadow: inset 3px 3px 6px var(--shadow-dark-color), inset -3px -3px 6px var(--shadow-light-color); transform: translateY(1px); }
+        .btn.btn-primary { background: linear-gradient(145deg, var(--accent-color), var(--primary-color)); color: var(--white); } /* Gradiente con acento */
+        .btn.btn-primary:hover { background: linear-gradient(145deg, var(--primary-color), var(--accent-color)); }
+        .btn.btn-success { background: linear-gradient(145deg, #34c759 , var(--success-color)); color: var(--white); }
+        .btn.btn-success:hover { background: linear-gradient(145deg, var(--success-color), #34c759); }
+
+        .back-button { position: fixed; bottom: 20px; right: 20px; background: var(--primary-color); color: var(--white); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 100; font-size: 1.2rem; transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        .back-button:hover { background: var(--accent-color); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* --- Estilos Modo Oscuro --- */
+        body.dark-mode { background: var(--dark-bg); color: var(--dark-text-primary); }
+        body.dark-mode header { background: var(--dark-card-bg); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); }
+        body.dark-mode .sidebar { background: #252525; }
+        body.dark-mode .main-content h2 { color: var(--accent-color); }
+
+        body.dark-mode .bio-section { background: var(--dark-card-bg); box-shadow: 6px 6px 12px var(--dark-shadow-dark), -6px -6px 12px var(--dark-shadow-light); border-color: rgba(0, 0, 0, 0.2); }
+        body.dark-mode .bio-section > p { color: var(--dark-text-secondary); }
+
+        body.dark-mode .metric-card { background: var(--dark-card-bg); box-shadow: 5px 5px 10px var(--dark-shadow-dark), -5px -5px 10px var(--dark-shadow-light); border-left-color: var(--primary-color); }
+        body.dark-mode .metric-card:hover { box-shadow: 7px 7px 14px var(--dark-shadow-dark), -7px -7px 14px var(--dark-shadow-light); }
+        body.dark-mode .metric-card h3 { color: var(--accent-color); border-bottom-color: var(--primary-color); }
+        body.dark-mode .metric-card h3 i { color: var(--primary-color); }
+
+        body.dark-mode .chart-container { background: var(--dark-card-bg); box-shadow: 5px 5px 10px var(--dark-shadow-dark), -5px -5px 10px var(--dark-shadow-light); }
+         body.dark-mode .chart-container .chart-title { color: var(--dark-text-secondary); }
+
+
+        body.dark-mode .form-group label { color: var(--dark-text-secondary); }
+        body.dark-mode .form-group input[type="number"],
+        body.dark-mode .form-group select { background-color: #333; color: var(--dark-text-primary); box-shadow: inset 3px 3px 6px var(--dark-shadow-dark), inset -3px -3px 6px var(--dark-shadow-light); }
+        body.dark-mode .form-group input[type="number"]:focus,
+        body.dark-mode .form-group select:focus { box-shadow: inset 4px 4px 8px var(--dark-shadow-dark), inset -4px -4px 8px var(--dark-shadow-light), 0 0 0 2px var(--primary-color); }
+        body.dark-mode .form-group input[readonly] { background-color: #444; box-shadow: none; color: var(--dark-text-secondary); border-color: #555; }
+        body.dark-mode .form-group small { color: #aaa; }
+
+        body.dark-mode .result-section { background: var(--dark-card-bg); box-shadow: 5px 5px 10px var(--dark-shadow-dark), -5px -5px 10px var(--dark-shadow-light); }
+        body.dark-mode .result-section h3 { color: var(--accent-color); }
+        body.dark-mode .result-section .form-group input { background-color: #444; color: var(--dark-text-primary); border-color: #555; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2); }
+        body.dark-mode .result-section .form-group label { color: var(--dark-text-secondary); }
+
+        body.dark-mode .btn { box-shadow: 4px 4px 8px var(--dark-shadow-dark), -4px -4px 8px var(--dark-shadow-light); }
+        body.dark-mode .btn:hover { box-shadow: 6px 6px 12px var(--dark-shadow-dark), -6px -6px 12px var(--dark-shadow-light); }
+        body.dark-mode .btn:active { box-shadow: inset 3px 3px 6px var(--dark-shadow-dark), inset -3px -3px 6px var(--dark-shadow-light); }
+        body.dark-mode .btn.btn-primary { background: linear-gradient(145deg, var(--primary-color), var(--accent-color)); }
+        body.dark-mode .btn.btn-success { background: linear-gradient(145deg, var(--success-darker), var(--success-color)); }
+        body.dark-mode .back-button { background: var(--primary-color); }
+        body.dark-mode .back-button:hover { background: var(--accent-color); color: var(--text-dark); }
+
+    </style>
+</head>
+
+<body>
+    <!-- Header y Sidebar (Sin cambios estructurales) -->
+    <header>
+        <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+        <div class="header-logo"> <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo"> </div>
+        <div class="header-search"> <input type="text" id="main-search-input" placeholder="Buscar paciente o historia..."></div>
+        <div class="header-actions"> <i class="fas fa-bell" onclick="alert('Notificaciones')"></i> <i class="fas fa-moon" id="theme-toggle"></i> <i class="fas fa-user"></i> </div>
+    </header>
+    <nav class="sidebar">
+        <!-- ... Menu Items ... -->
+         <div class="menu-item" onclick="window.location.href='index.html'"> <i class="fas fa-chart-line"></i> <span>Dashboard</span> </div>
+        <div class="menu-item active"> <i class="fas fa-book-medical"></i> <span>Historias</span> </div>
+        <div class="menu-item" onclick="window.location.href='profesionales.html'"> <i class="fas fa-user-md"></i> <span>Profesionales</span> </div>
+        <div class="menu-item" onclick="window.location.href='analitica.html'"> <i class="fas fa-chart-pie"></i> <span>Analítica</span> </div>
+        <div class="menu-item reports-item" id="reportes-item" tabindex="0" onclick="toggleSubmenu()"> <i class="fas fa-file-alt"></i> <span>Reportes</span> <ul class="popup-submenu" id="reportes-submenu"> <li><a href="#">Reporte Paciente</a></li> <li><a href="#">Reporte General</a></li> </ul> </div>
+        <div class="menu-item" onclick="window.location.href='configuracion.html'"> <i class="fas fa-cog"></i> <span>Configuración</span> </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2><i class="fas fa-procedures"></i> Edad Biofísica</h2>
+            <p>Paciente ID: <strong id="patient-id-display">Cargando...</strong></p>
+        </div>
+
+        <div class="bio-section">
+             <p>La edad biofísica se determina mediante la evaluación de parámetros físicos y funcionales...</p>
+
+            <form id="biofisica-metrics-form">
+                <div class="metrics-grid">
+
+                    <!-- Información Personal (Sin gráfico asociado directamente) -->
+                    <div class="metric-card" style="max-width: 100%;"> <!-- Ocupa todo el ancho ya que no tiene gráfico -->
+                        <h3><i class="fas fa-user-circle"></i> Información Personal</h3> {/* Icono cambiado */}
+                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                             <div class="form-group">
+                                <label for="genero">Género</label>
+                                <select id="genero" required>
+                                    <option value="">Seleccione</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="masculino_deportivo">Masculino Deportivo</option>
+                                    <option value="femenino_deportivo">Femenino Deportivo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad-cronologica-input">Edad Cronológica Actual</label>
+                                <input type="number" id="edad-cronologica-input" placeholder="e.g. 50" required min="1" step="1">
+                                <small>Necesaria para calcular la diferencia.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Composición Corporal + Gráfico IMC -->
+                    <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-weight"></i> Composición Corporal</h3>
+                            <div class="form-group"> <label for="peso">Peso (kg)</label> <input type="number" id="peso" step="0.1" required placeholder="e.g. 70.5"> </div>
+                            <div class="form-group"> <label for="altura">Altura (cm)</label> <input type="number" id="altura" required placeholder="e.g. 175" step="1"> </div>
+                            <div class="form-group"> <label for="imc">IMC</label> <input type="number" id="imc" readonly> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">IMC</div>
+                            <canvas id="imcChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Mediciones Corporales + Gráfico ICC -->
+                    <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-ruler-combined"></i> Mediciones Corporales</h3>
+                            <div class="form-group"> <label for="cintura">Circ. cintura (cm)</label> <input type="number" id="cintura" step="0.1" required placeholder="e.g. 85.5"> </div>
+                            <div class="form-group"> <label for="cadera">Circ. cadera (cm)</label> <input type="number" id="cadera" step="0.1" required placeholder="e.g. 100.0"> </div>
+                            <div class="form-group"> <label for="icc">Índice Cintura-Cadera</label> <input type="number" id="icc" readonly> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">ICC</div>
+                            <canvas id="iccChart"></canvas>
+                        </div>
+                    </div>
+
+                     <!-- Composición Grasa + Gráfico % Grasa -->
+                     <div class="metric-row">
+                         <div class="metric-card">
+                            <h3><i class="fas fa-percentage"></i> Composición Grasa</h3>
+                            <div class="form-group"> <label for="grasa-corporal">% Grasa Corporal</label> <input type="number" id="grasa-corporal" step="0.1" required placeholder="e.g. 23.5"> </div>
+                            <div class="form-group"> <label for="grasa-visceral">Nivel Grasa Visceral</label> <input type="number" id="grasa-visceral" min="1" max="59" required placeholder="e.g. 5" step="1"> </div>
+                         </div>
+                         <div class="chart-container">
+                              <div class="chart-title">% Grasa</div>
+                             <canvas id="grasaChart"></canvas> {/* Usaremos % Grasa para el gráfico */}
+                         </div>
+                    </div>
+
+                    <!-- Masa Muscular y Ósea + Gráfico Masa Muscular -->
+                    <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-bone"></i> Masa Muscular y Ósea</h3>
+                            <div class="form-group"> <label for="masa-muscular">Masa Muscular (kg)</label> <input type="number" id="masa-muscular" step="0.1" required placeholder="e.g. 55.2"> </div>
+                            <div class="form-group"> <label for="masa-osea">Masa Ósea (kg)</label> <input type="number" id="masa-osea" step="0.1" required placeholder="e.g. 2.8"> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">M. Muscular (kg)</div>
+                             <canvas id="masaChart"></canvas> {/* Usaremos Masa Muscular */}
+                        </div>
+                    </div>
+
+                    <!-- Signos Vitales + Gráfico Presión Arterial -->
+                     <div class="metric-row">
+                         <div class="metric-card">
+                            <h3><i class="fas fa-heartbeat"></i> Signos Vitales</h3>
+                            <div class="form-group">
+                                <label for="presion-sistolica">Presión Arterial (Sist/Diast)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="presion-sistolica" placeholder="Sist." style="width: 50%;" required step="1">
+                                    <span style="align-self: center; color: var(--text-light);">/</span>
+                                    <input type="number" id="presion-diastolica" placeholder="Diast." style="width: 50%;" required step="1">
+                                </div>
+                            </div>
+                            <div class="form-group"> <label for="frecuencia-cardiaca">Frecuencia Cardíaca (lpm)</label> <input type="number" id="frecuencia-cardiaca" required placeholder="e.g. 65" step="1"> </div>
+                            <div class="form-group"> <label for="saturacion">Saturación O<sub>2</sub> (%)</label> <input type="number" id="saturacion" step="0.1" required placeholder="e.g. 98.5" min="80" max="100"> </div>
+                         </div>
+                         <div class="chart-container">
+                              <div class="chart-title">P. Arterial</div>
+                             <canvas id="signosVitalesChart"></canvas> {/* Graficará Sist/Diast */}
+                         </div>
+                    </div>
+
+                     <!-- Capacidad Funcional + Gráfico Fuerza Agarre -->
+                     <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-running"></i> Capacidad Funcional</h3>
+                            <div class="form-group"> <label for="fuerza-agarre">Fuerza Agarre (kg)</label> <input type="number" id="fuerza-agarre" step="0.1" required placeholder="e.g. 42.5"> </div>
+                            <div class="form-group"> <label for="flexibilidad">Flexibilidad (cm)</label> <input type="number" id="flexibilidad" step="0.1" required placeholder="e.g. 20.0"> </div>
+                        </div>
+                         <div class="chart-container">
+                              <div class="chart-title">F. Agarre (kg)</div>
+                              <canvas id="capacidadFuncionalChart"></canvas> {/* Graficará Fuerza Agarre */}
+                         </div>
+                    </div>
+
+                    <!-- NUEVOS - Reflejos + Gráfico -->
+                    <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-hand-sparkles"></i> Reflejos Digitales (cm)</h3> {/* Icono cambiado */}
+                            <div class="form-group"> <label for="reflejos-digitales">Reflejos Digitales (cm)</label> <input type="number" id="reflejos-digitales" step="0.1" required placeholder="e.g. 15.0"> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">Reflejos (cm)</div>
+                            <canvas id="reflejosChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- NUEVOS - Acomodación + Gráfico -->
+                    <div class="metric-row">
+                         <div class="metric-card">
+                            <h3><i class="fas fa-eye"></i> Acomodación Visual (cm)</h3>
+                            <div class="form-group"> <label for="acomodacion-visual">Acomodación Visual (cm)</label> <input type="number" id="acomodacion-visual" step="0.1" required placeholder="e.g. 30.0"> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">A. Visual (cm)</div>
+                            <canvas id="acomodacionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- NUEVOS - Balance + Gráfico -->
+                    <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-balance-scale"></i> Balance Estático (seg)</h3>
+                            <div class="form-group"> <label for="balance-estatico">Balance Estático (seg)</label> <input type="number" id="balance-estatico" step="0.1" required placeholder="e.g. 20.0"> </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">Balance (seg)</div>
+                            <canvas id="balanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- NUEVOS - Hidratación + Gráfico -->
+                     <div class="metric-row">
+                        <div class="metric-card">
+                            <h3><i class="fas fa-tint"></i> Hidratación Cutánea (seg)</h3>
+                            <div class="form-group"> <label for="hidratacion-cutanea">Hidratación Cutánea (seg)</label> <input type="number" id="hidratacion-cutanea" step="0.1" required placeholder="e.g. 15.0"> </div>
+                        </div>
+                        <div class="chart-container">
+                             <div class="chart-title">Hidrat. (seg)</div>
+                            <canvas id="hidratacionChart"></canvas>
+                        </div>
+                    </div>
+
+                </div> <!-- Fin .metrics-grid -->
+
+                <!-- Sección de Resultados -->
+                <div class="result-section">
+                    <h3>Resultado Estimado</h3>
+                    <div class="form-group">
+                        <label for="resultado-biofisico">Edad Biofísica (años)</label>
+                        <input type="text" id="resultado-biofisico" value="--" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="diferencia-biofisica">Diferencia vs Cronológica</label>
+                        <input type="text" id="diferencia-biofisica" value="--" readonly>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-primary" onclick="calcularEdadBiofisica()">
+                       <i class="fas fa-calculator"></i> Calcular Edad Biofísica
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="guardarResultados()">
+                        <i class="fas fa-save"></i> Guardar Resultados
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Botón para volver -->
+        <div class="back-button"
+            onclick="window.location.href='historias_tabs_bio.html?patientId=' + (currentPatientId || '')">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let currentPatientId = null;
+        let charts = {}; // Objeto para almacenar instancias de gráficos
+
+        // --- Define rangos ideales/normales (EJEMPLOS - AJUSTAR CON DATOS CLÍNICOS) ---
+        const ranges = {
+            imc: { low: 18.5, high: 24.9, optimalLow: 20, optimalHigh: 23 }, // Óptimo más estrecho
+            icc: { low: 0.7, high: 0.9, dangerMale: 1.0, dangerFemale: 0.85 }, // Valores de riesgo varían por género
+            grasaCorporal: { low: 15, high: 25, target: 20 }, // Ejemplo general
+            masaMuscular: { low: 40, high: 70, target: 55 }, // Depende mucho de edad/género/altura
+            presionSistolica: { low: 90, high: 120 },
+            presionDiastolica: { low: 60, high: 80 },
+            fuerzaAgarre: { low: 30, high: 55, target: 40 }, // Depende de edad/género
+            reflejosDigitales: { low: 10, high: 20, lowerIsBetter: true },
+            acomodacionVisual: { low: 20, high: 40, lowerIsBetter: true }, // Más bajo es mejor (más cerca puede enfocar)
+            balanceEstatico: { low: 15, high: 40, target: 25 },
+            hidratacionCutanea: { low: 10, high: 25, target: 18 },
+            // Añadir rangos para otros gráficos (grasaVisceral, etc.) si se grafican
+        };
+
+        // --- Función para obtener color según valor y rangos ---
+        function getGaugeColor(value, range) {
+            if (value === null || value === undefined || isNaN(value)) return '#cccccc'; // Gris para sin valor
+            if (range.lowerIsBetter) {
+                // Si más bajo es mejor
+                if (value < (range.low ?? range.target)) return 'rgba(40, 167, 69, 0.7)'; // Verde (Óptimo/Bueno)
+                if (value <= (range.high ?? (range.target * 1.5))) return 'rgba(255, 193, 7, 0.7)'; // Amarillo (Regular)
+                return 'rgba(220, 53, 69, 0.7)'; // Rojo (Malo)
+            } else {
+                // Si más alto es mejor (o dentro de un rango óptimo)
+                 const optimalL = range.optimalLow ?? range.low ?? range.target;
+                 const optimalH = range.optimalHigh ?? range.high ?? range.target;
+                if (value >= optimalL && value <= optimalH) return 'rgba(40, 167, 69, 0.7)'; // Verde
+                if (value > optimalH && value <= optimalH * 1.2) return 'rgba(255, 193, 7, 0.7)'; // Amarillo (ligeramente alto)
+                if (value < optimalL && value >= optimalL * 0.8) return 'rgba(255, 193, 7, 0.7)'; // Amarillo (ligeramente bajo)
+                return 'rgba(220, 53, 69, 0.7)'; // Rojo (muy alto o muy bajo)
+            }
+        }
+
+       // --- Función para crear o actualizar gráficos tipo Gauge (Doughnut) ---
+        function updateGaugeChart(chartId, label, value, range) {
+            const ctx = document.getElementById(chartId)?.getContext('2d');
+            if (!ctx) return;
+
+            const numericValue = parseFloat(value);
+            const isValidValue = !isNaN(numericValue);
+
+            const gaugeColor = getGaugeColor(numericValue, range);
+            // Determinar el valor máximo realista para la escala del gauge (o usar un valor fijo alto)
+            let maxValue = range.high ? range.high * 1.3 : (range.target ? range.target * 2 : (numericValue > 0 ? numericValue * 2 : 50)); // Estimación
+             if (range.lowerIsBetter && range.high) maxValue = range.high * 1.5; // Ajuste para "lower is better"
+             if (numericValue > maxValue) maxValue = numericValue * 1.2; // Asegurar que el valor actual quepa
+
+
+            const data = {
+                // labels: [label, 'Restante'], // No necesitamos labels visibles
+                datasets: [{
+                    data: isValidValue ? [numericValue, Math.max(0, maxValue - numericValue)] : [0, maxValue], // Valor vs Restante hasta max
+                    backgroundColor: isValidValue ? [gaugeColor, '#e9ecef'] : ['#cccccc', '#e9ecef'], // Color valor vs Gris claro
+                    borderColor: isValidValue ? [gaugeColor, '#e0e0e0'] : ['#cccccc', '#e0e0e0'],
+                    borderWidth: 1,
+                    circumference: 270, // Semi círculo o 3/4
+                    rotation: 225,      // Empezar desde abajo a la izquierda
+                    cutout: '70%',      // Grosor del anillo
+                }]
+            };
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: { enabled: false }, // Deshabilitar tooltips default
+                    legend: { display: false },
+                    datalabels: { // Usar plugin para mostrar el valor en el centro
+                         display: true,
+                         formatter: (val, context) => {
+                             // Mostrar solo el valor principal (el primero en data)
+                             if (context.dataIndex === 0 && isValidValue) {
+                                 return numericValue.toFixed(range.step === 0.1 ? 1 : 0); // Formatear decimales
+                             }
+                             return null; // No mostrar etiqueta para la parte 'restante'
+                         },
+                         color: '#333', // Color del texto central
+                         font: {
+                             size: 16, // Tamaño del texto central
+                             weight: 'bold',
+                             family: 'Poppins, sans-serif'
+                         },
+                         anchor: 'center',
+                         align: 'center'
+                     }
+                }
+            };
+
+            // Destruir gráfico anterior si existe y crear uno nuevo
+            if (charts[chartId]) {
+                charts[chartId].destroy();
+            }
+            charts[chartId] = new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: options,
+                plugins: [ChartDataLabels] // Registrar el plugin
+            });
+        }
+
+         // --- Función específica para gráfico de Presión Arterial (ej: 2 barras) ---
+         function updateBPChart(chartId, syst, diast, rangeSyst, rangeDiast) {
+            const ctx = document.getElementById(chartId)?.getContext('2d');
+            if (!ctx) return;
+
+            const numSyst = parseFloat(syst);
+            const numDiast = parseFloat(diast);
+            const isValidSyst = !isNaN(numSyst);
+            const isValidDiast = !isNaN(numDiast);
+
+            const systColor = getGaugeColor(numSyst, rangeSyst);
+            const diastColor = getGaugeColor(numDiast, rangeDiast);
+
+            const data = {
+                labels: ['Sistólica', 'Diastólica'],
+                datasets: [{
+                    data: [isValidSyst ? numSyst : 0, isValidDiast ? numDiast : 0],
+                    backgroundColor: [isValidSyst ? systColor : '#cccccc', isValidDiast ? diastColor : '#cccccc'],
+                    borderColor: [isValidSyst ? systColor.replace('0.7', '1') : '#bbbbbb', isValidDiast ? diastColor.replace('0.7', '1') : '#bbbbbb'], // Más opaco
+                    borderWidth: 1,
+                    barPercentage: 0.6, // Ancho de barras
+                    categoryPercentage: 0.7,
+                }]
+            };
+
+             const options = {
+                indexAxis: 'y', // Barras horizontales para mejor lectura de etiquetas
+                responsive: true,
+                maintainAspectRatio: false, // Permitir que se ajuste al contenedor
+                scales: {
+                    x: { beginAtZero: false, // No necesariamente empezar en 0 para PA
+                         min: 40, // Mínimo realista
+                         suggestedMax: 180 // Máximo común
+                        },
+                    y: { ticks: { font: { size: 10 } } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                         callbacks: { label: (context) => `${context.label}: ${context.raw}` }
+                     },
+                    datalabels: { display: false } // Desactivar para gráfico de barras
+                }
+            };
+
+
+             if (charts[chartId]) {
+                charts[chartId].destroy();
+            }
+            charts[chartId] = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+         }
+
+
+        // --- Inicializar todos los gráficos ---
+        function initializeCharts() {
+             charts = {}; // Resetear instancias
+             // Definir qué gráfico usar para cada canvas
+             updateGaugeChart('imcChart', 'IMC', NaN, ranges.imc);
+             updateGaugeChart('iccChart', 'ICC', NaN, ranges.icc);
+             updateGaugeChart('grasaChart', '% Grasa', NaN, ranges.grasaCorporal);
+             updateGaugeChart('masaChart', 'M. Muscular', NaN, ranges.masaMuscular);
+             updateBPChart('signosVitalesChart', NaN, NaN, ranges.presionSistolica, ranges.presionDiastolica);
+             updateGaugeChart('capacidadFuncionalChart', 'F. Agarre', NaN, ranges.fuerzaAgarre);
+             updateGaugeChart('reflejosChart', 'Reflejos', NaN, ranges.reflejosDigitales);
+             updateGaugeChart('acomodacionChart', 'A. Visual', NaN, ranges.acomodacionVisual);
+             updateGaugeChart('balanceChart', 'Balance', NaN, ranges.balanceEstatico);
+             updateGaugeChart('hidratacionChart', 'Hidratación', NaN, ranges.hidratacionCutanea);
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            currentPatientId = new URLSearchParams(window.location.search).get('patientId');
+            const displayElement = document.getElementById('patient-id-display');
+            if (displayElement) displayElement.textContent = currentPatientId || "No especificado";
+
+            initializeCharts(); // Inicializar gráficos vacíos
+
+             // --- Add Event Listeners para actualizar gráficos dinámicamente ---
+            const pesoInput = document.getElementById('peso');
+            const alturaInput = document.getElementById('altura');
+            const imcInput = document.getElementById('imc');
+            const cinturaInput = document.getElementById('cintura');
+            const caderaInput = document.getElementById('cadera');
+            const iccInput = document.getElementById('icc');
+            const grasaInput = document.getElementById('grasa-corporal');
+            const masaMuscInput = document.getElementById('masa-muscular');
+            const sistInput = document.getElementById('presion-sistolica');
+            const diastInput = document.getElementById('presion-diastolica');
+            const agarreInput = document.getElementById('fuerza-agarre');
+             const reflejosInput = document.getElementById('reflejos-digitales');
+             const acomodacionInput = document.getElementById('acomodacion-visual');
+             const balanceInput = document.getElementById('balance-estatico');
+             const hidratacionInput = document.getElementById('hidratacion-cutanea');
+
+
+            const calcularYActualizarIMC = () => {
+                let imc = NaN;
+                if (pesoInput?.value && alturaInput?.value) {
+                    const peso = parseFloat(pesoInput.value);
+                    const alturaCm = parseFloat(alturaInput.value);
+                    if (alturaCm > 0) {
+                        const alturaM = alturaCm / 100;
+                        imc = peso / (alturaM * alturaM);
+                        if (imcInput) imcInput.value = imc.toFixed(2);
+                    } else if (imcInput) imcInput.value = '';
+                } else if (imcInput) imcInput.value = '';
+                updateGaugeChart('imcChart', 'IMC', imc, ranges.imc);
+            };
+            pesoInput?.addEventListener('input', calcularYActualizarIMC);
+            alturaInput?.addEventListener('input', calcularYActualizarIMC);
+
+             const calcularYActualizarICC = () => {
+                let icc = NaN;
+                 if (cinturaInput?.value && caderaInput?.value) {
+                    const cintura = parseFloat(cinturaInput.value);
+                    const cadera = parseFloat(caderaInput.value);
+                    if (cadera > 0) {
+                        icc = cintura / cadera;
+                        if(iccInput) iccInput.value = icc.toFixed(2);
+                     } else if(iccInput) iccInput.value = '';
+                 } else if(iccInput) iccInput.value = '';
+                 updateGaugeChart('iccChart', 'ICC', icc, ranges.icc);
+             };
+             cinturaInput?.addEventListener('input', calcularYActualizarICC);
+             caderaInput?.addEventListener('input', calcularYActualizarICC);
+
+             // Listeners para otros inputs que actualizan gráficos directamente
+             grasaInput?.addEventListener('input', (e) => updateGaugeChart('grasaChart', '% Grasa', e.target.value, ranges.grasaCorporal));
+             masaMuscInput?.addEventListener('input', (e) => updateGaugeChart('masaChart', 'M. Muscular', e.target.value, ranges.masaMuscular));
+             agarreInput?.addEventListener('input', (e) => updateGaugeChart('capacidadFuncionalChart', 'F. Agarre', e.target.value, ranges.fuerzaAgarre));
+             reflejosInput?.addEventListener('input', (e) => updateGaugeChart('reflejosChart', 'Reflejos', e.target.value, ranges.reflejosDigitales));
+             acomodacionInput?.addEventListener('input', (e) => updateGaugeChart('acomodacionChart', 'A. Visual', e.target.value, ranges.acomodacionVisual));
+             balanceInput?.addEventListener('input', (e) => updateGaugeChart('balanceChart', 'Balance', e.target.value, ranges.balanceEstatico));
+             hidratacionInput?.addEventListener('input', (e) => updateGaugeChart('hidratacionChart', 'Hidratación', e.target.value, ranges.hidratacionCutanea));
+
+
+             // Listener para Presión Arterial (actualiza un gráfico con 2 valores)
+             const actualizarGraficoPA = () => {
+                updateBPChart('signosVitalesChart', sistInput?.value, diastInput?.value, ranges.presionSistolica, ranges.presionDiastolica);
+             }
+             sistInput?.addEventListener('input', actualizarGraficoPA);
+             diastInput?.addEventListener('input', actualizarGraficoPA);
+
+
+            // --- Sidebar y Theme Toggle (sin cambios lógicos) ---
+           const sidebar = document.querySelector('.sidebar'); const toggleBtn = document.querySelector('.sidebar-toggle'); const body = document.body; if (toggleBtn && sidebar && body) { toggleBtn.addEventListener('click', function () { body.classList.toggle('sidebar-expanded'); sidebar.classList.toggle('expanded'); /* ... */ }); } const themeToggle = document.getElementById('theme-toggle'); if (themeToggle) { const currentTheme = localStorage.getItem('theme'); if (currentTheme === 'dark') { document.body.classList.add('dark-mode'); } themeToggle.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); if (document.body.classList.contains('dark-mode')) { localStorage.setItem('theme', 'dark'); } else { localStorage.setItem('theme', 'light'); } }); }
+        });
+
+        // --- Calcular Edad Biofísica (sin cambios lógicos) ---
+        function calcularEdadBiofisica() { /* ... */ console.log("Calculando..."); const edadCronoInput = document.getElementById('edad-cronologica-input'); if (!edadCronoInput || !edadCronoInput.value) { alert("Ingrese Edad Cronológica."); edadCronoInput?.focus(); return; } const edadCronologica = parseFloat(edadCronoInput.value); if (isNaN(edadCronologica) || edadCronologica <= 0) { alert("Edad Cronológica inválida."); edadCronoInput.focus(); return; } const inputs = [ { id: 'imc', ideal: 22, factor: 0.5, inverse: false }, { id: 'icc', ideal: 0.85, factor: 15, inverse: false }, { id: 'grasa-corporal', ideal: 20, factor: 0.3, inverse: false }, { id: 'frecuencia-cardiaca', ideal: 65, factor: 0.1, inverse: false }, { id: 'presion-sistolica', ideal: 115, factor: 0.15, inverse: false }, { id: 'fuerza-agarre', ideal: 40, factor: 0.2, inverse: true }, { id: 'flexibilidad', ideal: 25, factor: 0.1, inverse: true }, { id: 'reflejos-digitales', ideal: 15, factor: 0.1, inverse: false }, { id: 'acomodacion-visual', ideal: 25, factor: 0.1, inverse: false }, { id: 'balance-estatico', ideal: 25, factor: 0.1, inverse: true }, { id: 'hidratacion-cutanea', ideal: 18, factor: 0.05, inverse: false }, ]; let edadBioCalculada = edadCronologica; let validInputs = 0; for (const inputConf of inputs) { const inputElem = document.getElementById(inputConf.id); const valor = parseFloat(inputElem?.value); if (!inputElem || isNaN(valor)) { continue; } validInputs++; let desviacion = valor - inputConf.ideal; if (inputConf.inverse) { desviacion = inputConf.ideal - valor; } if (desviacion > 0) { edadBioCalculada += desviacion * inputConf.factor; } } if (validInputs < inputs.length / 2) { alert("Datos insuficientes."); document.getElementById('resultado-biofisico').value = "--"; document.getElementById('diferencia-biofisica').value = "--"; return; } edadBioCalculada = Math.round(edadBioCalculada); const diferencia = edadBioCalculada - edadCronologica; const textoDiferencia = diferencia === 0 ? "Igual" : `${diferencia > 0 ? '+' : ''}${diferencia} ${Math.abs(diferencia) === 1 ? 'año' : 'años'}`; document.getElementById('resultado-biofisico').value = edadBioCalculada; document.getElementById('diferencia-biofisica').value = textoDiferencia; console.log("Edad Biofísica Estimada:", edadBioCalculada); }
+
+        // --- Guardar Resultados (sin cambios lógicos) ---
+        function guardarResultados() { /* ... */ console.log("Guardando..."); if (!currentPatientId) { alert("Paciente no identificado."); return; } const edadBioInput = document.getElementById('resultado-biofisico'); const diffInput = document.getElementById('diferencia-biofisica'); if (!edadBioInput || !diffInput || edadBioInput.value === '--' || diffInput.value === '--') { alert("Calcule antes de guardar."); return; } const formData = new FormData(document.getElementById('biofisica-metrics-form')); formData.append('patientId', currentPatientId); formData.append('edadCronologica', document.getElementById('edad-cronologica-input')?.value || ''); formData.append('edadBiofisicaCalculada', edadBioInput.value); formData.append('edadDiferencialCalculada', diffInput.value); console.log("Enviando:", Object.fromEntries(formData)); const saveButton = document.querySelector('button[onclick="guardarResultados()"]'); if (saveButton) { saveButton.disabled = true; saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...'; } fetch('guardar_biofisica.php', { method: 'POST', body: formData }).then(response => { if (!response.ok) return response.text().then(text => { throw new Error(`Error HTTP: ${response.status} ${response.statusText} - ${text}`); }); return response.json(); }).then(data => { console.log('Respuesta:', data); if (data.status === 'success') { alert('Resultados guardados.'); } else { alert(`Error al guardar: ${data.message || 'Error desconocido.'}`); } }).catch(error => { console.error('Error fetch:', error); alert(`Error conexión: ${error.message}`); }).finally(() => { if (saveButton) { saveButton.disabled = false; saveButton.innerHTML = '<i class="fas fa-save"></i> Guardar Resultados'; } }); }
+
+        // --- Submenu Sidebar (sin cambios lógicos) ---
+        function toggleSubmenu() { /* ... */ const reportsItem = document.getElementById('reportes-item'); const sidebar = document.querySelector('.sidebar'); if (reportsItem && sidebar && !sidebar.classList.contains('expanded')) { const submenu = document.getElementById('reportes-submenu'); if (submenu) { const rect = reportsItem.getBoundingClientRect(); submenu.style.position = 'absolute'; submenu.style.top = `${rect.top}px`; submenu.style.left = `${rect.right}px`; submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block'; } } }
+         document.addEventListener('click', function(event) { const sidebar = document.querySelector('.sidebar'); const reportsItem = document.getElementById('reportes-item'); const submenu = document.getElementById('reportes-submenu'); if (sidebar && !sidebar.classList.contains('expanded') && submenu && reportsItem) { const isClickInside = reportsItem.contains(event.target) || submenu.contains(event.target); if (!isClickInside && submenu.style.display === 'block') { submenu.style.display = 'none'; } } });
+
+    </script>
+</body>
+</html>

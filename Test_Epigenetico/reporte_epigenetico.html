@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Epigenético Wellness</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> <!-- Para etiquetas en gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script> <!-- Si usas ejes de tiempo -->
+    <link rel="stylesheet" href="reporte_styles.css">
+</head>
+<body>
+    <div class="report-container">
+        <!-- Sección 1: Portada -->
+        <section class="cover-section">
+            <div class="cover-content">
+                <div class="cover-text">
+                    <p class="report-type">Tu Informe Epigenético Wellness</p>
+                    <h1>Informe de Optimización Wellness</h1>
+                    <div class="patient-details">
+                        <p id="patient-name">Cargando...</p>
+                        <p id="patient-id">ID: Cargando...</p>
+                        <p id="report-date">Fecha: Cargando...</p>
+                    </div>
+                </div>
+                <div class="cover-logo">
+                    <img src="assets/spotheal_logo.png" alt="Spot Heal Logo"> <!-- Asume que tienes este logo -->
+                </div>
+            </div>
+            <div class="cover-image">
+                <img src="assets/wellness_food.jpg" alt="Comida saludable"> <!-- Asume que tienes esta imagen -->
+            </div>
+             <div class="cover-footer">
+                 <span>Tu Informe Epigenético Wellness</span>
+                 <span>www.spotheal.com</span>
+             </div>
+        </section>
+
+        <!-- Sección 2: Introducción -->
+        <section class="intro-section content-padding">
+             <div class="intro-header">
+                 <div class="patient-id-small">
+                     <span id="intro-patient-name"></span><br>
+                     <span id="intro-patient-id"></span>
+                 </div>
+                 <span class="website">www.spotheal.com</span>
+                 <span class="welcome-text">Bienvenido a tu Informe Epigenético</span>
+             </div>
+             <div class="intro-main">
+                 <div class="intro-text-block">
+                     <h2>Hola, <span id="intro-hello-name"></span></h2>
+                     <h3>¡Estamos encantados de presentarte los resultados de tu Test Epigenético!</h3>
+                     <h4>Tus resultados</h4>
+                     <p>Este es tu informe epigenético... (texto completo)... podrás realizar cambios positivos en tu dieta diaria y la interacción con el ambiente que te rodea.</p>
+                     <p>Los resultados se dividen en secciones... (texto completo)... información más valiosa y relevante.</p>
+                     <p>En la página "Resumen de tus resultados"... (texto completo)... optimizar tu bienestar y salud.</p>
+                     <h4>Si tienes cualquier pregunta, no dudes en contactarnos.</h4>
+                     <p class="att">Atentamente,<br>Dra. Daniela Steib | Dra. Leydimar Duran | Dra. Stephanie Dona | Dr. Manuel Gonzalez</p>
+
+                     <div class="contact-info">
+                         <h4>¿Tienes alguna pregunta?</h4>
+                         <div class="contact-details">
+                             <i class="fas fa-comments contact-icon"></i>
+                             <div>
+                                 <strong>Contáctanos:</strong><br>
+                                 Teléfono: +58-424-2917581<br>
+                                 Email: drspothealve@gmail.com
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="intro-image">
+                      <img src="assets/doctor_image.png" alt="Doctora sonriendo"> <!-- Asume que tienes esta imagen -->
+                 </div>
+             </div>
+        </section>
+
+        <!-- Sección 3: Resumen de Resultados -->
+        <section class="summary-section content-padding" id="summary">
+            <div class="section-header">
+                <span class="section-breadcrumb">Tu Informe Epigenético</span>
+                <span class="section-title-main">Resumen de tus resultados <span class="section-number">Sección 01</span></span>
+            </div>
+            <div class="summary-content">
+                <div class="summary-intro">
+                    <h2>Resumen de tus resultados</h2>
+                    <div>
+                        <h3>Aquí está el resumen de resultados de tu Informe Epigenético</h3>
+                        <p>El siguiente gráfico muestra la prioridad de cada uno de los indicadores epigenéticos. Los consejos del informe se enfocarán en aquellos indicadores que estén más alejados del Nivel Optimizado.</p>
+                    </div>
+                </div>
+                <div class="summary-charts">
+                    <div class="chart-block">
+                        <h4>Indicadores Epigenéticos para valoración de nutrientes</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="nutrientsChart"></canvas>
+                        </div>
+                        <p class="chart-note">Nivel más alto indica mayor necesidad.</p>
+                    </div>
+                    <div class="chart-block">
+                        <h4>Indicadores Epigenéticos para reducir carga o exposición</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="exposureChart"></canvas>
+                        </div>
+                        <p class="chart-note">Nivel más alto indica mayor necesidad de reducción.</p>
+                    </div>
+                </div>
+                 <div class="summary-legend">
+                     <p>Este test epigenético se realiza mediante estudios cualitativos...</p>
+                     <ul>
+                         <li><span class="legend-color optimized"></span> Nivel Optimizado</li>
+                         <li><span class="legend-color low-need"></span> Necesidad Baja de Optimización</li>
+                         <li><span class="legend-color medium-need"></span> Necesidad Media de Optimización</li>
+                         <li><span class="legend-color high-need"></span> Necesidad Alta de Optimización</li>
+                     </ul>
+                 </div>
+                 <div class="summary-categories" id="summary-category-list">
+                     <!-- Se generará con JS -->
+                     <div class="category-column">
+                         <h4>Necesidad de Optimización Alta</h4>
+                         <ul id="cat-high"></ul>
+                     </div>
+                     <div class="category-column">
+                         <h4>Necesidad de Optimización Media</h4>
+                         <ul id="cat-medium"></ul>
+                     </div>
+                     <div class="category-column">
+                         <h4>Necesidad de Optimización Baja</h4>
+                         <ul id="cat-low"></ul>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Sección 4: Indicadores Detallados (Generados dinámicamente) -->
+        <div id="detailed-sections-container">
+            <!-- Aquí JS insertará las secciones de Vitaminas, Minerales, etc. -->
+        </div>
+
+        <!-- Footer del Informe -->
+        <footer class="report-footer content-padding">
+            <p>Este documento es sólo para fines informativos. Consulte a un profesional de la salud antes de emprender cualquier plan nutricional o programa dietético. Es su responsabilidad evaluar su propia condición médica y física, o la de sus clientes, y determinar de forma individual si debe realizar, utilizar o adaptar cualquier información o contenidos de este reporte o de nuestro sitio web.</p>
+        </footer>
+    </div>
+
+    <script src="reporte_script.js"></script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historias - Edades Biológicas</title>
+  <!-- Enlazar CSS de pestañas y estilo adaptado -->
+  <link rel="stylesheet" href="historias_tabs_bio.css">
+  <!-- FontAwesome (versión recomendada) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Chart.js para gráficos de tendencias -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  //<style>
+    /* Variables CSS */
+    :root {
+      --primary-color: #293B64;
+      --sky-blue: #23BCEF;
+      --bg-color: #f0f2f5;
+      --bg-gradient: linear-gradient(145deg, #293B64, #1e2b4a);
+      --neumorph-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2), -6px -6px 12px rgba(255, 255, 255, 0.1);
+      --neumorph-shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Estructura principal */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Barra lateral neumórfica */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-gradient);
+      box-shadow: var(--neumorph-shadow);
+      padding: 1rem;
+      transition: width 0.3s ease;
+      position: fixed;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .menu-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #ffffffcc;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .menu-item:hover {
+      background: rgba(79, 209, 225, 0.1);
+      box-shadow: var(--neumorph-shadow-inset);
+      color: var(--sky-blue);
+    }
+
+    .menu-item.active {
+      background: rgba(79, 209, 225, 0.1);
+      color: var(--sky-blue);
+      box-shadow: var(--neumorph-shadow-inset);
+    }
+
+    .menu-item i {
+      font-size: 1.2rem;
+      width: 30px;
+    }
+
+    /* Contenido principal (adaptado para funcionar con el sidebar) */
+    .main-content {
+      flex: 1;
+      margin-left: 240px; /* Igual al ancho del sidebar */
+      width: calc(100% - 240px);
+    }
+
+    /* Ajustes para mantener la estructura original */
+    header {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>*/
+</head>
+<body>
+  <!-- Sidebar lateral izquierdo -->
+  <div class="sidebar">
+    <div class="menu-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="menu-item active" onclick="window.location.href='historias.html'">
+      <i class="fas fa-folder-open"></i>
+      <span>Historias</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='profesionales.html'">
+      <i class="fas fa-user-md"></i>
+      <span>Profesionales</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='analitica.html'">
+      <i class="fas fa-chart-pie"></i>
+      <span>Analítica</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='reportes.html'">
+      <i class="fas fa-file-alt"></i>
+      <span>Reportes</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='configuracion.html'">
+      <i class="fas fa-cog"></i>
+      <span>Configuración</span>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <header>
+      <!-- Logo en la esquina superior izquierda con tamaño aumentado -->
+      <div class="header-logo">
+        <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+        <h1></h1>
+      </div>
+      <!-- Ícono de modo oscuro -->
+      <div class="header-dark-toggle">
+        <i class="fas fa-moon" id="theme-toggle"></i>
+      </div>
+    </header>
+
+    <div class="tabs-container">
+      <!-- Barra de pestañas con íconos -->
+      <ul class="tabs">
+        <li class="tab active" data-tab="tab1">
+          <i class="fas fa-info-circle"></i> Datos Generales
+        </li>
+        <li class="tab" data-tab="tab2">
+          <i class="fas fa-notes-medical"></i> Historia Clínica
+        </li>
+        <li class="tab" data-tab="tab3">
+          <i class="fas fa-flask"></i> Edad Biológica
+        </li>
+        <li class="tab" data-tab="tab4">
+          <i class="fas fa-heartbeat"></i> Guía del Paciente
+        </li>
+      </ul>
+
+      <!-- Contenido de cada pestaña -->
+      <div class="tabs-content">
+        <!-- Pestaña 1: Datos Generales -->
+        <div id="tab1" class="tab-content active">
+          <h2>Datos Generales</h2>
+          <div class="form-grid">
+            <!-- Campos de Datos Generales (sin cambios) -->
+            <div class="form-group">
+              <label for="nacionalidad">Nacionalidad</label>
+              <input type="text" id="nacionalidad" placeholder="e.g. Venezolano">
+            </div>
+            <div class="form-group">
+              <label for="identificacion">Identificación</label>
+              <input type="text" id="identificacion" placeholder="e.g. V-12345678">
+            </div>
+            <div class="form-group">
+              <label for="apellidos">Apellidos</label>
+              <input type="text" id="apellidos">
+            </div>
+            <div class="form-group">
+              <label for="nombres">Nombres</label>
+              <input type="text" id="nombres">
+            </div>
+            <div class="form-group">
+              <label for="fecha-nacimiento">Fecha Nacimiento (dd/mm/aa)</label>
+              <input type="text" id="fecha-nacimiento" placeholder="dd/mm/aaaa">
+            </div>
+            <div class="form-group">
+              <label for="edad-cronologica">Edad Cronológica</label>
+              <input type="number" id="edad-cronologica">
+            </div>
+            <div class="form-group">
+              <label for="genero">Género</label>
+              <select id="genero">
+                <option>Masculino</option>
+                <option>Femenino</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edo-civil">Estado Civil</label>
+              <input type="text" id="edo-civil" placeholder="e.g. Soltero/a">
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="text" id="telefono" placeholder="e.g. +584123456789">
+            </div>
+            <div class="form-group">
+              <label for="profesion">Profesión</label>
+              <input type="text" id="profesion">
+            </div>
+            <div class="form-group">
+              <label for="direccion">Dirección</label>
+              <input type="text" id="direccion">
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" placeholder="e.g. usuario@correo.com">
+            </div>
+            <div class="form-group">
+              <label for="pais">País</label>
+              <input type="text" id="pais">
+            </div>
+            <div class="form-group">
+              <label for="ciudad">Ciudad</label>
+              <input type="text" id="ciudad">
+            </div>
+            <div class="form-group">
+              <label for="grupo-sanguineo">Grupo Sanguíneo</label>
+              <select id="grupo-sanguineo">
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+                <option>O+</option>
+                <option>O-</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pestaña 2: Historia Clínica -->
+        <div id="tab2" class="tab-content">
+          <h2>Historia Clínica</h2>
+          <div class="form-group full-width">
+            <label for="antecedentes-familiares">Antecedentes Familiares</label>
+            <textarea id="antecedentes-familiares"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label for="antecedentes-personales">Antecedentes Personales</label>
+            <textarea id="antecedentes-personales"></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label for="habitos">Hábitos (alimentación, ejercicio, sueño, etc.)</label>
+            <textarea id="habitos"></textarea>
+          </div>
+        </div>
+
+        <!-- Pestaña 3: Edad Biológica -->
+        <div id="tab3" class="tab-content">
+          <h2>Edad Biológica</h2>
+          <p>Edad Cronológica Vs Edad Biológica:</p>
+          
+          <!-- Cards de las 4 Edades -->
+          <div class="bio-ages-grid">
+            <div class="bio-age-card" onclick="abrirBiofisica()">
+              <h3><i class="fas fa-procedures"></i> Edad Biofísica</h3>
+              <div class="bio-age-value" id="edad-biofisica">--</div>
+            </div>
+            <div class="bio-age-card" onclick="abrirBioquimica()">
+              <h3><i class="fas fa-vial"></i> Edad Bioquímica</h3>
+              <div class="bio-age-value" id="edad-bioquimica">--</div>
+            </div>
+            <div class="bio-age-card" onclick="abrirOrtomo()">
+              <h3><i class="fas fa-atom"></i> Edad Ortomolecular</h3>
+              <div class="bio-age-value" id="edad-ortomolecular">--</div>
+            </div>
+            <div class="bio-age-card" onclick="abrirGenetica()">
+              <h3><i class="fas fa-dna"></i> Edad Genética</h3>
+              <div class="bio-age-value" id="edad-genetica">--</div>
+            </div>
+          </div>
+          
+          <!-- Sección Comparativa de Edades -->
+          <h3 class="subtitle">Diferencial entre Edades</h3>
+          <div class="comparison-cards">
+            <div class="comparison-card">
+              <h4>Cronológica</h4>
+              <p id="compare-crono">--</p>
+            </div>
+            <div class="comparison-card">
+              <h4>Biofísica</h4>
+              <p id="compare-biofisica">--</p>
+            </div>
+            <div class="comparison-card">
+              <h4>Bioquímica</h4>
+              <p id="compare-bioquimica">--</p>
+            </div>
+            <div class="comparison-card">
+              <h4>Ortomolecular</h4>
+              <p id="compare-ortomolecular">--</p>
+            </div>
+            <div class="comparison-card">
+              <h4>Genética</h4>
+              <p id="compare-genetica">--</p>
+            </div>
+          </div>
+          
+          <!-- Controles y gráfico de tendencias -->
+          <div class="chart-controls">
+            <label for="date-range">Rango de Fechas:</label>
+            <select id="date-range" onchange="actualizarGrafico()">
+              <option value="6m">Últimos 6 meses</option>
+              <option value="1y" selected>Último año</option>
+              <option value="2y">Últimos 2 años</option>
+            </select>
+            
+            <!-- Botones de tipo de gráfico -->
+            <div class="chart-type-buttons">
+              <button type="button" onclick="cambiarTipoGrafico('line')">Línea</button>
+              <button type="button" onclick="cambiarTipoGrafico('bar')">Barras</button>
+              <button type="button" onclick="cambiarTipoGrafico('radar')">Radar</button>
+              <button type="button" onclick="cambiarTipoGrafico('polarArea')">Polar</button>
+              <button type="button" onclick="cambiarTipoGrafico('pie')">Pie</button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+          </div>
+          
+          <!-- Botón para generar informe -->
+          <div class="form-buttons center">
+            <button type="button" onclick="generarInforme()">Generar Informe</button>
+          </div>
+        </div>
+
+        <!-- Pestaña 4: Guía del Paciente -->
+        <div id="tab4" class="tab-content">
+          <div class="guia-paciente-content">
+            <!-- Se integra el contenido completo del archivo guia_paciente.html -->
+            <object type="text/html" data="guia_paciente.html" width="100%" height="800px">
+              <!-- Mensaje alternativo en caso de error -->
+              <p>Su navegador no soporta la visualización de este contenido.</p>
+            </object>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción generales -->
+    <div class="form-buttons">
+      <button type="button" onclick="alert('Historia guardada')">Guardar</button>
+      <button type="button" onclick="alert('Regresar')">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    let currentChartType = 'line'; // Tipo de gráfico por defecto
+    let myChart;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab');
+      const contents = document.querySelectorAll('.tab-content');
+
+      // Manejo de pestañas
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+
+          // Actualiza cuadros comparativos (simulado)
+          document.getElementById('compare-crono').innerText =
+            document.getElementById('edad-cronologica').value || '--';
+          document.getElementById('compare-biofisica').innerText =
+            document.getElementById('edad-biofisica').innerText || '--';
+          document.getElementById('compare-bioquimica').innerText =
+            document.getElementById('edad-bioquimica').innerText || '--';
+          document.getElementById('compare-ortomolecular').innerText =
+            document.getElementById('edad-ortomolecular').innerText || '--';
+          document.getElementById('compare-genetica').innerText =
+            document.getElementById('edad-genetica').innerText || '--';
+        });
+      });
+
+      // Inicializa el gráfico de tendencias (simulación)
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      myChart = new Chart(ctx, getChartConfig(document.getElementById('date-range').value, currentChartType));
+    });
+
+    // Retorna la configuración del gráfico con 4 data sets (Biofísica, Bioquímica, Ortomolecular, Genética)
+    function getChartConfig(dateRange, chartType) {
+      const { labels, datasets } = obtenerDatos(dateRange);
+      return {
+        type: chartType,
+        data: {
+          labels,
+          datasets
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true, labels: { color: '#293B64' } },
+            title: {
+              display: true,
+              text: 'Evolución de Biomarcadores',
+              color: '#293B64',
+              font: { size: 16 }
+            }
+          },
+          scales: {
+            y: { beginAtZero: false, ticks: { color: '#293B64' } },
+            x: { ticks: { color: '#293B64' } }
+          }
+        }
+      };
+    }
+
+    // Genera los datos para las 4 Edades, según el rango de fechas
+    function obtenerDatos(dateRange) {
+      let labels = [];
+      if (dateRange === '6m') {
+        labels = ['Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5', 'Mes 6'];
+      } else if (dateRange === '1y') {
+        labels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      } else {
+        labels = ['Año 1','Año 1.5','Año 2','Año 2.5','Año 3','Año 3.5'];
+      }
+      const biofisicaData = [70, 71, 70.5, 70, 69.5, 69];
+      const bioquimicaData = [68, 68.5, 68, 67.5, 67, 66.5];
+      const ortoData = [65, 65.5, 65, 64.5, 64, 63.5];
+      const genData = [72, 71.5, 71, 70.5, 70, 69.8];
+      const datasets = [
+        {
+          label: 'Edad Biofísica',
+          data: biofisicaData,
+          borderColor: '#23BCEF',
+          backgroundColor: 'rgba(35,188,239,0.2)',
+          fill: false
+        },
+        {
+          label: 'Edad Bioquímica',
+          data: bioquimicaData,
+          borderColor: '#FF7F50',
+          backgroundColor: 'rgba(255,127,80,0.2)',
+          fill: false
+        },
+        {
+          label: 'Edad Ortomolecular',
+          data: ortoData,
+          borderColor: '#FFA500',
+          backgroundColor: 'rgba(255,165,0,0.2)',
+          fill: false
+        },
+        {
+          label: 'Edad Genética',
+          data: genData,
+          borderColor: '#9370DB',
+          backgroundColor: 'rgba(147,112,219,0.2)',
+          fill: false
+        }
+      ];
+      return { labels, datasets };
+    }
+
+    // Actualiza el gráfico al cambiar Rango de Fechas
+    function actualizarGrafico() {
+      const dateRange = document.getElementById('date-range').value;
+      if (window.myChart) {
+        window.myChart.destroy();
+      }
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      myChart = new Chart(ctx, getChartConfig(dateRange, currentChartType));
+    }
+
+    // Cambia el tipo de gráfico (línea, barras, radar, polarArea, pie)
+    function cambiarTipoGrafico(tipo) {
+      currentChartType = tipo;
+      actualizarGrafico();
+    }
+
+    function generarInforme() {
+      alert('Informe personalizado generado (simulado).');
+    }
+
+    // Redirecciones para las cards de Edad Biológica - ACTUALIZADAS
+    function abrirBiofisica() {
+      window.location.href = 'edad_biofisica.html';
+    }
+    
+    function abrirBioquimica() {
+      window.location.href = 'edad_bioquimica1.html';
+    }
+    
+    function abrirOrtomo() {
+      window.location.href = 'edad_orthomolecular.html';
+    }
+    
+    function abrirGenetica() {
+      window.location.href = 'edad_genetica.html';
+    }
+
+    // Modo oscuro
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>

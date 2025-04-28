@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis Cuantitativo</title>
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Estilos integrados (puedes usar css/styles.css) -->
+  <style>
+    /* Reset y tipografía */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #f5f5f5, #e6e6e6);
+      color: #293B64;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #23BCEF;
+      padding: 1rem 1.5rem;
+      color: #fff;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-logo img.logo {
+      height: 55px;
+      margin-right: 1rem;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+    }
+
+    .icons i {
+      font-size: 1.5rem;
+      margin-left: 1rem;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    /* Cards */
+    .card {
+      background-color: #fff;
+      border: 2px solid #23BCEF;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      font-size: 1.25rem;
+      color: #293B64;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Ícono de ADN-huella */
+    .dna-icon {
+      width: 70px; /* Ajusta el tamaño que desees */
+      height: auto;
+    }
+
+    /* Tabs Interactivos */
+    .tabs-menu {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      background-color: #293B64;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .tab-btn:hover {
+      background-color: #1f2a44;
+    }
+
+    .tabs-content {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .tabs-content.active {
+      display: block;
+    }
+
+    /* Semáforo de riesgo */
+    .risk-semaforo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .risk-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .risk-dot.green {
+      background-color: green;
+    }
+
+    .risk-dot.yellow {
+      background-color: gold;
+    }
+
+    .risk-dot.red {
+      background-color: red;
+    }
+
+    /* Panel de progreso con metas */
+    .progress-panel {
+      margin-top: 1rem;
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .progress-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .progress-item label {
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 60%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #23BCEF;
+      transition: width 0.4s ease;
+    }
+
+    /* Mapas de calor */
+    .heatmap-container {
+      margin-top: 1rem;
+      background: #fff;
+      padding: 1rem;
+      border: 2px solid #23BCEF;
+      border-radius: 16px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Botones en general */
+    .main-button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #293B64;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.3s;
+    }
+
+    .main-button:hover {
+      background-color: #1f2a44;
+    }
+
+    /* Modo oscuro */
+    .dark body {
+      background: linear-gradient(145deg, #222, #333);
+      color: #f5f5f5;
+    }
+
+    .dark header {
+      background-color: #1c1c1c;
+    }
+
+    .dark .card {
+      background-color: #3a3a3a;
+      border-color: #23BCEF;
+      color: #f5f5f5;
+    }
+
+    .dark .progress-panel {
+      background: #2c2c2c;
+    }
+
+    .dark .progress-bar {
+      background-color: #444;
+    }
+
+    .dark .heatmap-container {
+      background: #2c2c2c;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+      <h1>Análisis Cuantitativo</h1>
+    </div>
+    <div class="icons">
+      <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sección Superior: Gráfico Telómeros vs Edad Biológica + Semáforo de riesgo -->
+    <div class="card">
+      <h3>
+        <!-- Ícono de ADN-huella con tamaño ajustado -->
+        <img src="assets/fingerprint1_dna.png" alt="ADN-Huella" class="dna-icon" />
+        Telómeros vs. Edad Biológica
+      </h3>
+      <canvas id="telomeresChart" style="max-height: 300px;"></canvas>
+      <div class="risk-semaforo">
+        <span style="font-weight: 600;">Riesgo General:</span>
+        <div class="risk-dot red"></div> <span>Alto</span>
+      </div>
+    </div>
+
+    <!-- Sección Central: Tabs Interactivos -->
+    <div class="card">
+      <h3>
+        <i class="fas fa-layer-group" style="color: #23BCEF;"></i>
+        Análisis Detallado
+      </h3>
+      <div class="tabs-menu">
+        <button class="tab-btn" onclick="openTab('tab-genomica')">Genómica</button>
+        <button class="tab-btn" onclick="openTab('tab-biomarcadores')">Biomarcadores</button>
+        <button class="tab-btn" onclick="openTab('tab-lifestyle')">Estilo de Vida</button>
+      </div>
+      <div id="tab-genomica" class="tabs-content">
+        <p>Explicación de variantes genéticas (ej. FOXO3, ApoE4, MTHFR)...</p>
+        <!-- Podrías colocar un mini-gráfico o tabla con la expresión de genes. -->
+      </div>
+      <div id="tab-biomarcadores" class="tabs-content">
+        <p>Valores de PCR, IL-6, TNF-α, Vitamina D, etc. Historial e interpretación.</p>
+      </div>
+      <div id="tab-lifestyle" class="tabs-content">
+        <p>Resumen de sueño, ejercicio, estrés. Correlación con inflamación y telómeros.</p>
+        <canvas id="exerciseInflammationChart" style="max-height: 250px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Sección Central: Mapas de calor y Panel de Progreso con Metas -->
+    <div class="card">
+      <h3>
+        <i class="fas fa-fire" style="color: #23BCEF;"></i>
+        Mapa de Calor (Correlaciones)
+      </h3>
+      <div class="heatmap-container">
+        <canvas id="heatmapChart" style="max-height: 300px;"></canvas>
+      </div>
+      <div class="progress-panel">
+        <div class="progress-item">
+          <label>Objetivo: PCR &lt; 3 mg/L (6 meses)</label>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressPCR" style="width: 50%;"></div>
+          </div>
+        </div>
+        <div class="progress-item">
+          <label>Objetivo: Telómeros &gt; 7 kb (1 año)</label>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressTelomeres" style="width: 20%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Inferior: Lista de Recomendaciones y Botón "Simular Escenarios" -->
+    <div class="card">
+      <h3>
+        <i class="fas fa-list-ul" style="color: #23BCEF;"></i>
+        Recomendaciones Prioritarias
+      </h3>
+      <ul style="margin: 1rem 0; list-style: inside;">
+        <li><strong>1. Reducir ingesta de azúcares refinados</strong> – <a href="#" target="_blank">Ver Estudio</a></li>
+        <li><strong>2. Aumentar ejercicio aeróbico</strong> – <a href="#" target="_blank">Evidencia Clínica</a></li>
+        <li><strong>3. Suplementar vitamina D</strong> – <a href="#" target="_blank">Ensayo Controlado</a></li>
+      </ul>
+      <button class="main-button" onclick="simularEscenarios()">
+        <i class="fas fa-cogs"></i> Simular Escenarios
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Modo oscuro
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Tabs
+    function openTab(tabId) {
+      const allTabs = document.querySelectorAll('.tabs-content');
+      allTabs.forEach(t => t.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Función para "Simular Escenarios"
+    function simularEscenarios() {
+      alert("Simulando escenarios con ajustes en ejercicio, nutrición y suplementos (demostración).");
+    }
+
+    // Inicialización de gráficos
+    let telomeresChart, exerciseInflammationChart, heatmapChart;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Por defecto, abrimos la primera tab
+      openTab('tab-genomica');
+
+      // Gráfico Telómeros vs Edad Biológica (ejemplo simple)
+      const ctxTel = document.getElementById('telomeresChart').getContext('2d');
+      telomeresChart = new Chart(ctxTel, {
+        type: 'line',
+        data: {
+          labels: ['20 años', '30 años', '40 años', '50 años', '60 años', '70 años'],
+          datasets: [
+            {
+              label: 'Telómeros (kb)',
+              data: [8, 7.5, 7, 6.8, 6.3, 5.9],
+              borderColor: '#23BCEF',
+              backgroundColor: 'rgba(35,188,239,0.2)',
+              fill: false
+            },
+            {
+              label: 'Edad Biológica (Aprox)',
+              data: [25, 35, 42, 55, 65, 78],
+              borderColor: '#FF7F50',
+              backgroundColor: 'rgba(255,127,80,0.2)',
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true },
+            title: { display: true, text: 'Telómeros vs. Edad Biológica' }
+          },
+          scales: {
+            y: { beginAtZero: false },
+            x: {}
+          }
+        }
+      });
+
+      // Gráfico Correlación Ejercicio vs Inflamación
+      const ctxExIn = document.getElementById('exerciseInflammationChart')?.getContext('2d');
+      if (ctxExIn) {
+        exerciseInflammationChart = new Chart(ctxExIn, {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: 'Correlación Ejercicio-Inflamación',
+              data: [
+                { x: 0, y: 10 }, { x: 20, y: 8 }, { x: 40, y: 6 }, { x: 60, y: 5 }, { x: 80, y: 4 }
+              ],
+              borderColor: '#23BCEF',
+              backgroundColor: 'rgba(35,188,239,0.2)'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: { display: true, text: 'Ejercicio (%) vs. PCR (mg/L)' }
+            },
+            scales: {
+              x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Ejercicio (min/semana)' } },
+              y: { title: { display: true, text: 'PCR (mg/L)' } }
+            }
+          }
+        });
+      }
+
+      // Mapa de calor simulado
+      const ctxHeat = document.getElementById('heatmapChart')?.getContext('2d');
+      if (ctxHeat) {
+        // Ejemplo de "heatmap" usando un gráfico 'matrix' en Chart.js (versión con plugin) o un approach simulado
+        // Aquí solo se hace una representación con "bar" adaptado
+        heatmapChart = new Chart(ctxHeat, {
+          type: 'bar',
+          data: {
+            labels: ['Sueño <6h', 'Ej. <1h', 'Estrés alto', 'Fumador', 'PCR>5', 'IL-6>10'],
+            datasets: [{
+              label: 'Correlación de Factores',
+              data: [15, 12, 20, 25, 30, 18],
+              backgroundColor: function (ctx) {
+                // Simulación de gradiente para "intensidad"
+                const value = ctx.parsed.y;
+                if (value < 15) return 'green';
+                else if (value < 25) return 'gold';
+                else return 'red';
+              }
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              title: { display: true, text: 'Heatmap (Correlaciones)' },
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Índice de Asociación (%)' } },
+              x: { title: { display: true, text: 'Factor de Riesgo' } }
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

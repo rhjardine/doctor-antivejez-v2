@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLongevity AI Assistant</title> <!-- Título de la pestaña -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+
+    <style>
+        :root {
+            --primary-color: #62B6CB;
+            --primary-dark: #3D8DAE; /* Ajustado para un azul más oscuro como en DrAntivejez */
+            --primary-light: #8ECAE6;
+            --secondary-color: #13293D; /* Azul muy oscuro / Gris */
+            --secondary-light: #247BA0;
+            --text-dark: #2C3E50;
+            --text-medium: #546E7A;
+            --text-light: #78909C;
+            --bg-light: #F8F9FA;
+            --bg-white: #FFFFFF;
+            --bg-card: #EEF1F5;
+            --danger: #E63946;
+            --warning: #F9A826;
+            --success: #2DC653;
+            --info: #5BC0EB;
+            --border-color: #D9E2EC;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+
+            --transition: all 0.3s ease;
+
+             /* RGB vars for transparency */
+             --primary-rgb: 98, 182, 203;
+             --danger-rgb: 230, 57, 70;
+             --warning-rgb: 249, 168, 38;
+             --success-rgb: 45, 198, 83;
+             --info-rgb: 91, 192, 235;
+             --secondary-rgb: 19, 41, 61;
+        }
+
+        .dark-mode {
+            --primary-color: #62B6CB;
+            --primary-dark: #3D8DAE;
+            --primary-light: #8ECAE6;
+            --text-dark: #E0E6ED;
+            --text-medium: #B8C4CF;
+            --text-light: #8D99A4;
+            --bg-light: #1A2634;
+            --bg-white: #242F3F;
+            --bg-card: #2E3A4A;
+            --border-color: #3A4858;
+
+            /* RGB Dark mode */
+             --primary-rgb: 98, 182, 203;
+             --danger-rgb: 230, 57, 70;
+             --warning-rgb: 249, 168, 38;
+             --success-rgb: 45, 198, 83;
+             --info-rgb: 91, 192, 235;
+             --secondary-rgb: 19, 41, 61;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(to bottom, var(--bg-white) 70%, color-mix(in srgb, var(--bg-white) 90%, var(--text-light) 10%));
+            border-right: 1px solid var(--border-color);
+            padding: 0; /* Removed padding to use header/footer approach */
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            height: 100vh; /* Full viewport height */
+            position: fixed; /* Fixed position */
+            left: 0;
+            top: 0;
+            z-index: 100; /* High z-index */
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar-header {
+            padding: 0 1rem; /* Adjusted padding */
+            height: 65px; /* Fixed height for header */
+            display: flex;
+            justify-content: center; /* Center logo when collapsed */
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+         .sidebar:not(.collapsed) .sidebar-header {
+             justify-content: flex-start; /* Align left when expanded */
+             padding: 0 1.5rem;
+         }
+
+
+        .logo {
+            /* font properties removed */
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+             text-decoration: none;
+             height: 100%; /* Fill header height */
+        }
+
+        /* --- Logo Image Styling --- */
+        .logo-img {
+            height: 42px; /* Increased size */
+            width: auto;
+            max-height: 50px;
+            display: block;
+            object-fit: contain;
+            transition: height 0.3s ease;
+        }
+        .sidebar.collapsed .logo-img {
+             height: 35px; /* Slightly smaller */
+         }
+        /* --- End Logo Image Styling --- */
+
+        .nav-menu {
+            flex-grow: 1; /* Allow menu to take space */
+            list-style-type: none;
+            overflow-y: auto; /* Scroll if needed */
+            padding: 1rem 0; /* Padding top/bottom */
+        }
+
+        .nav-item {
+            padding: 0;
+            display: flex;
+            align-items: center;
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+            height: 100%;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .nav-item a:hover {
+            color: var(--primary-color);
+            background-color: rgba(var(--primary-rgb), 0.1);
+            transform: translateX(3px);
+        }
+
+        .nav-item.active a {
+            color: var(--primary-color);
+            background-color: rgba(var(--primary-rgb), 0.15);
+            border-left-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed .logo span, /* Span no longer exists */
+        .sidebar.collapsed .nav-item span,
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item a {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+        .sidebar.collapsed .nav-item {
+            padding: 0;
+        }
+
+        .user-profile {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            border-top: 1px solid var(--border-color);
+            transition: var(--transition);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .user-profile:hover {
+            background-color: rgba(var(--primary-rgb), 0.05);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .user-profile:hover .user-avatar {
+            transform: scale(1.05);
+        }
+
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            color: var(--text-light);
+            font-size: 0.813rem;
+        }
+
+        .sidebar.collapsed .user-profile {
+            justify-content: center;
+            padding: 1rem;
+        }
+
+         .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            margin-left: 220px; /* Margin for fixed sidebar */
+            transition: margin-left 0.3s ease;
+            min-height: 100vh; /* Ensure it takes full height */
+        }
+         .sidebar.collapsed + .main-content {
+             margin-left: 64px;
+         }
+
+
+        /* === REST OF THE CSS (Patient Header, Assistant, Modals, Toast, etc.) === */
+        /* === This section remains identical to the previous complete code response === */
+        /* === It includes all styles for the main content area, responsiveness, etc. === */
+         .patient-header {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem;
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .patient-header:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .patient-header:hover .patient-avatar {
+            transform: scale(1.05);
+        }
+
+        .patient-info {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+
+        .patient-details {
+            color: var(--text-medium);
+            font-size: 0.875rem;
+        }
+
+        .health-metrics {
+            display: flex;
+            gap: 1.25rem;
+            margin-left: auto;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .metric {
+            text-align: center;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+             flex-basis: 100px; /* Give a base width */
+             flex-grow: 1;
+        }
+
+        .metric:hover {
+            background-color: rgba(var(--primary-rgb), 0.05);
+            transform: translateY(-2px);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+             word-break: break-word;
+        }
+
+        .metric-value .trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--success);
+             margin-left: 0.25rem;
+             display: inline-block;
+        }
+
+        .section-header {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+             flex-wrap: wrap; /* Allow wrap */
+             gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .assistant-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .assistant-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .assistant-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            background-color: var(--bg-light); /* Light background for tabs */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-card);
+        }
+
+        .assistant-tabs::-webkit-scrollbar { height: 4px; }
+        .assistant-tabs::-webkit-scrollbar-track { background: var(--bg-card); }
+        .assistant-tabs::-webkit-scrollbar-thumb { background-color: var(--primary-color); border-radius: 20px; }
+
+        .assistant-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 3px solid transparent; /* Underline style */
+            margin-bottom: -1px; /* Overlap container border */
+        }
+
+        .assistant-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color); /* Use border instead of background */
+            font-weight: 600;
+        }
+
+        .assistant-tab:hover:not(.active) {
+            color: var(--text-dark);
+            background-color: rgba(var(--primary-rgb), 0.05); /* Subtle hover */
+        }
+
+        .assistant-content {
+            padding: 1.5rem;
+            min-height: 500px;
+            /* max-height: 700px; */ /* Let content define height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex-grow: 1; /* Take available space */
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem; /* For scrollbar */
+            min-height: 300px; /* Minimum chat height */
+        }
+
+        .chat-message {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.3s ease forwards;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.ai { align-items: flex-start; }
+        .chat-message.user { align-items: flex-end; }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            line-height: 1.4; /* Improve readability */
+        }
+        .message-bubble p:last-child { margin-bottom: 0; } /* Remove extra margin */
+
+        .message-bubble:hover { box-shadow: var(--shadow-md); }
+
+        .chat-message.ai .message-bubble {
+            background-color: var(--bg-card);
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-message.user .message-bubble {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            align-items: flex-end; /* Align items to bottom */
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 3.5rem 0.75rem 1rem; /* Adjust padding for buttons */
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.938rem;
+            color: var(--text-dark);
+            background-color: var(--bg-white); /* Use white background */
+            transition: var(--transition);
+            resize: none; /* Prevent manual resize */
+             line-height: 1.4; /* Match bubble */
+             min-height: 45px; /* Ensure decent height */
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+        }
+
+         .input-buttons-container {
+            position: absolute;
+            right: 4.5rem; /* Position relative to send button */
+            bottom: 0.6rem; /* Align with input bottom padding */
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .voice-button, .attach-button {
+            background: none; border: none; font-size: 1.1rem; /* Slightly smaller */
+            color: var(--text-medium); cursor: pointer; transition: var(--transition);
+            padding: 0.3rem;
+            display: flex; align-items: center; justify-content: center;
+             width: 28px; height: 28px;
+        }
+
+        .voice-button:hover, .attach-button:hover { color: var(--primary-color); transform: scale(1.1); }
+        .file-input { display: none; }
+
+        .send-button {
+            padding: 0.6rem 1rem; /* Adjusted padding */
+            background-color: var(--primary-color); color: white; border: none;
+            border-radius: var(--radius-md); font-weight: 500; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;
+            height: 45px; /* Match input min-height */
+            align-self: flex-end; /* Align with bottom */
+        }
+
+        .send-button:hover { background-color: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .send-button i { font-size: 1rem; }
+
+        /* Document Tab Styles */
+        .document-tab { display: flex; flex-direction: column; gap: 1.5rem; height: 100%; overflow-y: auto; }
+        .document-upload-area { border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 2rem; text-align: center; background-color: var(--bg-light); transition: var(--transition); cursor: pointer; }
+        .document-upload-area:hover { border-color: var(--primary-color); background-color: rgba(var(--primary-rgb), 0.05); }
+        .document-upload-area.dragover { border-color: var(--primary-color); background-color: rgba(var(--primary-rgb), 0.1); }
+        .upload-icon { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem; transition: var(--transition); }
+        .document-upload-area:hover .upload-icon { transform: translateY(-5px); }
+        .upload-text { font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem; }
+        .upload-subtext { color: var(--text-medium); font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .upload-button { padding: 0.75rem 1.5rem; background-color: var(--primary-color); color: white; border: none; border-radius: var(--radius-md); font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.5rem; }
+        .upload-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .document-preview { display: none; flex-direction: column; gap: 1.5rem; background-color: var(--bg-card); border-radius: var(--radius-lg); padding: 1.5rem; }
+        .document-preview.active { display: flex; }
+        .document-preview-header { display: flex; justify-content: space-between; align-items: center; }
+        .document-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .document-actions { display: flex; gap: 0.5rem; }
+        .document-action-button { padding: 0.5rem; border: none; background-color: var(--bg-white); color: var(--text-medium); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition); }
+        .document-action-button:hover { background-color: var(--primary-color); color: white; transform: translateY(-2px); }
+        .document-content { background-color: var(--bg-white); border-radius: var(--radius-md); padding: 1.5rem; max-height: 300px; overflow-y: auto; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .document-content img { max-width: 100%; border-radius: var(--radius-sm); }
+        .document-content pre { white-space: pre-wrap; font-family: 'Courier New', monospace; color: var(--text-dark); font-size: 0.875rem; }
+        .document-analysis { display: none; background-color: var(--bg-white); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .document-analysis.active { display: block; }
+        .analysis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .analysis-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .analysis-status { font-size: 0.813rem; color: var(--text-light); display: flex; align-items: center; gap: 0.375rem; }
+        .analysis-status.complete { color: var(--success); }
+        .analysis-content { margin-bottom: 1.5rem; }
+        .analysis-section { margin-bottom: 1.5rem; }
+        .analysis-section-title { font-weight: 600; color: var(--primary-color); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.375rem; }
+        .analysis-highlight { background-color: rgba(var(--primary-rgb), 0.1); border-left: 3px solid var(--primary-color); padding: 0.75rem 1rem; margin: 0.75rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+        .analysis-highlight.warning { background-color: rgba(var(--warning-rgb), 0.1); border-left-color: var(--warning); }
+        .analysis-highlight.danger { background-color: rgba(var(--danger-rgb), 0.1); border-left-color: var(--danger); }
+        .analysis-highlight.success { background-color: rgba(var(--success-rgb), 0.1); border-left-color: var(--success); }
+        .document-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.875rem; }
+        .document-table th, .document-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .document-table th { font-weight: 600; color: var(--text-dark); background-color: var(--bg-card); }
+        .document-table tr:hover { background-color: rgba(var(--primary-rgb), 0.05); }
+        .document-table td.highlight { font-weight: 500; color: var(--primary-dark); }
+        .document-action-row { display: flex; justify-content: flex-end; margin-top: 1rem; gap: 0.75rem; }
+        .load-more-btn, .analyze-btn, .integrate-btn { padding: 0.6rem 1rem; border-radius: var(--radius-md); cursor: pointer; transition: var(--transition); font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 0.375rem; border: none; }
+        .load-more-btn { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-medium); }
+        .load-more-btn:hover { background-color: var(--bg-light); transform: translateY(-1px); }
+        .analyze-btn { background-color: var(--primary-color); color: white; }
+        .analyze-btn:hover { background-color: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .integrate-btn { background-color: var(--success); color: white; }
+        .integrate-btn:hover { background-color: color-mix(in srgb, var(--success) 85%, black 15%); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+        .document-records { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+        .document-record { background-color: var(--bg-white); border-radius: var(--radius-md); padding: 0.75rem 1rem; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; transition: var(--transition); cursor: pointer; }
+        .document-record:hover { border-color: var(--primary-color); transform: translateX(3px); box-shadow: var(--shadow-sm); }
+        .document-record-info { display: flex; align-items: center; gap: 0.75rem; overflow: hidden; }
+        .document-record-icon { font-size: 1.25rem; color: var(--primary-color); flex-shrink: 0; }
+        .document-record-details { display: flex; flex-direction: column; overflow: hidden; }
+        .document-record-name { font-weight: 500; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .document-record-meta { font-size: 0.75rem; color: var(--text-light); }
+        .document-record-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .document-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); color: white; background-color: var(--primary-color); }
+        .document-badge.genomic { background-color: var(--success); }
+        .document-badge.lab { background-color: var(--info); }
+        .document-badge.report { background-color: var(--warning); }
+        .typing-indicator { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background-color: var(--bg-card); border-radius: var(--radius-lg); width: fit-content; margin-bottom: 1rem; }
+        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-light); animation: typingAnimation 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingAnimation { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .spinner-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .spinner { border: 4px solid rgba(var(--primary-rgb), 0.1); border-left-color: var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-text { color: var(--text-medium); font-weight: 500; }
+        .document-message { margin-top: 0.5rem; padding: 0.75rem; background-color: var(--bg-light); border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.75rem; border: 1px solid var(--border-color); }
+        .document-message-icon { color: var(--primary-color); font-size: 1.25rem; }
+        .document-message-info { flex: 1; overflow: hidden; }
+        .document-message-name { font-weight: 500; color: var(--text-dark); font-size: 0.875rem; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .document-message-meta { font-size: 0.75rem; color: var(--text-light); }
+        .theme-toggle { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); z-index: 999; transition: var(--transition); }
+        .theme-toggle:hover { transform: scale(1.05); background-color: var(--primary-dark); }
+
+        /* Document Viewer Modal */
+        .document-viewer-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; z-index: 1050; opacity: 0; transition: opacity 0.3s ease; }
+        .document-viewer-modal.active { display: flex; opacity: 1; }
+        .document-viewer-container { background-color: var(--bg-white); border-radius: var(--radius-lg); width: 90%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); transform: scale(0.95); transition: transform 0.3s ease; }
+        .document-viewer-modal.active .document-viewer-container { transform: scale(1); }
+        .document-viewer-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .document-viewer-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .document-viewer-close { background: none; border: none; font-size: 1.25rem; color: var(--text-medium); cursor: pointer; transition: var(--transition); padding: 0.2rem; }
+        .document-viewer-close:hover { color: var(--danger); transform: scale(1.1); }
+        .document-viewer-content { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        .document-viewer-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 1rem; flex-shrink: 0; }
+        .document-viewer-button { padding: 0.6rem 1rem; border-radius: var(--radius-md); font-weight: 500; cursor: pointer; transition: var(--transition); font-size: 0.875rem; display: flex; align-items: center; gap: 0.375rem; border: none; }
+        .document-viewer-button.primary { background-color: var(--primary-color); color: white; }
+        .document-viewer-button.primary:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+        .document-viewer-button.secondary { background-color: var(--bg-card); color: var(--text-medium); border: 1px solid var(--border-color); }
+        .document-viewer-button.secondary:hover { background-color: var(--bg-light); transform: translateY(-1px); }
+
+        /* Toast Container */
+        .toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; }
+        .toast { padding: 0.75rem 1rem; background-color: var(--bg-white); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 0.75rem; transform: translateX(120%); transition: transform 0.3s ease; max-width: 350px; border-left: 4px solid var(--info); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.info { border-left-color: var(--info); }
+        .toast.show { transform: translateX(0); }
+        .toast-icon { font-size: 1.25rem; flex-shrink: 0; }
+        .toast-icon.success { color: var(--success); }
+        .toast-icon.warning { color: var(--warning); }
+        .toast-icon.error { color: var(--danger); }
+        .toast-icon.info { color: var(--info); }
+        .toast-content { flex: 1; overflow: hidden; }
+        .toast-title { font-weight: 600; color: var(--text-dark); font-size: 0.875rem; margin-bottom: 0.25rem; }
+        .toast-message { color: var(--text-medium); font-size: 0.813rem; }
+        .toast-close { background: none; border: none; font-size: 1rem; color: var(--text-light); cursor: pointer; transition: var(--transition); padding: 0.2rem; flex-shrink: 0; }
+        .toast-close:hover { color: var(--danger); transform: scale(1.1); }
+
+        /* Dark Mode Specific Styles */
+        body.dark-mode .patient-header { background-color: var(--bg-card); border-left-color: var(--primary-light); }
+        body.dark-mode .patient-avatar { background-color: var(--bg-white); color: var(--primary-light); }
+        body.dark-mode .assistant-container { background-color: var(--bg-card); border-color: var(--border-color); }
+        body.dark-mode .assistant-tabs { background-color: var(--bg-white); border-bottom-color: var(--border-color); }
+        body.dark-mode .assistant-tab { color: var(--text-medium); }
+        body.dark-mode .assistant-tab.active { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+        body.dark-mode .assistant-tab:hover:not(.active) { color: var(--text-dark); background-color: var(--bg-light); }
+        body.dark-mode .chat-message.ai .message-bubble { background-color: var(--bg-white); }
+        body.dark-mode .chat-message.user .message-bubble { background-color: var(--primary-dark); color: var(--text-dark); }
+        body.dark-mode .chat-input { background-color: var(--bg-white); border-color: var(--border-color); color: var(--text-dark); }
+        body.dark-mode .chat-input:focus { border-color: var(--primary-light); box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3); }
+        body.dark-mode .send-button { background-color: var(--primary-light); color: var(--secondary-color); }
+        body.dark-mode .send-button:hover { background-color: var(--primary-color); }
+        body.dark-mode .document-upload-area { background-color: var(--bg-card); border-color: var(--border-color); }
+        body.dark-mode .document-upload-area:hover { border-color: var(--primary-light); background-color: var(--bg-white); }
+        body.dark-mode .document-preview { background-color: var(--bg-card); }
+        body.dark-mode .document-action-button { background-color: var(--bg-light); color: var(--text-light); }
+        body.dark-mode .document-action-button:hover { background-color: var(--primary-light); color: var(--bg-dark); }
+        body.dark-mode .document-content { background-color: var(--bg-white); border-color: var(--border-color); }
+        body.dark-mode .document-content pre { color: var(--text-dark); }
+        body.dark-mode .document-analysis { background-color: var(--bg-card); border-color: var(--border-color); }
+        body.dark-mode .analysis-header { border-bottom-color: var(--border-color); }
+        body.dark-mode .analysis-title { color: var(--text-dark); }
+        body.dark-mode .document-table th { background-color: var(--bg-white); color: var(--text-dark); }
+        body.dark-mode .document-table td { border-bottom-color: var(--border-color); }
+        body.dark-mode .document-table tr:hover { background-color: rgba(var(--primary-rgb), 0.08); }
+        body.dark-mode .document-record { background-color: var(--bg-card); border-color: var(--border-color); }
+        body.dark-mode .document-record:hover { border-color: var(--primary-light); }
+        body.dark-mode .document-message { background-color: var(--bg-card); border-color: var(--border-color); }
+        body.dark-mode .toast { background-color: var(--bg-card); box-shadow: var(--shadow-lg); }
+        body.dark-mode .toast-title { color: var(--text-dark); }
+        body.dark-mode .toast-message { color: var(--text-medium); }
+        body.dark-mode .toast-close { color: var(--text-light); }
+        body.dark-mode .toast-close:hover { color: var(--danger); }
+         body.dark-mode .document-viewer-container { background-color: var(--bg-card); }
+         body.dark-mode .document-viewer-header { border-bottom-color: var(--border-color); }
+         body.dark-mode .document-viewer-title { color: var(--text-dark); }
+         body.dark-mode .document-viewer-close { color: var(--text-light); }
+         body.dark-mode .document-viewer-close:hover { color: var(--danger); }
+         body.dark-mode .document-viewer-content { /* Potentially adjust background */ }
+         body.dark-mode .document-viewer-footer { border-top-color: var(--border-color); }
+         body.dark-mode .document-viewer-button.secondary { background-color: var(--bg-white); color: var(--text-dark); border-color: var(--border-color); }
+         body.dark-mode .document-viewer-button.secondary:hover { background-color: var(--bg-light); }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+             /* Sidebar handled by fixed positioning margin adjustment */
+             .main-content { padding: 1rem; }
+             .patient-header { padding: 1rem; }
+             .health-metrics { gap: 0.75rem; }
+             .metric { padding: 0.4rem; }
+             .metric-value { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .patient-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .health-metrics { margin-left: 0; width: 100%; justify-content: space-around; }
+            .document-content { max-height: 200px; }
+            .document-viewer-container { width: 95%; max-height: 95vh; }
+            .assistant-tab { padding: 0.8rem 1rem; font-size: 0.9rem; }
+            .assistant-content { padding: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .app-container { flex-direction: column; }
+            .sidebar {
+                 width: 100%; height: auto; position: static; /* Remove fixed positioning */
+                 padding: 1rem 0; border-right: none; border-bottom: 1px solid var(--border-color);
+                 order: -1; /* Show sidebar on top */
+            }
+            .sidebar.collapsed { width: 100%; } /* No visual collapse on mobile */
+            .main-content { margin-left: 0; padding: 0.75rem; } /* No margin needed */
+            .sidebar-header { height: auto; padding-bottom: 1rem; justify-content: center; }
+            .logo-img { height: 40px; } /* Consistent logo size */
+            .sidebar.collapsed .logo-img { height: 40px; }
+
+            .nav-menu { flex-direction: row; flex-wrap: wrap; justify-content: center; padding: 0.5rem 0; }
+            .nav-item { flex-basis: auto; min-width: 70px; } /* Adjust basis */
+            .nav-item a { padding: 0.5rem; flex-direction: column; align-items: center; font-size: 0.75rem; gap: 0.25rem; border-left: none; border-bottom: 3px solid transparent; }
+            .nav-item.active a { border-bottom-color: var(--primary-color); }
+            .nav-item a:hover { transform: none; background-color: rgba(var(--primary-rgb), 0.05); }
+            .nav-item a span { display: block; }
+
+            .user-profile { display: none; } /* Hide profile on mobile */
+
+            .patient-header { padding: 0.75rem; }
+             .patient-avatar { width: 50px; height: 50px; font-size: 1.2rem; margin-right: 0.75rem;}
+             .patient-name { font-size: 1.1rem; }
+             .patient-details { font-size: 0.8rem; }
+             .health-metrics { gap: 0.5rem; flex-direction: column; align-items: flex-start; }
+             .metric { text-align: left; padding: 0.25rem 0; }
+             .metric-value { font-size: 1rem; }
+             .section-title { font-size: 1.2rem; }
+             .assistant-tab { padding: 0.6rem 0.8rem; font-size: 0.8rem; gap: 0.3rem;}
+             .assistant-content { padding: 0.75rem; }
+             .chat-input-container { flex-direction: column; align-items: stretch; }
+             .input-buttons-container { position: static; transform: none; margin-bottom: 0.5rem; justify-content: flex-end; }
+             .chat-input { padding-right: 1rem; /* Reset padding */ }
+             .send-button { width: 100%; justify-content: center; height: auto; padding: 0.75rem; }
+             .document-upload-area { padding: 1rem; }
+             .upload-icon { font-size: 2rem; }
+             .document-record-meta { display: none; } /* Hide less critical info */
+             .document-action-row { flex-direction: column; }
+             .load-more-btn, .analyze-btn, .integrate-btn { width: 100%; justify-content: center; }
+             .theme-toggle { width: 2.5rem; height: 2.5rem; bottom: 1rem; right: 1rem; }
+        }
+        /* === End Responsive === */
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <!-- --- MODIFICATION: Logo Image --- -->
+                <a href="dashboard_advanced_gen.html" class="logo" id="toggle-sidebar" aria-label="Volver al Dashboard">
+                    <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo-img">
+                </a>
+                <!-- --- MODIFICATION END --- -->
+            </div>
+
+            <ul class="nav-menu">
+                 <li class="nav-item">
+                    <a href="dashboard_advanced_gen.html"> <!-- Link to main page -->
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="historias_tabs_bio.html"> <!-- Link to Historias page -->
+                        <i class="fas fa-book-medical"></i>
+                        <span>Historias</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                    <a href="profesionales.html"> <!-- Link to Profesionales page -->
+                        <i class="fas fa-user-md"></i>
+                        <span>Profesionales</span>
+                    </a>
+                </li>
+                <!-- Set 'Agente IA' as active for this dashboard page -->
+                <li class="nav-item active">
+                    <a href="#"> <!-- Placeholder link -->
+                        <i class="fas fa-robot"></i>
+                        <span>Agente IA</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#"> <!-- Placeholder link -->
+                        <i class="fas fa-file-medical-alt"></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                     <a href="#"> <!-- Placeholder link -->
+                        <i class="fas fa-cog"></i>
+                        <span>Ajustes</span>
+                    </a>
+                </li>
+                 <li class="nav-item">
+                     <a href="#"> <!-- Placeholder link (logout needs specific handling) -->
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Salir</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Dr. María García</div>
+                    <div class="user-role">Longevity Specialist</div>
+                </div>
+            </div>
+        </div> <!-- End Sidebar -->
+
+        <!-- === Main Content (Exactly as provided in the prompt) === -->
+        <div class="main-content">
+            <div class="patient-header">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-info">
+                    <h2 class="patient-name" id="patient-name">Isabel Romero</h2>
+                    <div class="patient-details" id="patient-details">58 years • Female • ID: 458912</div>
+                </div>
+                <div class="health-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Biological Age</div>
+                        <div class="metric-value" id="biological-age">52.3 <span class="trend">(-5.7)</span></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Health Score</div>
+                        <div class="metric-value" id="health-score">84/100</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Last Checkup</div>
+                        <div class="metric-value" id="last-checkup">12/04/2023</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-brain"></i> AI Longevity Assistant</h2>
+            </div>
+
+            <div class="assistant-container">
+                <div class="assistant-tabs">
+                    <div class="assistant-tab active" data-tab="chat">
+                        <i class="fas fa-comments"></i> Conversational Assistant
+                    </div>
+                    <div class="assistant-tab" data-tab="documents">
+                        <i class="fas fa-file-medical"></i> Document Analysis
+                    </div>
+                    <div class="assistant-tab" data-tab="knowledge">
+                        <i class="fas fa-database"></i> Knowledge Base
+                    </div>
+                    <div class="assistant-tab" data-tab="analysis">
+                        <i class="fas fa-chart-bar"></i> Analysis & Interpretation
+                    </div>
+                    <div class="assistant-tab" data-tab="recommendations">
+                        <i class="fas fa-clipboard-check"></i> Recommendations
+                    </div>
+                    <div class="assistant-tab" data-tab="pathways">
+                        <i class="fas fa-project-diagram"></i> Pathway Analysis
+                    </div>
+                </div>
+
+                <div class="assistant-content">
+                    <div class="tab-content" id="chat-tab">
+                        <div class="chat-container">
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>Hola, Dr. García. Estoy listo para ayudarle con el análisis de datos médicos de Isabel. Puede subir documentos o hacer preguntas específicas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-container">
+                            <textarea class="chat-input" placeholder="Haga una pregunta detallada sobre la salud de Isabel..." id="chat-input" rows="1"></textarea> <!-- Changed to textarea -->
+                             <div class="input-buttons-container"> <!-- Container for buttons -->
+                                <button class="voice-button" id="voice-button" title="Entrada de voz">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="attach-button" id="attach-button" title="Adjuntar documento">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                            </div>
+                            <input type="file" id="file-input" class="file-input" accept=".pdf, image/*, .docx, .xlsx"> <!-- Accept more file types -->
+                            <button class="send-button" id="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Enviar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="documents-tab" style="display: none;">
+                        <div class="document-tab">
+                            <div class="document-upload-area" id="upload-area">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <h3 class="upload-text">Subir Documentos Médicos</h3>
+                                <p class="upload-subtext">Arrastre y suelte archivos aquí o haga clic para buscar (PDF, Imagen, Word, Excel)</p>
+                                <button class="upload-button" id="browse-files">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>Buscar Archivos</span>
+                                </button>
+                                <input type="file" id="document-file-input" class="file-input" accept=".pdf, image/*, .docx, .xlsx" multiple> <!-- Allow multiple -->
+                            </div>
+
+                            <div class="document-preview" id="document-preview">
+                                <!-- Preview content generated by JS -->
+                            </div>
+
+                            <div class="document-analysis" id="document-analysis">
+                                <!-- Analysis content generated by JS -->
+                            </div>
+
+                            <div class="document-records" id="document-records">
+                                <h3 class="upload-text" style="text-align: left; margin-bottom: 1rem;">Documentos Analizados Previamente</h3>
+                                <!-- Records generated by JS -->
+                                <p style="text-align:center; color: var(--text-light); margin-top: 1rem;">Cargando documentos...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="knowledge-tab" style="display: none;">
+                        <h3 class="tab-title">Base de Conocimiento</h3>
+                        <p>Aquí se mostraría contenido relevante de la base de conocimiento, estudios, etc. (Funcionalidad pendiente)</p>
+                    </div>
+
+                    <div class="tab-content" id="analysis-tab" style="display: none;">
+                         <h3 class="tab-title">Análisis e Interpretación</h3>
+                         <p>Visualizaciones avanzadas, comparativas y análisis de datos integrados. (Funcionalidad pendiente)</p>
+                         <!-- Placeholder for charts/tables -->
+                          <canvas id="analysis-chart-placeholder" style="max-height: 300px; margin-top: 1rem;"></canvas>
+                    </div>
+
+                    <div class="tab-content" id="recommendations-tab" style="display: none;">
+                         <h3 class="tab-title">Recomendaciones Personalizadas</h3>
+                         <p>Recomendaciones generadas por la IA basadas en los datos del paciente. (Funcionalidad pendiente)</p>
+                         <ul id="recommendations-list" style="margin-top: 1rem; list-style: disc; padding-left: 20px;">
+                             <li>Recomendación simulada 1...</li>
+                             <li>Recomendación simulada 2...</li>
+                         </ul>
+                    </div>
+
+                    <div class="tab-content" id="pathways-tab" style="display: none;">
+                         <h3 class="tab-title">Análisis de Vías Metabólicas/Genéticas</h3>
+                         <p>Visualización interactiva de vías relevantes. (Funcionalidad pendiente)</p>
+                         <!-- Placeholder for pathway visualization -->
+                         <div id="pathway-placeholder" style="min-height: 300px; background: var(--bg-light); border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-top: 1rem;">Visualización de Vía</div>
+                    </div>
+                </div> <!-- End Assistant Content -->
+            </div> <!-- End Assistant Container -->
+        </div> <!-- End Main Content -->
+    </div> <!-- End App Container -->
+
+    <!-- Modals and Toast Container -->
+    <div class="document-viewer-modal" id="document-viewer-modal">
+        <div class="document-viewer-container">
+            <div class="document-viewer-header">
+                <h3 class="document-viewer-title">
+                    <i class="fas fa-file-alt"></i> <!-- Generic file icon -->
+                    <span id="modal-document-name">Nombre del Documento</span>
+                </h3>
+                <button class="document-viewer-close" id="close-modal" aria-label="Cerrar Visor">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="document-viewer-content" id="modal-document-content">
+                <!-- Content (e.g., PDF embed or image) loaded by JS -->
+                 <p style="text-align: center; padding: 2rem; color: var(--text-light);">Cargando previsualización...</p>
+            </div>
+            <div class="document-viewer-footer">
+                <button class="document-viewer-button secondary" id="previous-page">
+                    <i class="fas fa-arrow-left"></i> <span>Página Anterior</span>
+                </button>
+                <button class="document-viewer-button secondary" id="next-page">
+                    <i class="fas fa-arrow-right"></i> <span>Siguiente Página</span>
+                </button>
+                <button class="document-viewer-button primary" id="analyze-modal-document">
+                    <i class="fas fa-brain"></i> <span>Analizar Documento</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- === JavaScript === -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const API_BASE_URL = 'http://localhost:5000/api'; // Example API Base
+            let currentAnalysis = null;
+            let currentFileId = null;
+            const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+            // --- Theme Toggle ---
+             const themeToggleBtn = document.getElementById('theme-toggle');
+             if (themeToggleBtn) {
+                 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                 const savedTheme = localStorage.getItem('theme');
+                 const body = document.body;
+                 const icon = themeToggleBtn.querySelector('i');
+
+                 const applyTheme = (isDark) => {
+                     body.classList.toggle('dark-mode', isDark);
+                     if (icon) {
+                         icon.classList.toggle('fa-sun', isDark);
+                         icon.classList.toggle('fa-moon', !isDark);
+                     }
+                     // Update chart theme if needed (example)
+                     // if (typeof updateChartTheme === 'function') updateChartTheme();
+                 };
+
+                 if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                     applyTheme(true);
+                 } else {
+                     applyTheme(false);
+                 }
+
+                 themeToggleBtn.addEventListener('click', () => {
+                     const isDarkMode = body.classList.toggle('dark-mode');
+                     applyTheme(isDarkMode); // Update icon
+                     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                 });
+             }
+
+            // --- Sidebar Toggle ---
+             const sidebarEl = document.getElementById('sidebar');
+             const mainContentEl = document.querySelector('.main-content');
+             const sidebarToggleTrigger = document.getElementById('toggle-sidebar');
+
+             if (sidebarEl && sidebarToggleTrigger && mainContentEl) {
+                 const adjustMargin = () => {
+                     if (window.innerWidth > 480) {
+                          mainContentEl.style.marginLeft = sidebarEl.classList.contains('collapsed') ? '64px' : '220px';
+                     } else {
+                         mainContentEl.style.marginLeft = '0';
+                     }
+                 };
+
+                 sidebarToggleTrigger.addEventListener('click', (e) => {
+                     e.preventDefault();
+                     sidebarEl.classList.toggle('collapsed');
+                     adjustMargin();
+                 });
+                 adjustMargin(); // Initial check
+                 window.addEventListener('resize', adjustMargin);
+
+             }
+
+            // --- Active Menu Item ---
+             try {
+                 const currentPath = window.location.pathname.split("/").pop() || 'dashboard_advanced_gen.html';
+                 const navLinks = document.querySelectorAll('.nav-menu .nav-item a');
+                 let foundActive = false;
+                 navLinks.forEach(link => {
+                     const linkPath = link.getAttribute('href')?.split("/").pop();
+                     const parentLi = link.closest('.nav-item');
+                     if (!parentLi) return;
+                     parentLi.classList.remove('active');
+                     if (linkPath === currentPath) {
+                         parentLi.classList.add('active');
+                         foundActive = true;
+                     }
+                 });
+                 if (!foundActive) { // Fallback to Agente IA if no match (specific to this file)
+                      const agentLink = Array.from(navLinks).find(a => a.querySelector('span')?.textContent === 'Agente IA');
+                      agentLink?.closest('.nav-item')?.classList.add('active');
+                 }
+             } catch (e) { console.error("Error setting active link:", e); }
+
+            // --- Mock Patient Data ---
+            function loadMockPatientData() { /* ... (same as before) ... */
+                 const mockPatient={name:"Isabel Romero",age:58,gender:"Female",id:"458912",biologicalAge:52.3,trend:-5.7,healthScore:84,lastCheckup:"2023-04-12"};const patientNameEl=document.getElementById('patient-name');const patientDetailsEl=document.getElementById('patient-details');const biologicalAgeEl=document.getElementById('biological-age');const healthScoreEl=document.getElementById('health-score');const lastCheckupEl=document.getElementById('last-checkup');if(patientNameEl)patientNameEl.textContent=mockPatient.name;if(patientDetailsEl)patientDetailsEl.textContent=`${mockPatient.age} years • ${mockPatient.gender} • ID: ${mockPatient.id}`;if(biologicalAgeEl)biologicalAgeEl.innerHTML=`${mockPatient.biologicalAge} <span class="trend">(${mockPatient.trend>0?'+':''}${mockPatient.trend})</span>`;if(healthScoreEl)healthScoreEl.textContent=`${mockPatient.healthScore}/100`;if(lastCheckupEl)lastCheckupEl.textContent=mockPatient.lastCheckup?new Date(mockPatient.lastCheckup+'T00:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'}):'N/A';const recordsContainer=document.getElementById('document-records');if(recordsContainer)recordsContainer.innerHTML='<h3 class="upload-text" style="text-align: left; margin-bottom: 1rem;">Documentos Analizados Previamente</h3><p style="text-align:center; color: var(--text-light); margin-top: 1rem;">No hay documentos analizados.</p>';
+             }
+            loadMockPatientData();
+
+
+             // --- Assistant Tab Switching ---
+             const assistantTabs = document.querySelectorAll('.assistant-tab');
+             const tabContents = document.querySelectorAll('.assistant-content > .tab-content');
+             assistantTabs.forEach(tab => { /* ... (same as before) ... */
+                  tab.addEventListener('click',()=>{assistantTabs.forEach(t=>t.classList.remove('active'));tabContents.forEach(content=>{if(content)content.style.display='none';});tab.classList.add('active');const targetTabId=tab.getAttribute('data-tab')+'-tab';const targetContent=document.getElementById(targetTabId);if(targetContent){targetContent.style.display='block';}else{console.warn(`Tab content not found for ID: ${targetTabId}`);}});
+              });
+             const initialActiveAssistantTab=document.querySelector('.assistant-tab.active');if(initialActiveAssistantTab){const initialTargetId=initialActiveAssistantTab.getAttribute('data-tab')+'-tab';const initialTargetContent=document.getElementById(initialTargetId);if(initialTargetContent)initialTargetContent.style.display='block';}else if(assistantTabs.length>0){assistantTabs[0].click();}
+
+
+            // --- Chat Functionality ---
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const chatContainer = document.querySelector('.chat-container');
+
+            const addChatMessage = (content, sender) => { /* ... (same as before) ... */
+                 if (!chatContainer) return; const messageDiv = document.createElement('div'); messageDiv.className = `chat-message ${sender}`; const bubble = document.createElement('div'); bubble.className = 'message-bubble'; bubble.innerHTML = typeof content === 'string' && content.match(/<[a-z][\s\S]*>/i) ? content : `<p>${content || ''}</p>`; messageDiv.appendChild(bubble); chatContainer.appendChild(messageDiv); chatContainer.scrollTop = chatContainer.scrollHeight;
+             };
+            const showTyping = () => { /* ... (same as before) ... */
+                 if (!chatContainer || chatContainer.querySelector('.typing-indicator')) return; const typingIndicator = document.createElement('div'); typingIndicator.className = 'typing-indicator'; typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>'; chatContainer.appendChild(typingIndicator); chatContainer.scrollTop = chatContainer.scrollHeight;
+             };
+            const hideTyping = () => { chatContainer?.querySelector('.typing-indicator')?.remove(); };
+
+            const handleSendMessage = async () => { /* ... (same as before, including simulation) ... */
+                 if (!chatInput || !chatInput.value.trim()) return; const message = chatInput.value.trim(); addChatMessage(message, 'user'); chatInput.value = ''; chatInput.style.height = 'auto'; showTyping(); try { await new Promise(resolve => setTimeout(resolve, 1500)); const aiResponse = `He procesado tu consulta sobre "${message.substring(0, 30)}...". Aquí tienes una respuesta simulada. Necesitaría más contexto o acceso a datos reales para dar una respuesta detallada.`; hideTyping(); addChatMessage(aiResponse, 'ai'); } catch (error) { hideTyping(); showToast('Error Chat', 'No se pudo obtener respuesta del asistente.', 'error'); console.error("Chat error:", error); }
+             };
+
+             if (sendButton) sendButton.addEventListener('click', handleSendMessage);
+             if (chatInput) {
+                 chatInput.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
+                 chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = (chatInput.scrollHeight) + 'px'; });
+             }
+
+            // --- Other Buttons (Voice, Attach, File Input) ---
+             document.getElementById('voice-button')?.addEventListener('click', () => showToast('Info', 'Entrada de voz no implementada.', 'info'));
+             document.getElementById('attach-button')?.addEventListener('click', () => document.getElementById('file-input')?.click());
+             document.getElementById('file-input')?.addEventListener('change', (event) => { /* ... (same as before) ... */
+                  if (event.target.files.length > 0) { const file = event.target.files[0]; if (file.size > MAX_FILE_SIZE) { showToast('Error Archivo', `El archivo es demasiado grande (Máx: ${MAX_FILE_SIZE / 1024 / 1024}MB).`, 'error'); return; } addChatMessage(`Archivo adjunto: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`, 'user'); showToast('Archivo Adjunto', `${file.name} listo para enviar o procesar.`, 'info'); event.target.value = null; }
+              });
+
+            // --- Document Tab Simplified Logic ---
+            document.getElementById('browse-files')?.addEventListener('click', () => document.getElementById('document-file-input')?.click());
+            document.getElementById('analyze-document-btn')?.addEventListener('click', () => showToast('Info', 'Análisis de documento no implementado.', 'info'));
+            document.getElementById('integrate-analysis-btn')?.addEventListener('click', () => showToast('Info', 'Integración no implementada.', 'info'));
+            document.getElementById('document-file-input')?.addEventListener('change', (event) => { /* Handle file upload for document tab */ });
+
+             // --- Global Helper: showToast ---
+             function showToast(title, message, type = 'info') { /* ... (same robust implementation as before) ... */
+                  const toastContainer = document.getElementById('toast-container'); if (!toastContainer) { console.warn('Toast container not found!'); return; } const toast = document.createElement('div'); toast.className = `toast ${type}`; const iconClass = type === 'success' ? 'fas fa-check-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : type === 'error' ? 'fas fa-times-circle' : 'fas fa-info-circle'; toast.innerHTML = `<div class="toast-icon ${type}"><i class="${iconClass}"></i></div><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close"><i class="fas fa-times"></i></button>`; toastContainer.appendChild(toast); const closeButton = toast.querySelector('.toast-close'); closeButton?.addEventListener('click', () => { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); }); setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { if (toast.parentNode === toastContainer) { toast.classList.remove('show'); setTimeout(() => { if (toast.parentNode === toastContainer) toast.remove(); }, 300); } }, 5000);
+             }
+             // Other helpers like formatFileSize, getFileIcon can be added if needed by document tab logic
+
+            console.log("Dashboard AI Assistant page initialized.");
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>

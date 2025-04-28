@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLongevity - AI-Powered Personalized Medicine Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#6366F1',
+                        accent: '#4F46E5',
+                        neutral: '#F3F4F6',
+                        dark: '#181818'
+                    },
+                    boxShadow: {
+                        neumorph: '8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff',
+                        'neumorph-dark': '8px 8px 16px #121212, -8px -8px 16px #1e1e1e'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            scroll-behavior: smooth;
+        }
+        
+        .neumorphic {
+            border-radius: 16px;
+            background: #f0f0f0;
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        .dark .neumorphic {
+            background: #202020;
+            box-shadow: 8px 8px 16px #121212, -8px -8px 16px #2e2e2e;
+        }
+        
+        .neumorphic:hover {
+            transform: translateY(-5px);
+        }
+        
+        .neumorph-button {
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f0f0f0, #e6e6e6);
+            box-shadow: 4px 4px 8px #d1d1d1, -4px -4px 8px #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .dark .neumorph-button {
+            background: linear-gradient(145deg, #202020, #1c1c1c);
+            box-shadow: 4px 4px 8px #121212, -4px -4px 8px #2e2e2e;
+        }
+        
+        .neumorph-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 10px #d1d1d1, -6px -6px 10px #ffffff;
+        }
+        
+        .dark .neumorph-button:hover {
+            box-shadow: 6px 6px 10px #121212, -6px -6px 10px #2e2e2e;
+        }
+        
+        .neumorph-button:active {
+            transform: translateY(0px);
+            box-shadow: inset 4px 4px 8px #d1d1d1, inset -4px -4px 8px #ffffff;
+        }
+        
+        .dark .neumorph-button:active {
+            box-shadow: inset 4px 4px 8px #121212, inset -4px -4px 8px #2e2e2e;
+        }
+        
+        .biomarker-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .biomarker-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .risk-low {
+            border-color: #10B981;
+        }
+        
+        .risk-medium {
+            border-color: #F59E0B;
+        }
+        
+        .risk-high {
+            border-color: #EF4444;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .chat-message {
+            max-width: 80%;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            padding: 8px 12px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.user {
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            background-color: #5D5CDE;
+            color: white;
+        }
+        
+        .chat-message.assistant {
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        
+        .dark .chat-message.assistant {
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #888;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .sliding-tab {
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .sliding-tab.active {
+            border-color: #5D5CDE;
+            color: #5D5CDE;
+        }
+        
+        .dark .sliding-tab.active {
+            color: #8887FF;
+            border-color: #8887FF;
+        }
+        
+        .report-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .report-section.active {
+            max-height: 1000px;
+        }
+        
+        /* Ensure input font sizes are at least 16px on mobile */
+        @media (max-width: 768px) {
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-dark text-gray-800 dark:text-gray-200 min-h-screen">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 md:min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:flex md:flex-col">
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-2xl font-bold text-primary dark:text-indigo-400">MediLongevity</h1>
+                <button id="toggleTheme" class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 md:hidden">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-4 flex-grow">
+                <a href="#dashboard" class="nav-link flex items-center space-x-2 p-2 rounded-lg bg-primary bg-opacity-10 text-primary dark:text-indigo-400">
+                    <i class="fas fa-chart-line w-6"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#biomarkers" class="nav-link flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i class="fas fa-vial w-6"></i>
+                    <span>Biomarkers</span>
+                </a>
+                <a href="#assistant" class="nav-link flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i class="fas fa-robot w-6"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#protocols" class="nav-link flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i class="fas fa-clipboard-list w-6"></i>
+                    <span>Treatment Protocols</span>
+                </a>
+                <a href="#reports" class="nav-link flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i class="fas fa-file-medical-alt w-6"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            
+            <div class="mt-auto pt-4">
+                <div class="flex items-center p-2 rounded-lg bg-gray-200 dark:bg-gray-800 mb-4">
+                    <img src="https://i.imgur.com/8Km9tLL.png" alt="User" class="w-10 h-10 rounded-full bg-gray-300">
+                    <div class="ml-2">
+                        <div class="text-sm font-semibold">Dr. Maria García</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400">Longevity Specialist</div>
+                    </div>
+                </div>
+                <button id="sidebarThemeToggle" class="hidden md:flex items-center justify-center w-full p-2 rounded-lg bg-gray-200 dark:bg-gray-800">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                    <span class="ml-2">Toggle Theme</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-6 overflow-auto">
+            <!-- Patient Info Bar -->
+            <div class="mb-6 p-4 neumorphic">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <img src="https://i.imgur.com/J8E1nVG.png" alt="Patient" class="w-16 h-16 rounded-full bg-gray-300">
+                        <div class="ml-4">
+                            <h2 class="text-xl font-bold">Isabel Romero</h2>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">58 years • Female • ID: 458912</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Biological Age</div>
+                            <div class="text-xl font-bold text-primary">52.3 <span class="text-sm text-green-500">(-5.7)</span></div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Health Score</div>
+                            <div class="text-xl font-bold text-primary">84/100</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">Last Checkup</div>
+                            <div class="text-xl font-bold">12/04/2023</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div id="content-container">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <h2 class="text-2xl font-bold mb-4 md:mb-0">Health Dashboard</h2>
+                        <div class="flex space-x-2">
+                            <button class="time-filter active neumorph-button px-3 py-1 text-sm" data-period="1m">1M</button>
+                            <button class="time-filter neumorph-button px-3 py-1 text-sm" data-period="3m">3M</button>
+                            <button class="time-filter neumorph-button px-3 py-1 text-sm" data-period="6m">6M</button>
+                            <button class="time-filter neumorph-button px-3 py-1 text-sm" data-period="1y">1Y</button>
+                        </div>
+                    </div>
+
+                    <!-- Health Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 neumorphic">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm">Cardiovascular Health</div>
+                            <div class="text-2xl font-bold mt-1">Good</div>
+                            <div class="flex items-center mt-2">
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <span class="ml-2 text-sm font-medium">85%</span>
+                            </div>
+                        </div>
+                        <div class="p-4 neumorphic">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm">Metabolic Health</div>
+                            <div class="text-2xl font-bold mt-1">Moderate</div>
+                            <div class="flex items-center mt-2">
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 68%"></div>
+                                </div>
+                                <span class="ml-2 text-sm font-medium">68%</span>
+                            </div>
+                        </div>
+                        <div class="p-4 neumorphic">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm">Immune Function</div>
+                            <div class="text-2xl font-bold mt-1">Very Good</div>
+                            <div class="flex items-center mt-2">
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 92%"></div>
+                                </div>
+                                <span class="ml-2 text-sm font-medium">92%</span>
+                            </div>
+                        </div>
+                        <div class="p-4 neumorphic">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm">Cognitive Health</div>
+                            <div class="text-2xl font-bold mt-1">Good</div>
+                            <div class="flex items-center mt-2">
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div class="bg-green-500 h-2.5 rounded-full" style="width: 78%"></div>
+                                </div>
+                                <span class="ml-2 text-sm font-medium">78%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="p-4 neumorphic">
+                            <h3 class="font-semibold mb-4">Biological Age Trend</h3>
+                            <canvas id="ageChart" height="250"></canvas>
+                        </div>
+                        <div class="p-4 neumorphic">
+                            <h3 class="font-semibold mb-4">Key Biomarkers</h3>
+                            <canvas id="biomarkerChart" height="250"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Intervention Impact -->
+                    <div class="p-4 neumorphic">
+                        <h3 class="font-semibold mb-4">Treatment Impact Analysis</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">AI analysis of how current treatments are affecting key biomarkers</p>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-300 dark:border-gray-700">
+                                        <th class="text-left py-2 px-3">Intervention</th>
+                                        <th class="text-left py-2 px-3">Target Biomarkers</th>
+                                        <th class="text-left py-2 px-3">Start Date</th>
+                                        <th class="text-left py-2 px-3">Impact</th>
+                                        <th class="text-left py-2 px-3">AI Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <td class="py-3 px-3">Magnesio Quelado</td>
+                                        <td class="py-3 px-3">Metabolic Health, Sleep Quality</td>
+                                        <td class="py-3 px-3">03/01/2023</td>
+                                        <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">High Positive</span></td>
+                                        <td class="py-3 px-3">Continue current dosage</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <td class="py-3 px-3">Hidroterapia Ionizante</td>
+                                        <td class="py-3 px-3">Circulación, Detoxificación</td>
+                                        <td class="py-3 px-3">12/01/2023</td>
+                                        <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Moderate Positive</span></td>
+                                        <td class="py-3 px-3">Increase frequency to weekly</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                                        <td class="py-3 px-3">Omega 3</td>
+                                        <td class="py-3 px-3">Inflamación, Salud Cardiovascular</td>
+                                        <td class="py-3 px-3">20/02/2023</td>
+                                        <td class="py-3 px-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">Neutral</span></td>
+                                        <td class="py-3 px-3">Increase dosage to 2000mg daily</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-3">VIT C/Zinc</td>
+                                        <td class="py-3 px-3">Immune System, Antioxidante</td>
+                                        <td class="py-3 px-3">05/03/2023</td>
+                                        <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">High Positive</span></td>
+                                        <td class="py-3 px-3">Continue current protocol</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Health Risk Predictions -->
+                    <div class="p-4 neumorphic">
+                        <h3 class="font-semibold mb-4">AI Health Risk Predictions</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Predictive analysis based on current biomarkers and medical history</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="biomarker-card risk-low p-3 bg-white dark:bg-gray-800 rounded shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">Cardiovascular Disease</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">5-year risk assessment</p>
+                                    </div>
+                                    <span class="text-green-500 font-bold">Low</span>
+                                </div>
+                                <div class="mt-2 text-sm">
+                                    <p>Current risk is 12% below average for demographic</p>
+                                    <div class="flex items-center mt-1">
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div class="bg-green-500 h-1.5 rounded-full" style="width: 15%"></div>
+                                        </div>
+                                        <span class="ml-2 text-xs font-medium">15%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="biomarker-card risk-medium p-3 bg-white dark:bg-gray-800 rounded shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">Type 2 Diabetes</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">5-year risk assessment</p>
+                                    </div>
+                                    <span class="text-yellow-500 font-bold">Moderate</span>
+                                </div>
+                                <div class="mt-2 text-sm">
+                                    <p>Elevated glucose response patterns detected</p>
+                                    <div class="flex items-center mt-1">
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 42%"></div>
+                                        </div>
+                                        <span class="ml-2 text-xs font-medium">42%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="biomarker-card risk-high p-3 bg-white dark:bg-gray-800 rounded shadow">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium">Osteopenia</h4>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">5-year risk assessment</p>
+                                    </div>
+                                    <span class="text-red-500 font-bold">High</span>
+                                </div>
+                                <div class="mt-2 text-sm">
+                                    <p>Bone density markers show concerning trend</p>
+                                    <div class="flex items-center mt-1">
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div class="bg-red-500 h-1.5 rounded-full" style="width: 68%"></div>
+                                        </div>
+                                        <span class="ml-2 text-xs font-medium">68%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Biomarkers Section -->
+                <section id="biomarkers" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold">Biomarker Analysis</h2>
+                        <div class="flex space-x-2">
+                            <div class="relative">
+                                <input type="text" placeholder="Search biomarkers..." class="px-4 py-2 pr-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base">
+                                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                            </div>
+                            <button class="neumorph-button px-4 py-2 flex items-center">
+                                <i class="fas fa-filter mr-2"></i>
+                                <span>Filter</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Biomarker Categories -->
+                    <div class="flex flex-wrap gap-2">
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm active">All</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Metabolic</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Cardiovascular</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Immune</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Inflammatory</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Hormonal</button>
+                        <button class="biomarker-category-btn neumorph-button px-3 py-1 text-sm">Nutrientes</button>
+                    </div>
+
+                    <!-- Biomarker Table -->
+                    <div class="neumorphic p-4">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Biomarker</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Category</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Current Value</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Previous</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Reference Range</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Status</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">Glucose</td>
+                                        <td class="px-4 py-3 text-sm">Metabolic</td>
+                                        <td class="px-4 py-3 text-sm">105 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm">118 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm">70-99 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">Elevated</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-down"></i> -11%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">HbA1c</td>
+                                        <td class="px-4 py-3 text-sm">Metabolic</td>
+                                        <td class="px-4 py-3 text-sm">5.6%</td>
+                                        <td class="px-4 py-3 text-sm">5.9%</td>
+                                        <td class="px-4 py-3 text-sm">< 5.7%</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Normal</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-down"></i> -5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">hsCRP</td>
+                                        <td class="px-4 py-3 text-sm">Inflammatory</td>
+                                        <td class="px-4 py-3 text-sm">2.1 mg/L</td>
+                                        <td class="px-4 py-3 text-sm">3.8 mg/L</td>
+                                        <td class="px-4 py-3 text-sm">< 1.0 mg/L</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">Elevated</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-down"></i> -45%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">Vitamin D</td>
+                                        <td class="px-4 py-3 text-sm">Nutrientes</td>
+                                        <td class="px-4 py-3 text-sm">32 ng/mL</td>
+                                        <td class="px-4 py-3 text-sm">24 ng/mL</td>
+                                        <td class="px-4 py-3 text-sm">30-50 ng/mL</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Normal</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-up"></i> +33%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">Homocisteína</td>
+                                        <td class="px-4 py-3 text-sm">Cardiovascular</td>
+                                        <td class="px-4 py-3 text-sm">12.4 μmol/L</td>
+                                        <td class="px-4 py-3 text-sm">14.1 μmol/L</td>
+                                        <td class="px-4 py-3 text-sm">< 10 μmol/L</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">Elevated</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-down"></i> -12%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">IL-6</td>
+                                        <td class="px-4 py-3 text-sm">Inflammatory</td>
+                                        <td class="px-4 py-3 text-sm">2.8 pg/mL</td>
+                                        <td class="px-4 py-3 text-sm">4.2 pg/mL</td>
+                                        <td class="px-4 py-3 text-sm">< 1.8 pg/mL</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full text-xs">High</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-down"></i> -33%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 text-sm font-medium">Magnesio</td>
+                                        <td class="px-4 py-3 text-sm">Nutrientes</td>
+                                        <td class="px-4 py-3 text-sm">2.1 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm">1.8 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm">1.8-2.6 mg/dL</td>
+                                        <td class="px-4 py-3 text-sm"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Normal</span></td>
+                                        <td class="px-4 py-3 text-sm text-green-500"><i class="fas fa-arrow-up"></i> +17%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Biomarker Trend Analysis -->
+                    <div class="neumorphic p-4">
+                        <h3 class="font-semibold mb-4">Trend Analysis & Predictions</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">AI-powered analysis of your biomarker trends and future predictions</p>
+                        
+                        <div class="space-y-4">
+                            <div class="p-4 border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20 rounded">
+                                <h4 class="font-medium">Positive Trends</h4>
+                                <p class="text-sm mt-1">Key inflammatory markers (hsCRP, IL-6) show significant improvement, likely due to the Immune Modulator treatment and dietary changes. Continue current protocol.</p>
+                            </div>
+                            
+                            <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                                <h4 class="font-medium">Areas to Monitor</h4>
+                                <p class="text-sm mt-1">Metabolic markers are improving but still elevated. The current Magnesio Quelado supplementation is effective but consider adding targeted glucose regulation support.</p>
+                            </div>
+                            
+                            <div class="p-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 rounded">
+                                <h4 class="font-medium">AI Prediction</h4>
+                                <p class="text-sm mt-1">At current improvement rates, all inflammatory markers will reach optimal range within 3-4 months. Metabolic markers may take 5-6 months to fully normalize if current treatment adherence continues.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Assistant Section -->
+                <section id="assistant" class="hidden space-y-6">
+                    <h2 class="text-2xl font-bold">AI Longevity Assistant</h2>
+                    
+                    <div class="neumorphic p-4 h-[500px] flex flex-col">
+                        <div class="flex space-x-2 mb-4">
+                            <button class="sliding-tab active py-1 px-3 text-sm font-medium" data-tab="chat">Conversational Assistant</button>
+                            <button class="sliding-tab py-1 px-3 text-sm font-medium" data-tab="insights">AI Insights</button>
+                        </div>
+                        
+                        <!-- Chat Interface -->
+                        <div id="chat-tab" class="flex-1 flex flex-col">
+                            <div id="chat-messages" class="flex-1 overflow-y-auto mb-4 flex flex-col">
+                                <div class="chat-message assistant">
+                                    <p>Hello Dr. García. I've analyzed Isabel's latest biomarkers. Her inflammatory markers show significant improvement since starting the Immune Modulator therapy. What specific aspect of her health would you like to discuss today?</p>
+                                </div>
+                                <div class="chat-message user">
+                                    <p>Can you analyze her metabolic health trends and suggest optimizations to her current protocol?</p>
+                                </div>
+                                <div class="chat-message assistant">
+                                    <p>Isabel's metabolic markers are showing gradual improvement:</p>
+                                    <ul class="list-disc pl-5 mt-2">
+                                        <li>Fasting glucose reduced from 118 to 105 mg/dL (still above optimal range)</li>
+                                        <li>HbA1c improved from 5.9% to 5.6% (now within normal range)</li>
+                                        <li>Insulin sensitivity increased by 18%</li>
+                                    </ul>
+                                    <p class="mt-2">Recommendations to optimize her protocol:</p>
+                                    <ol class="list-decimal pl-5 mt-2">
+                                        <li>Increase Magnesio Quelado to 400mg daily (currently at 300mg)</li>
+                                        <li>Add Alpha Lipoic Acid 600mg daily to improve insulin sensitivity</li>
+                                        <li>Consider time-restricted eating (8-hour window) to improve metabolic flexibility</li>
+                                        <li>Continue current VIT C/Zinc supplementation which supports these pathways</li>
+                                    </ol>
+                                    <p class="mt-2">Would you like me to generate a detailed protocol update?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex">
+                                <input type="text" id="chat-input" placeholder="Ask the AI assistant..." class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-base">
+                                <button id="send-message" class="bg-primary hover:bg-opacity-90 text-white px-4 py-2 rounded-r-lg flex items-center">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Insights Tab -->
+                        <div id="insights-tab" class="hidden flex-1 overflow-y-auto">
+                            <div class="space-y-4">
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                                        <h3 class="font-medium">Key Health Insights</h3>
+                                    </div>
+                                    <p class="text-sm">Isabel's inflammatory markers show consistent improvement following implementation of the Immune Modulator therapy. The combination with Ginkgo biloba appears to have synergistic effects on both inflammation and circulation.</p>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+                                        <h3 class="font-medium">Biomarker Pattern Detection</h3>
+                                    </div>
+                                    <p class="text-sm">A correlation analysis reveals that Isabel's inflammatory markers improve significantly 3-4 days after each Hidroterapia Ionizante session, suggesting this therapy is particularly effective for her specific inflammatory profile.</p>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-search-plus text-green-500 mr-2"></i>
+                                        <h3 class="font-medium">Research-Based Recommendations</h3>
+                                    </div>
+                                    <p class="text-sm">Recent studies in individuals with similar metabolic profiles to Isabel show significant benefits from adding Berberine (500mg 2x daily) alongside magnesium supplementation. This combination improved insulin sensitivity by 24% in a 12-week trial.</p>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+                                    <div class="flex items-center mb-2">
+                                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                                        <h3 class="font-medium">Potential Interaction Alert</h3>
+                                    </div>
+                                    <p class="text-sm">The current dosage of Ginkgo biloba may interact with VIT C/Zinc when taken simultaneously. Recommend separating these supplements by at least 2 hours for optimal absorption and effectiveness.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Treatment Protocols Section -->
+                <section id="protocols" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold">Treatment Protocols</h2>
+                        <button id="generate-protocol" class="neumorph-button px-4 py-2 flex items-center bg-primary text-white">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span>Generate New Protocol</span>
+                        </button>
+                    </div>
+                    
+                    <div class="neumorphic p-4">
+                        <h3 class="font-semibold mb-4">Current Protocol (Updated: 12/04/2023)</h3>
+                        <div class="tabs flex space-x-4 mb-4 border-b border-gray-300 dark:border-gray-700">
+                            <button class="protocol-tab active text-sm py-2 border-b-2 border-primary dark:border-indigo-400" data-tab="supplements">Supplements</button>
+                            <button class="protocol-tab text-sm py-2" data-tab="therapies">Therapies</button>
+                            <button class="protocol-tab text-sm py-2" data-tab="lifestyle">Lifestyle</button>
+                            <button class="protocol-tab text-sm py-2" data-tab="monitor">Monitoring</button>
+                        </div>
+                        
+                        <!-- Supplements Tab -->
+                        <div id="supplements-tab" class="protocol-content">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-900">
+                                            <th class="text-left py-2 px-3">Supplement</th>
+                                            <th class="text-left py-2 px-3">Dosage</th>
+                                            <th class="text-left py-2 px-3">Schedule</th>
+                                            <th class="text-left py-2 px-3">Purpose</th>
+                                            <th class="text-left py-2 px-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Magnesio Quelado</td>
+                                            <td class="py-3 px-3">300mg</td>
+                                            <td class="py-3 px-3">1-0-1-0</td>
+                                            <td class="py-3 px-3">Metabolic support, muscle function</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Omega 3</td>
+                                            <td class="py-3 px-3">1000mg</td>
+                                            <td class="py-3 px-3">0-0-0-1</td>
+                                            <td class="py-3 px-3">Anti-inflammatory, cardiovascular</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">VIT C/Zinc</td>
+                                            <td class="py-3 px-3">1000mg/15mg</td>
+                                            <td class="py-3 px-3">1-0-0-0</td>
+                                            <td class="py-3 px-3">Immune support, antioxidant</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Immune Modulator</td>
+                                            <td class="py-3 px-3">2 capsules</td>
+                                            <td class="py-3 px-3">1-0-1-0</td>
+                                            <td class="py-3 px-3">Inflammatory regulation</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-medium">Ginkgo biloba</td>
+                                            <td class="py-3 px-3">120mg</td>
+                                            <td class="py-3 px-3">1-0-0-0</td>
+                                            <td class="py-3 px-3">Cerebral circulation, cognitive</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-lightbulb text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">AI Recommendations</h4>
+                                        <p class="text-sm mt-1">Based on recent biomarker trends, consider increasing Magnesio Quelado to 400mg daily and adding Alpha Lipoic Acid 600mg to improve metabolic markers. The current Omega 3 dosage could be increased to 2000mg for better anti-inflammatory effects.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Therapies Tab -->
+                        <div id="therapies-tab" class="protocol-content hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-900">
+                                            <th class="text-left py-2 px-3">Therapy</th>
+                                            <th class="text-left py-2 px-3">Frequency</th>
+                                            <th class="text-left py-2 px-3">Duration</th>
+                                            <th class="text-left py-2 px-3">Purpose</th>
+                                            <th class="text-left py-2 px-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Hidroterapia Ionizante</td>
+                                            <td class="py-3 px-3">Quincenal</td>
+                                            <td class="py-3 px-3">30 min</td>
+                                            <td class="py-3 px-3">Detoxificación, circulación</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Nebulización</td>
+                                            <td class="py-3 px-3">Semanal</td>
+                                            <td class="py-3 px-3">15 min</td>
+                                            <td class="py-3 px-3">Respiratory support</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                                            <td class="py-3 px-3 font-medium">Baños Hipertérmicos</td>
+                                            <td class="py-3 px-3">3x por semana</td>
+                                            <td class="py-3 px-3">15 min</td>
+                                            <td class="py-3 px-3">Circulación, detoxificación</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs">Active</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 px-3 font-medium">Quelación</td>
+                                            <td class="py-3 px-3">Mensual</td>
+                                            <td class="py-3 px-3">45 min</td>
+                                            <td class="py-3 px-3">Heavy metal detox, cardiovascular</td>
+                                            <td class="py-3 px-3"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full text-xs">Scheduled</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-lightbulb text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">AI Recommendations</h4>
+                                        <p class="text-sm mt-1">Data analysis shows Hidroterapia Ionizante has significant positive effects on inflammatory markers. Consider increasing frequency to weekly sessions for faster resolution of elevated biomarkers. The combination with Baños Hipertérmicos shows synergistic effects.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lifestyle Tab -->
+                        <div id="lifestyle-tab" class="protocol-content hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Nutrition</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Anti-inflammatory Mediterranean diet with emphasis on omega-3 rich foods</li>
+                                        <li>Time-restricted eating: 16:8 protocol (eating window 10am-6pm)</li>
+                                        <li>Minimize refined carbohydrates and processed foods</li>
+                                        <li>Increase fiber intake to 30g daily</li>
+                                        <li>Stay hydrated: 2L of filtered water daily</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Physical Activity</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Zone 2 cardio: 30 min x 3 days/week (heart rate 100-120 bpm)</li>
+                                        <li>Resistance training: 2 days/week (focus on major muscle groups)</li>
+                                        <li>Flexibility/mobility work: 15 min daily</li>
+                                        <li>Daily walking: minimum 7,000 steps</li>
+                                        <li>Avoid sitting for prolonged periods (>60 min)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Sleep Optimization</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Target 7-8 hours of quality sleep</li>
+                                        <li>Consistent sleep/wake schedule (10:30pm - 6:30am)</li>
+                                        <li>No screen exposure 60 min before bed</li>
+                                        <li>Bedroom temperature: 18-19°C</li>
+                                        <li>Morning sunlight exposure within 30 min of waking</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Stress Management</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Daily breathing practice: 5 min (4-7-8 technique)</li>
+                                        <li>Mindfulness meditation: 10 min daily</li>
+                                        <li>Nature exposure: minimum 30 min, 3x/week</li>
+                                        <li>Digital detox: 2 hours before bed</li>
+                                        <li>Weekly social connection activities</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-lightbulb text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">AI Recommendations</h4>
+                                        <p class="text-sm mt-1">Based on Isabel's metabolic markers, implementing a 24-hour fast once weekly could accelerate improvements in insulin sensitivity. Daily cold exposure (2-3 min cold shower) would complement the current protocol by activating brown adipose tissue and reducing inflammation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monitoring Tab -->
+                        <div id="monitor-tab" class="protocol-content hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Routine Tracking</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Daily: Weight, sleep quality (wearable device)</li>
+                                        <li>Weekly: Blood pressure, fasting glucose (home monitoring)</li>
+                                        <li>Daily: Symptom tracking via mobile app</li>
+                                        <li>Weekly: Subjective wellbeing assessment</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Clinical Testing</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Monthly: Complete blood count, metabolic panel</li>
+                                        <li>Quarterly: Inflammatory markers (hsCRP, IL-6)</li>
+                                        <li>Quarterly: Hormone panel</li>
+                                        <li>Bi-annual: Advanced lipid panel, oral glucose tolerance test</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Follow-up Schedule</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Telemedicine check-in: Every 2 weeks</li>
+                                        <li>In-person evaluation: Monthly</li>
+                                        <li>Comprehensive review: Quarterly</li>
+                                        <li>Next appointment: 15/05/2023</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                                    <h4 class="font-medium text-primary dark:text-indigo-400 mb-2">Key Metrics to Monitor</h4>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                                        <li>Fasting glucose: Target < 95 mg/dL</li>
+                                        <li>HbA1c: Target < 5.4%</li>
+                                        <li>hsCRP: Target < 1.0 mg/L</li>
+                                        <li>Blood pressure: Target < 120/80 mmHg</li>
+                                        <li>Resting heart rate: Target < 70 bpm</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <div class="flex items-start">
+                                    <i class="fas fa-lightbulb text-blue-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">AI Recommendations</h4>
+                                        <p class="text-sm mt-1">Consider adding continuous glucose monitoring (CGM) for 2 weeks to identify specific dietary triggers of glucose spikes. Also recommend adding heart rate variability (HRV) tracking to assess autonomic nervous system function and recovery status.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Previous Protocols -->
+                    <div class="neumorphic p-4">
+                        <h3 class="font-semibold mb-4">Previous Protocols</h3>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer">
+                                <div>
+                                    <h4 class="font-medium">Initial Protocol</h4>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Created: 24/12/2022</div>
+                                </div>
+                                <button class="px-3 py-1 text-sm neumorph-button">View</button>
+                            </div>
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer">
+                                <div>
+                                    <h4 class="font-medium">First Adjustment Protocol</h4>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Created: 15/02/2023</div>
+                                </div>
+                                <button class="px-3 py-1 text-sm neumorph-button">View</button>
+                            </div>
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer">
+                                <div>
+                                    <h4 class="font-medium">Second Adjustment Protocol</h4>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Created: 20/03/2023</div>
+                                </div>
+                                <button class="px-3 py-1 text-sm neumorph-button">View</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports" class="hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold">AI-Generated Reports</h2>
+                        <button id="generate-report" class="neumorph-button px-4 py-2 flex items-center bg-primary text-white">
+                            <i class="fas fa-file-medical mr-2"></i>
+                            <span>Generate New Report</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Sample Report -->
+                    <div class="neumorphic p-4">
+                        <div class="pb-4 mb-4 border-b border-gray-300 dark:border-gray-700">
+                            <h3 class="font-semibold text-xl">Comprehensive Health Evaluation: Isabel Romero</h3>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Generated: 12/04/2023 • ID: REP-23041201</div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <!-- Executive Summary -->
+                            <div class="report-section active">
+                                <h4 class="font-medium text-lg mb-3 flex items-center cursor-pointer report-toggle">
+                                    <i class="fas fa-chevron-down mr-2 text-primary"></i>
+                                    Executive Summary
+                                </h4>
+                                <div class="pl-6">
+                                    <p class="mb-3">Isabel Romero (58F) shows significant improvement in several key biomarkers related to aging and metabolic health since beginning her personalized longevity protocol in December 2022. Her biological age is currently estimated at 52.3 years (5.7 years below chronological age), representing a 2.1-year reduction since baseline assessment.</p>
+                                    
+                                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                            <h5 class="font-medium text-green-700 dark:text-green-400">Key Improvements</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+                                                <li>hsCRP reduced by 45%</li>
+                                                <li>Fasting glucose reduced by 11%</li>
+                                                <li>HbA1c normalized to 5.6%</li>
+                                                <li>Vitamin D increased to optimal range</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                                            <h5 class="font-medium text-yellow-700 dark:text-yellow-400">Areas of Concern</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+                                                <li>IL-6 remains elevated (2.8 pg/mL)</li>
+                                                <li>Homocysteine above optimal (12.4 μmol/L)</li>
+                                                <li>Bone density markers show decline</li>
+                                                <li>Sleep efficiency below target (78%)</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                            <h5 class="font-medium text-blue-700 dark:text-blue-400">Top Recommendations</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-1">
+                                                <li>Increase anti-inflammatory protocol</li>
+                                                <li>Add bone health support</li>
+                                                <li>Optimize Magnesio Quelado dosage</li>
+                                                <li>Implement weekly Hidroterapia</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Detailed Biomarker Analysis -->
+                            <div class="report-section">
+                                <h4 class="font-medium text-lg mb-3 flex items-center cursor-pointer report-toggle">
+                                    <i class="fas fa-chevron-right mr-2 text-primary"></i>
+                                    Detailed Biomarker Analysis
+                                </h4>
+                                <div class="pl-6 hidden">
+                                    <p class="mb-3">Comprehensive analysis of key biomarkers related to aging, inflammation, metabolism, and cardiovascular health reveals several significant trends:</p>
+                                    
+                                    <div class="space-y-4 mt-4">
+                                        <div>
+                                            <h5 class="font-medium">Inflammatory Markers</h5>
+                                            <p class="text-sm mt-1">High-sensitivity C-reactive protein (hsCRP) has decreased from 3.8 mg/L to 2.1 mg/L, representing a 45% improvement but still above the optimal range of < 1.0 mg/L. Interleukin-6 (IL-6) shows similar improvement but remains elevated at 2.8 pg/mL (optimal < 1.8 pg/mL). The improvement trajectory suggests these markers may normalize within 3-4 months with continued adherence to the current protocol.</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <h5 class="font-medium">Metabolic Health</h5>
+                                            <p class="text-sm mt-1">Fasting glucose has improved from 118 mg/dL to 105 mg/dL, while HbA1c has normalized from 5.9% to 5.6%. Insulin sensitivity has improved by 18% based on HOMA-IR calculations. Continuous glucose monitoring (CGM) data shows a 32% reduction in glucose variability and fewer postprandial spikes above 140 mg/dL.</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <h5 class="font-medium">Cardiovascular Risk</h5>
+                                            <p class="text-sm mt-1">Homocysteine remains elevated at 12.4 μmol/L (optimal < 10 μmol/L) but has improved from baseline of 14.1 μmol/L. Lipid profile shows improvement with HDL increasing from 45 to 52 mg/dL and triglycerides decreasing from 165 to 132 mg/dL. Inflammatory markers associated with cardiovascular risk have improved by an average of 37%.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Treatment Efficacy -->
+                            <div class="report-section">
+                                <h4 class="font-medium text-lg mb-3 flex items-center cursor-pointer report-toggle">
+                                    <i class="fas fa-chevron-right mr-2 text-primary"></i>
+                                    Treatment Efficacy Analysis
+                                </h4>
+                                <div class="pl-6 hidden">
+                                    <p class="mb-3">AI analysis of treatment efficacy based on biomarker response and subjective reporting:</p>
+                                    
+                                    <div class="overflow-x-auto mt-4">
+                                        <table class="min-w-full text-sm">
+                                            <thead>
+                                                <tr class="bg-gray-100 dark:bg-gray-900">
+                                                    <th class="text-left py-2 px-3">Intervention</th>
+                                                    <th class="text-left py-2 px-3">Target Pathways</th>
+                                                    <th class="text-left py-2 px-3">Efficacy Score</th>
+                                                    <th class="text-left py-2 px-3">Key Outcomes</th>
+                                                    <th class="text-left py-2 px-3">Recommendation</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="border-b border-gray-200 dark:border-gray-800">
+                                                    <td class="py-3 px-3 font-medium">Immune Modulator</td>
+                                                    <td class="py-3 px-3">Inflammatory regulation</td>
+                                                    <td class="py-3 px-3">85%</td>
+                                                    <td class="py-3 px-3">Significant reduction in inflammatory markers</td>
+                                                    <td class="py-3 px-3">Continue current protocol</td>
+                                                </tr>
+                                                <tr class="border-b border-gray-200 dark:border-gray-800">
+                                                    <td class="py-3 px-3 font-medium">Magnesio Quelado</td>
+                                                    <td class="py-3 px-3">Metabolic support</td>
+                                                    <td class="py-3 px-3">78%</td>
+                                                    <td class="py-3 px-3">Improved glucose metabolism, sleep quality</td>
+                                                    <td class="py-3 px-3">Increase dosage to 400mg</td>
+                                                </tr>
+                                                <tr class="border-b border-gray-200 dark:border-gray-800">
+                                                    <td class="py-3 px-3 font-medium">Hidroterapia Ionizante</td>
+                                                    <td class="py-3 px-3">Detoxification, circulation</td>
+                                                    <td class="py-3 px-3">92%</td>
+                                                    <td class="py-3 px-3">Significant reduction in inflammatory markers post-session</td>
+                                                    <td class="py-3 px-3">Increase to weekly frequency</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-3 px-3 font-medium">Omega 3</td>
+                                                    <td class="py-3 px-3">Anti-inflammatory</td>
+                                                    <td class="py-3 px-3">62%</td>
+                                                    <td class="py-3 px-3">Modest improvement in lipid profiles</td>
+                                                    <td class="py-3 px-3">Increase dosage to 2000mg</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recommendations -->
+                            <div class="report-section">
+                                <h4 class="font-medium text-lg mb-3 flex items-center cursor-pointer report-toggle">
+                                    <i class="fas fa-chevron-right mr-2 text-primary"></i>
+                                    AI-Generated Recommendations
+                                </h4>
+                                <div class="pl-6 hidden">
+                                    <p class="mb-3">Based on comprehensive analysis of biomarkers, treatment efficacy, and latest research, the following recommendations are provided:</p>
+                                    
+                                    <div class="space-y-4 mt-4">
+                                        <div class="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                                            <h5 class="font-medium text-primary dark:text-indigo-400">Protocol Optimizations</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-2">
+                                                <li><strong>Increase Magnesio Quelado to 400mg daily</strong> (1-0-1-0) - Current dose is showing positive effects but suboptimal response in sleep and glucose regulation.</li>
+                                                <li><strong>Add Alpha Lipoic Acid 600mg daily</strong> (1-0-0-0) - Recent research shows synergistic effects with magnesium for metabolic health.</li>
+                                                <li><strong>Increase Hidroterapia Ionizante to weekly sessions</strong> - Data shows significant drops in inflammatory markers for 4-5 days following each session.</li>
+                                                <li><strong>Add vitamin K2 (MK-7) 100mcg daily</strong> - To address bone health concerns and support cardiovascular protection.</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                                            <h5 class="font-medium text-primary dark:text-indigo-400">Lifestyle Modifications</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-2">
+                                                <li><strong>Implement time-restricted eating (8-hour window)</strong> - CGM data indicates prolonged elevated glucose during extended eating periods.</li>
+                                                <li><strong>Add structured resistance training 2x weekly</strong> - Bone density markers indicate need for mechanical loading to stimulate osteoblast activity.</li>
+                                                <li><strong>Cold exposure therapy</strong> - 2-3 minute cold shower daily to stimulate mitochondrial biogenesis and reduce inflammation.</li>
+                                                <li><strong>Sleep optimization</strong> - Implement regular sleep schedule and reduce blue light exposure after 8pm to improve sleep efficiency.</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="p-3 bg-white dark:bg-gray-800 rounded-lg">
+                                            <h5 class="font-medium text-primary dark:text-indigo-400">Advanced Monitoring</h5>
+                                            <ul class="list-disc pl-5 mt-2 text-sm space-y-2">
+                                                <li><strong>Implement CGM for 2 weeks</strong> - To identify specific dietary triggers of glucose variability.</li>
+                                                <li><strong>Add heart rate variability (HRV) tracking</strong> - To assess autonomic nervous system function and recovery status.</li>
+                                                <li><strong>Schedule DEXA scan</strong> - To establish baseline bone density and body composition metrics.</li>
+                                                <li><strong>Quarterly inflammatory panel</strong> - Continue tracking IL-6, TNF-alpha, and hsCRP to monitor progress.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-between">
+                            <button class="neumorph-button px-4 py-2 flex items-center">
+                                <i class="fas fa-print mr-2"></i>
+                                <span>Print Report</span>
+                            </button>
+                            <button class="neumorph-button px-4 py-2 flex items-center bg-primary text-white">
+                                <i class="fas fa-share-alt mr-2"></i>
+                                <span>Share with Patient</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Previous Reports -->
+                    <div class="neumorphic p-4">
+                        <h3 class="font-semibold mb-4">Previous Reports</h3>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer">
+                                <div>
+                                    <h4 class="font-medium">Initial Assessment Report</h4>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Generated: 24/12/2022</div>
+                                </div>
+                                <button class="px-3 py-1 text-sm neumorph-button">View</button>
+                            </div>
+                            <div class="p-3 bg-white dark:bg-gray-800 rounded-lg flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer">
+                                <div>
+                                    <h4 class="font-medium">Quarterly Progress Report</h4>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Generated: 15/03/2023</div>
+                                </div>
+                                <button class="px-3 py-1 text-sm neumorph-button">View</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            initCharts();
+            
+            // Toggle theme buttons
+            document.getElementById('toggleTheme').addEventListener('click', toggleTheme);
+            document.getElementById('sidebarThemeToggle').addEventListener('click', toggleTheme);
+            
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    showSection(targetId);
+                    
+                    // Update active nav link
+                    document.querySelectorAll('.nav-link').forEach(navLink => {
+                        navLink.classList.remove('bg-primary', 'bg-opacity-10', 'text-primary', 'dark:text-indigo-400');
+                        navLink.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-800');
+                    });
+                    link.classList.add('bg-primary', 'bg-opacity-10', 'text-primary', 'dark:text-indigo-400');
+                    link.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-800');
+                });
+            });
+            
+            // Time filters
+            document.querySelectorAll('.time-filter').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.time-filter').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateCharts(btn.dataset.period);
+                });
+            });
+            
+            // Protocol tabs
+            document.querySelectorAll('.protocol-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.protocol-tab').forEach(t => {
+                        t.classList.remove('active', 'border-b-2', 'border-primary', 'dark:border-indigo-400');
+                    });
+                    tab.classList.add('active', 'border-b-2', 'border-primary', 'dark:border-indigo-400');
+                    
+                    // Show active content
+                    document.querySelectorAll('.protocol-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+                });
+            });
+            
+            // Chat tabs
+            document.querySelectorAll('.sliding-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.sliding-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    tab.classList.add('active');
+                    
+                    // Show active content
+                    if (tabName === 'chat') {
+                        document.getElementById('chat-tab').style.display = 'flex';
+                        document.getElementById('insights-tab').style.display = 'none';
+                    } else {
+                        document.getElementById('chat-tab').style.display = 'none';
+                        document.getElementById('insights-tab').style.display = 'block';
+                    }
+                });
+            });
+            
+            // Chat functionality
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-message');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            sendButton.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+            
+            // Report section toggles
+            document.querySelectorAll('.report-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const icon = toggle.querySelector('i');
+                    const content = toggle.nextElementSibling;
+                    
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        content.classList.add('hidden');
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-right');
+                    }
+                });
+            });
+            
+            // Generate report and protocol buttons
+            document.getElementById('generate-report').addEventListener('click', () => {
+                simulateAIGeneration('Generating comprehensive health report...');
+            });
+            
+            document.getElementById('generate-protocol').addEventListener('click', () => {
+                simulateAIGeneration('Generating optimized treatment protocol...');
+            });
+            
+            // Biomarker category filtering
+            document.querySelectorAll('.biomarker-category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.biomarker-category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        });
+        
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            
+            // Update charts for dark/light mode
+            updateChartsTheme();
+        }
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('#content-container > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+        
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addChatMessage(message, 'user');
+            chatInput.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-message assistant';
+            typingIndicator.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            document.getElementById('chat-messages').appendChild(typingIndicator);
+            
+            // Simulate AI response
+            setTimeout(() => {
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add AI response based on input
+                let response = "";
+                if (message.toLowerCase().includes("protocol") || message.toLowerCase().includes("treatment")) {
+                    response = "Based on Isabel's latest biomarkers, I recommend optimizing her protocol by increasing Magnesio Quelado to 400mg daily and adding Alpha Lipoic Acid 600mg for better metabolic regulation. The Hidroterapia Ionizante sessions should be increased to weekly frequency as they show significant positive impact on inflammatory markers.";
+                } else if (message.toLowerCase().includes("risk") || message.toLowerCase().includes("prediction")) {
+                    response = "My predictive analysis shows that Isabel's current risk trajectory for Type 2 Diabetes has improved from 58% to 42% over the past 3 months. With the recommended protocol adjustments, we can expect to reduce this further to approximately 28% within 6 months. Her cardiovascular risk factors continue to improve, with a current 10-year risk of 15%, down from 22% at baseline.";
+                } else if (message.toLowerCase().includes("inflammation") || message.toLowerCase().includes("inflammatory")) {
+                    response = "Isabel's inflammatory markers show consistent improvement. hsCRP has decreased by 45% (from 3.8 to 2.1 mg/L) and IL-6 has decreased by 33% (from 4.2 to 2.8 pg/mL). Both markers are still above optimal ranges but are on a positive trajectory. The Immune Modulator therapy combined with Hidroterapia Ionizante is proving particularly effective for her inflammatory profile.";
+                } else {
+                    response = "I've analyzed Isabel's health data comprehensively. Her biological age has decreased from 54.4 to 52.3 years over the past 4 months of treatment. Key improvements include inflammatory marker reduction (hsCRP down 45%), metabolic health improvement (HbA1c normalized to 5.6%), and enhanced nutrient status (Vitamin D now optimal). Areas requiring attention include bone health markers and IL-6 levels which remain elevated.";
+                }
+                
+                addChatMessage(response, 'assistant');
+                
+                // Scroll to bottom
+                const chatContainer = document.getElementById('chat-messages');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1500);
+            
+            // Scroll to bottom
+            const chatContainer = document.getElementById('chat-messages');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function addChatMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.innerHTML = `<p>${text}</p>`;
+            document.getElementById('chat-messages').appendChild(messageDiv);
+        }
+        
+        function simulateAIGeneration(message) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            
+            // Create loader container
+            const loaderContainer = document.createElement('div');
+            loaderContainer.className = 'bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md text-center';
+            
+            // Animated AI icon
+            loaderContainer.innerHTML = `
+                <div class="w-20 h-20 mx-auto mb-4 text-primary dark:text-indigo-400 pulse-animation">
+                    <i class="fas fa-brain text-5xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">AI Working</h3>
+                <p class="mb-4">${message}</p>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                    <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+                <p id="progress-text" class="text-sm text-gray-600 dark:text-gray-400">Analyzing biomarkers...</p>
+            `;
+            
+            overlay.appendChild(loaderContainer);
+            document.body.appendChild(overlay);
+            
+            // Simulate progress
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const steps = [
+                "Analyzing biomarkers...",
+                "Processing treatment efficacy...",
+                "Reviewing scientific literature...",
+                "Generating personalized recommendations...",
+                "Finalizing document..."
+            ];
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress === 20) progressText.textContent = steps[1];
+                if (progress === 40) progressText.textContent = steps[2];
+                if (progress === 60) progressText.textContent = steps[3];
+                if (progress === 80) progressText.textContent = steps[4];
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                    }, 500);
+                }
+            }, 120);
+        }
+        
+        // Charts initialization
+        let ageChart, biomarkerChart;
+        
+        function initCharts() {
+            const ageCtx = document.getElementById('ageChart').getContext('2d');
+            const biomarkerCtx = document.getElementById('biomarkerChart').getContext('2d');
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#1f2937';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = textColor;
+            
+            // Biological Age Chart
+            ageChart = new Chart(ageCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+                    datasets: [
+                        {
+                            label: 'Chronological Age',
+                            data: [58, 58.08, 58.16, 58.25, 58.33],
+                            borderColor: '#6B7280',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Biological Age',
+                            data: [58, 56.8, 55.1, 53.9, 52.3],
+                            borderColor: '#5D5CDE',
+                            backgroundColor: 'rgba(93, 92, 222, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: {
+                                color: gridColor
+                            },
+                            min: 50,
+                            max: 60
+                        },
+                        x: {
+                            grid: {
+                                color: gridColor
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Biomarker Chart
+            biomarkerChart = new Chart(biomarkerCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+                    datasets: [
+                        {
+                            label: 'hsCRP (mg/L)',
+                            data: [3.8, 3.6, 3.2, 2.8, 2.1],
+                            borderColor: '#EF4444',
+                            tension: 0.1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Glucose (mg/dL)',
+                            data: [118, 115, 110, 108, 105],
+                            borderColor: '#F59E0B',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            label: 'HbA1c (%)',
+                            data: [5.9, 5.8, 5.7, 5.7, 5.6],
+                            borderColor: '#10B981',
+                            tension: 0.1,
+                            yAxisID: 'y2'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'hsCRP (mg/L)'
+                            },
+                            grid: {
+                                color: gridColor
+                            },
+                            min: 0,
+                            max: 5
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Glucose (mg/dL)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            min: 80,
+                            max: 130
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: false,
+                            min: 5,
+                            max: 7
+                        },
+                        x: {
+                            grid: {
+                                color: gridColor
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChartsTheme() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#1f2937';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            Chart.defaults.color = textColor;
+            
+            // Update Age Chart
+            ageChart.options.scales.y.grid.color = gridColor;
+            ageChart.options.scales.x.grid.color = gridColor;
+            
+            // Update Biomarker Chart
+            biomarkerChart.options.scales.y.grid.color = gridColor;
+            biomarkerChart.options.scales.x.grid.color = gridColor;
+            
+            ageChart.update();
+            biomarkerChart.update();
+        }
+        
+        function updateCharts(period) {
+            // This would normally update the charts with real data based on the selected time period
+            // For demo purposes, we'll just simulate changes
+            
+            if (period === '1m') {
+                ageChart.data.labels = ['Mar 15', 'Mar 22', 'Mar 29', 'Apr 5', 'Apr 12'];
+                ageChart.data.datasets[0].data = [58.25, 58.27, 58.29, 58.31, 58.33];
+                ageChart.data.datasets[1].data = [53.9, 53.5, 53.1, 52.7, 52.3];
+            } else if (period === '3m') {
+                ageChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr'];
+                ageChart.data.datasets[0].data = [58.08, 58.16, 58.25, 58.33];
+                ageChart.data.datasets[1].data = [56.8, 55.1, 53.9, 52.3];
+            } else if (period === '6m') {
+                ageChart.data.labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+                ageChart.data.datasets[0].data = [57.83, 57.92, 58, 58.08, 58.16, 58.25, 58.33];
+                ageChart.data.datasets[1].data = [59.2, 58.9, 58, 56.8, 55.1, 53.9, 52.3];
+            } else if (period === '1y') {
+                ageChart.data.labels = ['Apr 22', 'Jul 22', 'Oct 22', 'Jan 23', 'Apr 23'];
+                ageChart.data.datasets[0].data = [57.33, 57.58, 57.83, 58.08, 58.33];
+                ageChart.data.datasets[1].data = [59.8, 59.5, 58.9, 56.8, 52.3];
+            }
+            
+            ageChart.update();
+            
+            // Similarly update biomarker chart
+            if (period === '1m') {
+                biomarkerChart.data.labels = ['Mar 15', 'Mar 22', 'Mar 29', 'Apr 5', 'Apr 12'];
+                biomarkerChart.data.datasets[0].data = [2.8, 2.6, 2.4, 2.3, 2.1];
+                biomarkerChart.data.datasets[1].data = [108, 107, 106, 105, 105];
+                biomarkerChart.data.datasets[2].data = [5.7, 5.7, 5.6, 5.6, 5.6];
+            } else if (period === '3m') {
+                biomarkerChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr'];
+                biomarkerChart.data.datasets[0].data = [3.6, 3.2, 2.8, 2.1];
+                biomarkerChart.data.datasets[1].data = [115, 110, 108, 105];
+                biomarkerChart.data.datasets[2].data = [5.8, 5.7, 5.7, 5.6];
+            } else if (period === '6m') {
+                biomarkerChart.data.labels = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+                biomarkerChart.data.datasets[0].data = [4.1, 3.9, 3.8, 3.6, 3.2, 2.8, 2.1];
+                biomarkerChart.data.datasets[1].data = [122, 120, 118, 115, 110, 108, 105];
+                biomarkerChart.data.datasets[2].data = [6.1, 6.0, 5.9, 5.8, 5.7, 5.7, 5.6];
+            } else if (period === '1y') {
+                biomarkerChart.data.labels = ['Apr 22', 'Jul 22', 'Oct 22', 'Jan 23', 'Apr 23'];
+                biomarkerChart.data.datasets[0].data = [4.5, 4.3, 4.1, 3.6, 2.1];
+                biomarkerChart.data.datasets[1].data = [125, 123, 122, 115, 105];
+                biomarkerChart.data.datasets[2].data = [6.2, 6.1, 6.0, 5.8, 5.6];
+            }
+            
+            biomarkerChart.update();
+        }
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>

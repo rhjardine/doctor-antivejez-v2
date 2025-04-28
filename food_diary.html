@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diario de Alimentación</title>
+  <!-- Reutiliza tus estilos (css/styles.css) o combina en uno nuevo -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- FontAwesome para íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Estilos adicionales para el modal (opcional) -->
+  <style>
+    /* Ajustes básicos y tipografía (usando Poppins como en tus módulos) */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f5f5f5;
+      color: #293B64;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #23BCEF;
+      padding: 1rem 1.5rem;
+      color: #fff;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+    .header-logo img {
+      height: 50px;
+      margin-right: 1rem;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+    }
+    .icons i {
+      font-size: 1.5rem;
+      margin-left: 1rem;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    /* Card estilo general */
+    .card {
+      background-color: #fff;
+      border: 2px solid #23BCEF;
+      border-radius: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    /* Botón principal */
+    .main-button {
+      background-color: #293B64;
+      color: #fff;
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.3s;
+    }
+    .main-button:hover {
+      background-color: #1f2a44;
+    }
+    /* Modal overlay */
+    #foodDiaryModal {
+      display: none; /* oculto por defecto */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Contenedor del modal */
+    .modal-content {
+      background: #fff;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #293B64;
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #333;
+    }
+    /* Listado de entradas del diario */
+    .food-entry {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 1rem;
+    }
+    .food-entry:last-child {
+      border-bottom: none;
+    }
+    .food-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .food-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .food-date {
+      font-weight: 600;
+      color: #23BCEF;
+    }
+    .comment-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .comment-section textarea {
+      width: 100%;
+      height: 60px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f5f6f5;
+    }
+    .comment-section button {
+      align-self: flex-end;
+      background-color: #23BCEF;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .comment-section button:hover {
+      background-color: #1aa3d1;
+    }
+    /* Modo oscuro */
+    .dark body {
+      background: #2c2c2c;
+      color: #f5f5f5;
+    }
+    .dark header {
+      background-color: #1c1c1c;
+    }
+    .dark .card {
+      background-color: #3a3a3a;
+      border-color: #23BCEF;
+      color: #f5f5f5;
+    }
+    .dark #foodDiaryModal .modal-content {
+      background: #3a3a3a;
+      color: #f5f5f5;
+    }
+    .dark .food-entry {
+      border-bottom: 1px solid #666;
+    }
+    .dark .comment-section textarea {
+      background-color: #444;
+      color: #fff;
+      border-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+      <h1>Diario de Alimentación</h1>
+    </div>
+    <div class="icons">
+      <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h3 style="display: flex; align-items:center; gap:0.5rem;">
+        <i class="fas fa-utensils" style="color: #23BCEF;"></i>
+        Sección de Control de Alimentos
+      </h3>
+      <p>
+        Administre y visualice el registro fotográfico de los alimentos consumidos por el paciente, con comentarios del nutricionista.
+      </p>
+      <button class="main-button" onclick="openFoodDiary()">
+        <i class="fas fa-book"></i> Ver Diario Alimenticio
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal del Diario de Alimentación -->
+  <div id="foodDiaryModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeFoodDiary()">×</button>
+      <h2>
+        <i class="fas fa-book"></i>
+        Food Diary
+      </h2>
+      <!-- Listado de entradas del diario -->
+      <div id="foodDiaryEntries">
+        <!-- Se generará dinámicamente con JS o estará hardcodeado. Ejemplo: -->
+      </div>
+      <button class="main-button" style="margin-top: 1rem;" onclick="addNewFoodEntry()">
+        <i class="fas fa-plus-circle"></i> Añadir Nueva Entrada
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Modo oscuro
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Datos simulados del diario de alimentación
+    let foodDiaryData = [
+      {
+        date: "16 Oct 2024 - 6:52 PM",
+        image: "https://via.placeholder.com/80?text=Salad",
+        comment: ""
+      },
+      {
+        date: "16 Oct 2024 - 3:52 PM",
+        image: "https://via.placeholder.com/80?text=Soup",
+        comment: ""
+      },
+      {
+        date: "15 Oct 2024 - 6:52 PM",
+        image: "https://via.placeholder.com/80?text=Meal",
+        comment: ""
+      }
+    ];
+
+    function openFoodDiary() {
+      document.getElementById('foodDiaryModal').style.display = 'flex';
+      renderFoodDiary();
+    }
+
+    function closeFoodDiary() {
+      document.getElementById('foodDiaryModal').style.display = 'none';
+    }
+
+    function renderFoodDiary() {
+      const container = document.getElementById('foodDiaryEntries');
+      container.innerHTML = ""; // limpiar
+      foodDiaryData.forEach((entry, index) => {
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('food-entry');
+        entryDiv.innerHTML = `
+          <img src="${entry.image}" alt="Food" class="food-image" />
+          <div class="food-details">
+            <div class="food-date">${entry.date}</div>
+            <div class="comment-section">
+              <label for="comment-${index}" style="font-weight: 600;">Nutritionist's Comment:</label>
+              <textarea id="comment-${index}">${entry.comment}</textarea>
+              <button onclick="saveComment(${index})">Guardar</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(entryDiv);
+      });
+    }
+
+    function saveComment(index) {
+      const commentValue = document.getElementById(`comment-${index}`).value;
+      foodDiaryData[index].comment = commentValue;
+      alert('Comentario guardado para la entrada #' + (index + 1));
+    }
+
+    function addNewFoodEntry() {
+      // En un caso real, abrirías un formulario para subir foto y fecha/hora
+      // Aquí simplemente se añade una entrada simulada
+      const newEntry = {
+        date: "17 Oct 2024 - 4:15 PM",
+        image: "https://via.placeholder.com/80?text=New",
+        comment: ""
+      };
+      foodDiaryData.unshift(newEntry); // lo añade al inicio
+      renderFoodDiary();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Paciente - Antienvejecimiento</title>
+    <!-- FontAwesome y Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Variables de Color y Estilo --- */
+        :root {
+            --primary-color: rgb(35, 188, 239);       /* Azul Claro/Cian */
+            --dark-blue: rgb(41, 59, 100);            /* Azul Oscuro */
+            --bright-white: #FFFFFF;
+            --light-pearly-gray: #F0F4F8;
+            --success-color: #28a745;                 /* Verde */
+            --shadow-light-color: rgba(255, 255, 255, 0.8);
+            --shadow-dark-color: rgba(163, 177, 198, 0.6);
+            --base-font-size: 16px;
+            --border-radius: 10px;
+            --card-padding: 25px;
+            --input-padding: 12px 15px;
+            --button-padding: 12px 25px;
+        }
+
+        /* --- Estilos Base --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-size: var(--base-font-size);
+            background: var(--light-pearly-gray);
+            color: var(--dark-blue);
+            line-height: 1.7;
+        }
+
+        /* --- Contenedor Principal --- */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto; /* Ajustado el margen superior tras eliminar el header */
+            padding: 30px;
+            background: var(--bright-white);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Estilo para la Sección de Información del Paciente --- */
+        .patient-info {
+            background: var(--primary-color);
+            color: var(--bright-white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .patient-info .form-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .patient-info .form-group i {
+            font-size: 1.2em;
+        }
+        .patient-info .form-group label {
+            font-weight: 600;
+            color: var(--bright-white);
+        }
+        .patient-info .form-group input {
+            background: var(--bright-white);
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        /* --- Secciones Colapsables --- */
+        .collapsible {
+            margin-bottom: 20px;
+        }
+        .collapsible legend {
+            cursor: pointer;
+            padding: 10px;
+            background: var(--dark-blue);
+            color: var(--bright-white);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        .collapsible legend:hover {
+            background: var(--primary-color);
+        }
+        .collapsible legend i {
+            transition: transform 0.3s ease;
+        }
+        .collapsible.collapsed legend i {
+            transform: rotate(180deg);
+        }
+        .collapsible fieldset {
+            border: none;
+            padding: 15px;
+            background: var(--light-pearly-gray);
+            border-radius: 8px;
+            transition: max-height 0.3s ease;
+            overflow: hidden;
+        }
+        .collapsible.collapsed fieldset {
+            max-height: 0;
+            padding: 0;
+        }
+
+        /* --- Formularios Editables --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--dark-blue);
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: var(--input-padding);
+            border: 1px solid var(--light-pearly-gray);
+            border-radius: 8px;
+            background: var(--bright-white);
+            box-shadow: inset 2px 2px 4px var(--shadow-dark-color);
+        }
+        input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            margin-right: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .checkbox-item label {
+            font-weight: 400;
+            flex-grow: 1;
+        }
+        .checkbox-item .quantity-input {
+            width: 70px;
+            padding: 6px 10px;
+        }
+        .frequency-select, .custom-supplement {
+            width: 200px;
+            margin-left: 10px;
+        }
+
+        /* --- Botones de Acción --- */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: var(--button-padding);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(145deg, var(--primary-color), var(--dark-blue));
+            color: var(--bright-white);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(145deg, var(--dark-blue), var(--primary-color));
+        }
+        .btn-success {
+            background: linear-gradient(145deg, var(--success-color), #218838);
+            color: var(--bright-white);
+        }
+        .btn-success:hover {
+            background: linear-gradient(145deg, #218838, var(--success-color));
+        }
+
+        /* --- Vista Previa --- */
+        #patient-preview {
+            display: none;
+            margin-top: 30px;
+            padding: var(--card-padding);
+            background: var(--light-pearly-gray);
+            border-radius: var(--border-radius);
+        }
+
+        /* --- Responsividad --- */
+        @media (max-width: 768px) {
+            .container { margin: 15px; padding: 20px; }
+            .patient-info { flex-direction: column; align-items: flex-start; }
+            .patient-info .form-group { width: 100%; margin-bottom: 10px; }
+            .checkbox-item { flex-wrap: wrap; }
+            .checkbox-item .quantity-input, .frequency-select, .custom-supplement { width: 100%; margin-top: 5px; }
+            .action-buttons { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="patient-form">
+            <!-- Información del Paciente Estilizada -->
+            <div class="patient-info">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <label for="patient-name">Nombre del Paciente</label>
+                    <input type="text" id="patient-name" name="patient_name" placeholder="Ingrese el nombre del paciente">
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-calendar"></i>
+                    <label for="date">Fecha</label>
+                    <input type="date" id="date" name="date">
+                </div>
+            </div>
+
+            <!-- Fase de Remoción -->
+            <div class="collapsible">
+                <legend>Fase de Remoción <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="form-group">
+                        <label for="remocion-cucharadas">Cucharadas al acostarse (1 sola vez)</label>
+                        <textarea id="remocion-cucharadas" name="remocion_cucharadas" rows="2" placeholder="Indicar producto y dosis..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="remocion-detox">Detoxificación Alcalina Vegetariana (Semanas)</label>
+                        <input type="number" id="remocion-detox" name="remocion_detox_semanas" min="0" step="1" placeholder="Ej: 1">
+                    </div>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="terapia_nino"> Niño</label>
+                        <label><input type="checkbox" name="terapia_antiage"> Anti-envejecimiento</label>
+                        <label><input type="checkbox" name="terapia_metabolica"> Metabólica</label>
+                        <label><input type="checkbox" name="terapia_citostatica"> Citostática</label>
+                        <label><input type="checkbox" name="terapia_renal"> Renal</label>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Primarios -->
+            <div class="collapsible">
+                <legend>Nutracéuticos Primarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_mega_gh4" name="nutra_mega_gh4">
+                            <label for="nutra_mega_gh4">MegaGH4 (Fórmula Antienvejecimiento)</label>
+                            <input type="number" class="quantity-input" name="nutra_mega_gh4_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_mega_gh4_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_mega_gh4_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_stemcell" name="nutra_stemcell">
+                            <label for="nutra_stemcell">StemCell Enhancer (Revierte la oxidación)</label>
+                            <input type="number" class="quantity-input" name="nutra_stemcell_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_stemcell_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_stemcell_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_transfer" name="nutra_transfer">
+                            <label for="nutra_transfer">Transfer Tri Factor (Modulador celular)</label>
+                            <input type="number" class="quantity-input" name="nutra_transfer_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_transfer_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_transfer_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_telomeres" name="nutra_telomeres">
+                            <label for="nutra_telomeres">Telomeros (Activador de la Telomerasa)</label>
+                            <input type="number" class="quantity-input" name="nutra_telomeres_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_telomeres_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_telomeres_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Activador Metabólico -->
+            <div class="collapsible">
+                <legend>Activador Metabólico <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="activador_bioterapico" name="activador_bioterapico">
+                        <label for="activador_bioterapico">Bioterápico + Bach (gotas, veces al día debajo de la lengua)</label>
+                        <input type="number" class="quantity-input" name="activador_bioterapico_qty" min="0" placeholder="Cant.">
+                        <select class="frequency-select" name="activador_bioterapico_freq">
+                            <option value="">Seleccione frecuencia...</option>
+                            <option value="mañana">Mañana</option>
+                            <option value="noche">Noche</option>
+                            <option value="antes_desayuno">30 min antes de Desayuno</option>
+                            <option value="antes_cena">30 min antes de Cena</option>
+                        </select>
+                        <input type="text" class="custom-supplement" name="activador_bioterapico_supplement" placeholder="Suplemento personalizado">
+                    </div>
+                    <div class="checkbox-group" style="margin-left: 28px;">
+                        <label><input type="checkbox" name="cardiovascular"> Cardiovascular</label>
+                        <label><input type="checkbox" name="respiratorio"> Respiratorio</label>
+                        <label><input type="checkbox" name="digestivo"> Digestivo</label>
+                        <label><input type="checkbox" name="neuro"> Neuro</label>
+                        <label><input type="checkbox" name="inmune"> Inmune</label>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Secundarios -->
+            <div class="collapsible">
+                <legend>Nutracéuticos Secundarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_anti_stress" name="nutra_anti_stress">
+                            <label for="nutra_anti_stress">Anti stress (Energizante)</label>
+                            <input type="number" class="quantity-input" name="nutra_anti_stress_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_anti_stress_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_anti_stress_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_cardiovascular" name="nutra_cardiovascular">
+                            <label for="nutra_cardiovascular">Cardiovascular (Mejora la circulación)</label>
+                            <input type="number" class="quantity-input" name="nutra_cardiovascular_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_cardiovascular_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_cardiovascular_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_digestivo" name="nutra_digestivo">
+                            <label for="nutra_digestivo">Digestivo (Gases / Estreñimiento)</label>
+                            <input type="number" class="quantity-input" name="nutra_digestivo_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_digestivo_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_digestivo_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Nutracéuticos Complementarios -->
+            <div class="collapsible">
+                <legend>Nutracéuticos Complementarios <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_complementario_omega" name="nutra_complementario_omega">
+                            <label for="nutra_complementario_omega">Omega 3 (Salud cerebral y cardíaca)</label>
+                            <input type="number" class="quantity-input" name="nutra_complementario_omega_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_complementario_omega_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_complementario_omega_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="nutra_complementario_vitamina_d" name="nutra_complementario_vitamina_d">
+                            <label for="nutra_complementario_vitamina_d">Vitamina D (Refuerzo inmunológico)</label>
+                            <input type="number" class="quantity-input" name="nutra_complementario_vitamina_d_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="nutra_complementario_vitamina_d_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="nutra_complementario_vitamina_d_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Cosmecéuticos -->
+            <div class="collapsible">
+                <legend>Cosmecéuticos <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cosme_colageno" name="cosme_colageno">
+                            <label for="cosme_colageno">Colágeno Hidrolizado (Elasticidad de la piel)</label>
+                            <input type="number" class="quantity-input" name="cosme_colageno_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="cosme_colageno_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="cosme_colageno_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cosme_hialuronico" name="cosme_hialuronico">
+                            <label for="cosme_hialuronico">Ácido Hialurónico (Hidratación profunda)</label>
+                            <input type="number" class="quantity-input" name="cosme_hialuronico_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="cosme_hialuronico_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="cosme_hialuronico_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Fórmulas Naturales -->
+            <div class="collapsible">
+                <legend>Fórmulas Naturales <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div id="formulas-naturales-container">
+                        <div class="form-group">
+                            <label for="formula-nat-1-nombre">Fórmula</label>
+                            <input type="text" id="formula-nat-1-nombre" name="formula_nat_nombre[]" placeholder="Ej: Infusión de Valeriana">
+                        </div>
+                        <div class="form-group">
+                            <label for="formula-nat-1-instr">Instrucciones</label>
+                            <textarea id="formula-nat-1-instr" name="formula_nat_instr[]" rows="3" placeholder="Ej: Tomar 1 taza 1 hora antes de dormir..."></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="addFormula('formulas-naturales-container', 'nat')"><i class="fas fa-plus"></i> Añadir Fórmula Natural</button>
+                </fieldset>
+            </div>
+
+            <!-- Sueros - Shot Antivejez -->
+            <div class="collapsible">
+                <legend>Sueros - Shot Antivejez <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="suero_adipolitico" name="suero_adipolitico">
+                            <label for="suero_adipolitico">Adipolítico (Reducción de grasa)</label>
+                            <input type="number" class="quantity-input" name="suero_adipolitico_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="suero_adipolitico_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="suero_adipolitico_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="suero_detox" name="suero_detox">
+                            <label for="suero_detox">Detox (Limpieza interna)</label>
+                            <input type="number" class="quantity-input" name="suero_detox_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="suero_detox_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="suero_detox_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Terapias Antienvejecimiento -->
+            <div class="collapsible">
+                <legend>Terapias Antienvejecimiento <i class="fas fa-chevron-down"></i></legend>
+                <fieldset>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="terapia_autovacuna" name="terapia_autovacuna">
+                            <label for="terapia_autovacuna">Autovacuna (Inmunoterapia)</label>
+                            <input type="number" class="quantity-input" name="terapia_autovacuna_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="terapia_autovacuna_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="terapia_autovacuna_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="terapia_ozono" name="terapia_ozono">
+                            <label for="terapia_ozono">Ozonoterapia (Oxigenación celular)</label>
+                            <input type="number" class="quantity-input" name="terapia_ozono_qty" min="0" placeholder="Cant.">
+                            <select class="frequency-select" name="terapia_ozono_freq">
+                                <option value="">Seleccione frecuencia...</option>
+                                <option value="mañana">Mañana</option>
+                                <option value="noche">Noche</option>
+                                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                                <option value="antes_cena">30 min antes de Cena</option>
+                            </select>
+                            <input type="text" class="custom-supplement" name="terapia_ozono_supplement" placeholder="Suplemento personalizado">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Vista Previa -->
+            <section id="patient-preview">
+                <h3><i class="fas fa-eye"></i> Vista Previa de la Guía</h3>
+                <div id="preview-content">
+                    <p><strong>Paciente:</strong> <span id="preview-patient-name">-</span></p>
+                    <p><strong>Fecha:</strong> <span id="preview-date">-</span></p>
+                    <hr>
+                    <h4>Fase de Remoción:</h4>
+                    <ul id="preview-remocion"></ul>
+                    <h4>Nutracéuticos Primarios:</h4>
+                    <ul id="preview-nutraceuticos-primarios"></ul>
+                    <h4>Activador Metabólico:</h4>
+                    <ul id="preview-activador-metabolico"></ul>
+                    <h4>Nutracéuticos Secundarios:</h4>
+                    <ul id="preview-nutraceuticos-secundarios"></ul>
+                    <h4>Nutracéuticos Complementarios:</h4>
+                    <ul id="preview-nutraceuticos-complementarios"></ul>
+                    <h4>Cosmecéuticos:</h4>
+                    <ul id="preview-cosmeceuticos"></ul>
+                    <h4>Fórmulas Naturales:</h4>
+                    <ul id="preview-formulas-naturales"></ul>
+                    <h4>Sueros - Shot Antivejez:</h4>
+                    <ul id="preview-sueros"></ul>
+                    <h4>Terapias Antienvejecimiento:</h4>
+                    <ul id="preview-terapias"></ul>
+                </div>
+            </section>
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <button type="button" class="btn btn-success" id="preview-button"><i class="fas fa-eye"></i> Vista Previa</button>
+                <button type="submit" class="btn btn-primary" id="save-send-button"><i class="fas fa-paper-plane"></i> Guardar y Enviar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('date');
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+        });
+
+        // Colapsar/Expandir Secciones
+        document.querySelectorAll('.collapsible legend').forEach(legend => {
+            legend.addEventListener('click', () => {
+                const parent = legend.parentElement;
+                parent.classList.toggle('collapsed');
+            });
+        });
+
+        // Añadir Fórmulas Naturales
+        let formulaNatCounter = 1;
+        function addFormula(containerId, typePrefix) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            formulaNatCounter++;
+            const card = document.createElement('div');
+            card.innerHTML = `
+                <div class="form-group">
+                    <label for="formula-${typePrefix}-${formulaNatCounter}-nombre">Fórmula #${formulaNatCounter}</label>
+                    <input type="text" id="formula-${typePrefix}-${formulaNatCounter}-nombre" name="formula_${typePrefix}_nombre[]" placeholder="Ej: Infusión de Valeriana">
+                </div>
+                <div class="form-group">
+                    <label for="formula-${typePrefix}-${formulaNatCounter}-instr">Instrucciones</label>
+                    <textarea id="formula-${typePrefix}-${formulaNatCounter}-instr" name="formula_${typePrefix}_instr[]" rows="3" placeholder="Ej: Tomar 1 taza 1 hora antes de dormir..."></textarea>
+                </div>
+            `;
+            container.appendChild(card);
+        }
+
+        // Generar Vista Previa
+        document.getElementById('preview-button').addEventListener('click', () => {
+            const previewSection = document.getElementById('patient-preview');
+            const previewContent = document.getElementById('preview-content');
+            let previewHTML = '';
+
+            const patientName = document.getElementById('patient-name')?.value || 'N/A';
+            const date = document.getElementById('date')?.value || 'N/A';
+            previewHTML += `<p><strong>Paciente:</strong> ${patientName}</p>`;
+            previewHTML += `<p><strong>Fecha:</strong> ${date}</p><hr>`;
+
+            // Fase de Remoción
+            previewHTML += '<h4>Fase de Remoción:</h4><ul>';
+            const cucharadas = document.getElementById('remocion-cucharadas')?.value;
+            if (cucharadas) previewHTML += `<li>Cucharadas al acostarse: ${cucharadas}</li>`;
+            const detoxSemanas = document.getElementById('remocion-detox')?.value;
+            if (detoxSemanas) previewHTML += `<li>Detoxificación Alcalina: ${detoxSemanas} semana(s)</li>`;
+            const terapias = Array.from(document.querySelectorAll('input[name^="terapia_"]:checked')).map(cb => cb.nextElementSibling.textContent);
+            if (terapias.length) previewHTML += `<li>Terapias: ${terapias.join(', ')}</li>`;
+            previewHTML += '</ul>';
+
+            // Nutracéuticos Primarios
+            previewHTML += '<h4>Nutracéuticos Primarios:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(2) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Activador Metabólico
+            previewHTML += '<h4>Activador Metabólico:</h4><ul>';
+            const bioChecked = document.getElementById('activador_bioterapico')?.checked;
+            const bioQty = document.querySelector('input[name="activador_bioterapico_qty"]')?.value;
+            const bioFreq = document.querySelector('select[name="activador_bioterapico_freq"]')?.value;
+            const bioSupplement = document.querySelector('input[name="activador_bioterapico_supplement"]')?.value;
+            if (bioChecked) {
+                previewHTML += `<li>Bioterápico + Bach: ${bioQty || 'N/A'} gotas${bioFreq ? ` - ${bioFreq}` : ''}${bioSupplement ? ` - Suplemento: ${bioSupplement}` : ''}</li>`;
+            }
+            const sistemas = Array.from(document.querySelectorAll('.collapsible:nth-child(3) .checkbox-group input[type="checkbox"]:checked')).map(cb => cb.nextElementSibling.textContent);
+            if (sistemas.length) previewHTML += `<li>Sistemas: ${sistemas.join(', ')}</li>`;
+            previewHTML += '</ul>';
+
+            // Nutracéuticos Secundarios
+            previewHTML += '<h4>Nutracéuticos Secundarios:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(4) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Nutracéuticos Complementarios
+            previewHTML += '<h4>Nutracéuticos Complementarios:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(5) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Cosmecéuticos
+            previewHTML += '<h4>Cosmecéuticos:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(6) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Fórmulas Naturales
+            previewHTML += '<h4>Fórmulas Naturales:</h4><ul>';
+            document.querySelectorAll('#formulas-naturales-container div').forEach(div => {
+                const nombre = div.querySelector('input')?.value;
+                const instr = div.querySelector('textarea')?.value;
+                if (nombre) previewHTML += `<li><strong>${nombre}:</strong> ${instr || 'Sin instrucciones'}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Sueros - Shot Antivejez
+            previewHTML += '<h4>Sueros - Shot Antivejez:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(8) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            // Terapias Antienvejecimiento
+            previewHTML += '<h4>Terapias Antienvejecimiento:</h4><ul>';
+            document.querySelectorAll('.collapsible:nth-child(9) input[type="checkbox"]:checked').forEach(cb => {
+                const label = cb.nextElementSibling.textContent;
+                const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+                const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+                const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+                previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ` - ${freq}` : ''}${supplement ? ` - Suplemento: ${supplement}` : ''}</li>`;
+            });
+            previewHTML += '</ul>';
+
+            previewContent.innerHTML = previewHTML;
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Enviar Formulario (Ejemplo Básico)
+        document.getElementById('patient-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("Formulario enviado con éxito!");
+        });
+    </script>
+</body>
+</html>

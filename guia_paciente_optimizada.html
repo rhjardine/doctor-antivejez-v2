@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Paciente - Optimizada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #23BCEF;
+            --secondary-color: #293B64;
+            --background-color: #F5F6F5;
+            --card-background-color: #FFFFFF;
+            --input-background-color: #F5F6F5;
+            --border-color: #E0E0E0;
+            --text-color: #333333;
+            --label-color: #293B64;
+            --accent-color: #1AAFD0;
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --warning-color: #FFC107;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .dark-mode {
+            --background-color: #1A1A1A;
+            --card-background-color: #2E2E2E;
+            --input-background-color: #383838;
+            --text-color: #F5F6F5;
+            --label-color: #FFFFFF;
+            --border-color: #555555;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section-title {
+            color: var(--secondary-color);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-width: 120px;
+        }
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+        }
+        .tab:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background-color: var(--card-background-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-header i {
+            margin-right: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card-header.collapsed i.fa-chevron-down {
+            transform: rotate(-90deg);
+        }
+        .card-body {
+            padding: 1.5rem;
+            display: none;
+        }
+        .card-body.show {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            color: var(--label-color);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-background-color);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(35, 188, 239, 0.2);
+        }
+        .form-control::placeholder {
+            color: #999;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 0.5rem;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: var(--input-background-color);
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            position: relative;
+        }
+        .checkbox-group input[type="checkbox"]:checked::before {
+            font-family: "Font Awesome 6 Free";
+            content: "\f00c";
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .checkbox-group label {
+            color: var(--text-color);
+            font-weight: normal;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+        .btn.secondary {
+            background-color: var(--secondary-color);
+        }
+        .btn.secondary:hover {
+            background-color: #1F2A44;
+        }
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .alert-success {
+            background-color: var(--success-color);
+            color: white;
+            border: 1px solid darken(var(--success-color), 10%);
+        }
+        .alert-error {
+            background-color: var(--error-color);
+            color: white;
+            border: 1px solid darken(var(--error-color), 10%);
+        }
+        .alert i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+        [data-tooltip]:hover::before,
+        [data-tooltip]:hover::after {
+            visibility: visible;
+            opacity: 1;
+        }
+        [data-tooltip]::before {
+            content: "";
+            position: absolute;
+            border: 6px solid transparent;
+            border-top-color: #333;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+        }
+        [data-tooltip]::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: rgba(35, 188, 239, 0.2);
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+        .tabla-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 0.5rem;
+        }
+        /* Responsive Table for Mobile */
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            table {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tbody, tr {
+                display: block;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem;
+                border: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            td:before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: var(--label-color);
+                width: 40%;
+            }
+            td .tabla-input {
+                width: 60%;
+            }
+            td:last-child {
+                border-bottom: none;
+            }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .btn.loading {
+            position: relative;
+            text-indent: -9999px;
+        }
+        .btn.loading .spinner {
+            display: inline-block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="section-title">Guía del Paciente</h1>
+
+        <!-- Información del paciente -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="text-lg font-semibold">Paciente: Isabel Romero</h2>
+                <p>Fecha: <strong>24/04/2023</strong></p>
+            </div>
+        </div>
+
+        <!-- Barra de búsqueda -->
+        <input type="text" id="searchInput" class="form-control mb-4" placeholder="Buscar tratamiento...">
+
+        <!-- Pestañas para categorías principales -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('fases')">Fases</div>
+            <div class="tab" onclick="showTab('nutraceuticos')">Nutracéuticos</div>
+            <div class="tab" onclick="showTab('formulas')">Fórmulas</div>
+            <div class="tab" onclick="showTab('activadorBach')">Activador/Bach</div>
+            <div class="tab" onclick="showTab('suerosShots')">Sueros/Shots</div>
+            <div class="tab" onclick="showTab('terapias')">Terapias</div>
+            <div class="tab" onclick="showTab('flores')">Flores de Bach</div>
+            <div class="tab" onclick="showTab('cosmeticos')">Cosméticos</div>
+        </div>
+
+        <!-- Formulario -->
+        <form id="treatment-form">
+            <!-- Tab: Fases -->
+            <div id="fases" class="tab-content active">
+                <!-- Fase de Remoción -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-trash-alt mr-2"></i> Fase de Remoción
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="cucharadas">Cucharadas al acostarse (1 sola vez):</label>
+                            <input type="text" id="cucharadas" class="form-control" placeholder="Ej: 1 cucharada" required>
+                            <div class="invalid-feedback hidden text-red-500 text-sm mt-1">Este campo es obligatorio.</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="detox">Detoxificación Alcalina (indicar semanas):</label>
+                            <input type="number" id="detox" class="form-control" placeholder="Número de semanas" required min="1">
+                            <div class="invalid-feedback hidden text-red-500 text-sm mt-1">Ingrese un número de semanas válido.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Selección de Terapia(s):</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="nino" name="terapia" value="nino">
+                                <label for="nino">Niño</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="antienvejecimiento" name="terapia" value="antienvejecimiento">
+                                <label for="antienvejecimiento">Antienvejecimiento</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="metabolica" name="terapia" value="metabolica">
+                                <label for="metabolica">Metabólica</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="citostatica" name="terapia" value="citostatica">
+                                <label for="citostatica">Citostática</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="renal" name="terapia" value="renal">
+                                <label for="renal">Renal</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="noniAloe">Noni/Aloe Vera <span class="text-sm text-gray-500">(tacita 30 minutos antes de)</span>:</label>
+                            <input type="text" id="noniAloe" class="form-control" placeholder="Ej: cada comida" data-tooltip="Indique la frecuencia y/o comidas antes de las cuales se debe tomar el Noni/Aloe Vera.">
+                        </div>
+                        <div class="form-group">
+                            <label for="frascos">Frascos:</label>
+                            <input type="text" id="frascos" class="form-control" placeholder="Ej: 2 frascos de..." data-tooltip="Indique la cantidad y el tipo de frascos.">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fase de Revitalización -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-battery-three-quarters mr-2"></i> Fase de Revitalización
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="complejoB">Complejo B (intramuscular):</label>
+                            <input type="text" id="complejoB" class="form-control" placeholder="Ej: 2cc, 1 vez/semana, 5 dosis" data-tooltip="Indique la dosis, frecuencia y duración del tratamiento con Complejo B intramuscular.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Nutracéuticos -->
+            <div id="nutraceuticos" class="tab-content">
+                <!-- Nutracéuticos Primarios -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-capsules mr-2"></i> Nutracéuticos Primarios
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="megaGH4">MegaGH4:</label>
+                            <input type="text" id="megaGH4" class="form-control" placeholder="Ej: Fórmula Antienvejecimiento" data-tooltip="Indique la fórmula o descripción.">
+                        </div>
+                        <div class="form-group">
+                            <label for="stemCell">StemCell Enhancer:</label>
+                            <input type="text" id="stemCell" class="form-control" placeholder="Ej: Revierta la oxidación" data-tooltip="Indique la función o descripción.">
+                        </div>
+                        <div class="form-group">
+                            <label for="transferFactor">Transfer Tri Factor:</label>
+                            <input type="text" id="transferFactor" class="form-control" placeholder="Ej: Modulador celular" data-tooltip="Indique la función o descripción.">
+                        </div>
+                        <div class="form-group">
+                            <label for="telomeros">Telómeros:</label>
+                            <input type="text" id="telomeros" class="form-control" placeholder="Ej: Activador de la Telomeraza" data-tooltip="Indique la función o descripción.">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nutracéuticos Secundarios -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-vial mr-2"></i> Nutracéuticos Secundarios
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Selección de Nutracéuticos:</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="antiStress" name="nutraceutico" value="antiStress">
+                                <label for="antiStress">Anti stress</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="cardiovascular" name="nutraceutico" value="cardiovascular">
+                                <label for="cardiovascular">Cardiovascular</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="digestivo" name="nutraceutico" value="digestivo">
+                                <label for="digestivo">Digestivo</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="femenino" name="nutraceutico" value="femenino">
+                                <label for="femenino">Femenino</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="osteoArticular" name="nutraceutico" value="osteoArticular">
+                                <label for="osteoArticular">Osteo Articular</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="immuneBooster" name="nutraceutico" value="immuneBooster">
+                                <label for="immuneBooster">Immune Booster</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="immuneModulador" name="nutraceutico" value="immuneModulador">
+                                <label for="immuneModulador">Immune Modulador</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="masculino" name="nutraceutico" value="masculino">
+                                <label for="masculino">Masculino</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="neuroCentral" name="nutraceutico" value="neuroCentral">
+                                <label for="neuroCentral">Neuro Central</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="neuroEmocional" name="nutraceutico" value="neuroEmocional">
+                                <label for="neuroEmocional">Neuro Emocional</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="prostata" name="nutraceutico" value="prostata">
+                                <label for="prostata">Próstata</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nutracéuticos Complementarios -->
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-flask mr-2"></i> Nutracéuticos Complementarios
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="aguaMineral">Agua Mineral:</label>
+                            <input type="text" id="aguaMineral" class="form-control" placeholder="Ej: 2 cucharaditas en ayunas" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="immuneSpray">Immune Spray:</label>
+                            <input type="text" id="immuneSpray" class="form-control" placeholder="Ej: 3 aplicaciones/día" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="magnesio">Magnesio Quelatado:</label>
+                            <input type="text" id="magnesio" class="form-control" placeholder="Ej: 1 tableta/día" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="omega3">Omega 3:</label>
+                            <input type="text" id="omega3" class="form-control" placeholder="Ej: 1 cápsula/día" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="vitC">Vit C + Zinc:</label>
+                            <input type="text" id="vitC" class="form-control" placeholder="Ej: 1 tableta/día" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Fórmulas Naturales -->
+            <div id="formulas" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-seedling mr-2"></i> Fórmulas Naturales
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="aceiteLimon">Aceite de oliva / limón:</label>
+                            <input type="text" id="aceiteLimon" class="form-control" placeholder="Ej: 2 cucharadas con jugo de limón en la mañana" data-tooltip="Indique la dosis y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="banosHipertermicos">Baños Hipertérmicos:</label>
+                            <input type="text" id="banosHipertermicos" class="form-control" placeholder="Ej: 15 minutos, 3 veces por semana" data-tooltip="Indique la duración y frecuencia.">
+                        </div>
+                        <div class="form-group">
+                            <label for="duchaVaginal">Ducha Vaginal:</label>
+                            <input type="text" id="duchaVaginal" class="form-control" placeholder="Ej: Solución de iodina con agua mineral" data-tooltip="Indique la composición y frecuencia.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Activador/Bach -->
+            <div id="activadorBach" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-bolt mr-2"></i> Activador Metabólico / Bach
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="activadorMetabolico">Activador Metabólico (dosis):</label>
+                            <input type="text" id="activadorMetabolico" class="form-control" placeholder="Ej: 10 gotas 2 veces al día" data-tooltip="Indique la dosis y frecuencia del Activador Metabólico.">
+                        </div>
+                        <div class="form-group">
+                            <label for="bioterapicoBach">Bioterápico + Bach:</label>
+                            <input type="text" id="bioterapicoBach" class="form-control" placeholder="Ej: 5 gotas, 3 veces/día" data-tooltip="Indique la dosis y frecuencia del Bioterápico + Bach.">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Sueros/Shots -->
+            <div id="suerosShots" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-syringe mr-2"></i> Sueros / Shots Antivejez
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="suerosTable">
+                                <thead>
+                                    <tr>
+                                        <th>Dosis</th>
+                                        <th>Sueros</th>
+                                        <th>Día</th>
+                                        <th>Sem</th>
+                                        <th>Quin</th>
+                                        <th>Mes</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="Dosis"><input type="text" name="dosis1" class="tabla-input" placeholder="Ej: 1"></td>
+                                        <td data-label="Sueros"><input type="text" name="sueros1" class="tabla-input" placeholder="Ej: Antienvejecimiento" list="suerosList"></td>
+                                        <td data-label="Día"><input type="checkbox" name="dia1"></td>
+                                        <td data-label="Sem"><input type="checkbox" name="sem1"></td>
+                                        <td data-label="Quin"><input type="checkbox" name="quin1"></td>
+                                        <td data-label="Mes"><input type="checkbox" name="mes1"></td>
+                                        <td data-label="Acciones"><button type="button" class="btn secondary" onclick="removeRow(this)">Eliminar</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <datalist id="suerosList">
+                                <option value="Antienvejecimiento">
+                                <option value="Antiviral">
+                                <option value="Biotergénico">
+                                <option value="Cardiovascular">
+                                <option value="Energizante">
+                                <option value="Immune Modulador">
+                                <option value="Metabólico">
+                            </datalist>
+                        </div>
+                        <button type="button" class="btn mt-2" onclick="addSuerosRow()">Agregar Fila</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Terapias -->
+            <div id="terapias" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-procedures mr-2"></i> Terapias Antienvejecimiento
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="terapiasTable">
+                                <thead>
+                                    <tr>
+                                        <th>Dosis</th>
+                                        <th>Terapia</th>
+                                        <th>Día</th>
+                                        <th>Sem</th>
+                                        <th>Quin</th>
+                                        <th>Mes</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="Dosis"><input type="text" name="dosisTerapia1" class="tabla-input" placeholder="Ej: 1"></td>
+                                        <td data-label="Terapia"><input type="text" name="terapia1" class="tabla-input" placeholder="Ej: Autovacuna" list="terapiaList"></td>
+                                        <td data-label="Día"><input type="checkbox" name="diaTerapia1"></td>
+                                        <td data-label="Sem"><input type="checkbox" name="semTerapia1"></td>
+                                        <td data-label="Quin"><input type="checkbox" name="quinTerapia1"></td>
+                                        <td data-label="Mes"><input type="checkbox" name="mesTerapia1"></td>
+                                        <td data-label="Acciones"><button type="button" class="btn secondary" onclick="removeRow(this)">Eliminar</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <datalist id="terapiaList">
+                                <option value="Autovacuna">
+                                <option value="Células Madres">
+                                <option value="Células Madres Segmento">
+                                <option value="Células Madres Mesenquimales">
+                                <option value="Cosmetología / Estética">
+                                <option value="Factores Autólogos PRP">
+                                <option value="Hidroterapia de Colón">
+                                <option value="Hidroterapia Iónica">
+                                <option value="Laser Rojo / Infrarrojo">
+                                <option value="LEM">
+                                <option value="Neubilización">
+                                <option value="Neural">
+                                <option value="Ozono">
+                            </datalist>
+                        </div>
+                        <button type="button" class="btn mt-2" onclick="addTerapiasRow()">Agregar Fila</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Flores de Bach -->
+            <div id="flores" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-leaf mr-2"></i> Flores de Bach
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Selección de Flores:</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="agrimony" name="flores" value="agrimony">
+                                <label for="agrimony">Agrimony</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="aspen" name="flores" value="aspen">
+                                <label for="aspen">Aspen</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="beech" name="flores" value="beech">
+                                <label for="beech">Beech</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="centaury" name="flores" value="centaury">
+                                <label for="centaury">Centaury</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="cerato" name="flores" value="cerato">
+                                <label for="cerato">Cerato</label>
+                            </div>
+                            <!-- Añadir más flores según el documento -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Cosméticos -->
+            <div id="cosmeticos" class="tab-content">
+                <div class="card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <i class="fas fa-spa mr-2"></i> Cosméticos
+                        <i class="fas fa-chevron-down ml-auto"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="condicionador">Condicionador:</label>
+                            <input type="text" id="condicionador" class="form-control" placeholder="Ej: Esencia capilar" data-tooltip="Indique el tipo de condicionador.">
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="exfoliante" name="cosmetico" value="exfoliante">
+                            <label for="exfoliante">Exfoliante capilar en la mañana y noche con la cara limpia</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="protector" name="cosmetico" value="protector">
+                            <label for="protector">Protector Solar MC-13</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="spaBody" name="cosmetico" value="spaBody">
+                            <label for="spaBody">Spa Body Scrub</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="spaFoot" name="cosmetico" value="spaFoot">
+                            <label for="spaFoot">Spa Foot Scrub</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="spaMassage" name="cosmetico" value="spaMassage">
+                            <label for="spaMassage">Spa Massage</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-end space-x-4 mt-4">
+                <button type="button" class="btn secondary" onclick="previewGuide()">Vista Previa</button>
+                <button type="submit" class="btn">
+                    <span id="button-text">Guardar Guía</span>
+                    <span class="spinner"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Mensajes de éxito/error -->
+    <div id="success-message" class="alert alert-success hidden" role="alert">
+        <i class="fas fa-check-circle mr-2"></i> Guía guardada exitosamente.
+    </div>
+    <div id="error-message" class="alert alert-error hidden" role="alert">
+        <i class="fas fa-times-circle mr-2"></i> <span id="error-text">Hubo un error al guardar la guía.</span>
+    </div>
+
+    <script>
+        // Desplegar/Contraer tarjetas
+        function toggleCard(header) {
+            header.classList.toggle("collapsed");
+            const body = header.nextElementSibling;
+            body.classList.toggle("show");
+        }
+
+        // Mostrar/Ocultar pestañas
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Modo oscuro
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark-mode');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+            }
+        });
+
+        // Buscador
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const cardText = card.innerText.toLowerCase();
+                if (cardText.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Agregar fila a la tabla de sueros
+        let suerosRowCount = 1;
+        function addSuerosRow() {
+            suerosRowCount++;
+            const tbody = document.querySelector('#suerosTable tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td data-label="Dosis"><input type="text" name="dosis${suerosRowCount}" class="tabla-input" placeholder="Ej: 1"></td>
+                <td data-label="Sueros"><input type="text" name="sueros${suerosRowCount}" class="tabla-input" placeholder="Ej: Antienvejecimiento" list="suerosList"></td>
+                <td data-label="Día"><input type="checkbox" name="dia${suerosRowCount}"></td>
+                <td data-label="Sem"><input type="checkbox" name="sem${suerosRowCount}"></td>
+                <td data-label="Quin"><input type="checkbox" name="quin${suerosRowCount}"></td>
+                <td data-label="Mes"><input type="checkbox" name="mes${suerosRowCount}"></td>
+                <td data-label="Acciones"><button type="button" class="btn secondary" onclick="removeRow(this)">Eliminar</button></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        // Agregar fila a la tabla de terapias
+        let terapiasRowCount = 1;
+        function addTerapiasRow() {
+            terapiasRowCount++;
+            const tbody = document.querySelector('#terapiasTable tbody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td data-label="Dosis"><input type="text" name="dosisTerapia${terapiasRowCount}" class="tabla-input" placeholder="Ej: 1"></td>
+                <td data-label="Terapia"><input type="text" name="terapia${terapiasRowCount}" class="tabla-input" placeholder="Ej: Autovacuna" list="terapiaList"></td>
+                <td data-label="Día"><input type="checkbox" name="diaTerapia${terapiasRowCount}"></td>
+                <td data-label="Sem"><input type="checkbox" name="semTerapia${terapiasRowCount}"></td>
+                <td data-label="Quin"><input type="checkbox" name="quinTerapia${terapiasRowCount}"></td>
+                <td data-label="Mes"><input type="checkbox" name="mesTerapia${terapiasRowCount}"></td>
+                <td data-label="Acciones"><button type="button" class="btn secondary" onclick="removeRow(this)">Eliminar</button></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        // Eliminar fila de las tablas
+        function removeRow(button) {
+            button.closest('tr').remove();
+            if (button.closest('table').id === 'suerosTable') {
+                suerosRowCount--;
+            } else if (button.closest('table').id === 'terapiasTable') {
+                terapiasRowCount--;
+            }
+        }
+
+        // Vista previa (simulada)
+        function previewGuide() {
+            alert('Vista previa del recetario (simulada). En un entorno real, esto generaría un PDF.');
+        }
+
+        // Formulario y validaciones
+        document.getElementById('treatment-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let isValid = true;
+            const form = this;
+
+            // Validación de campos obligatorios
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                const errorDiv = field.nextElementSibling;
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('border-red-500');
+                    errorDiv.classList.remove('hidden');
+                    errorDiv.textContent = "Este campo es obligatorio.";
+                } else {
+                    field.classList.remove('border-red-500');
+                    errorDiv.classList.add('hidden');
+                    errorDiv.textContent = "";
+
+                    if (field.type === 'number') {
+                        if (isNaN(parseFloat(field.value)) || !isFinite(field.value) || parseFloat(field.value) < 0) {
+                            isValid = false;
+                            field.classList.add('border-red-500');
+                            errorDiv.classList.remove('hidden');
+                            errorDiv.textContent = "Ingrese un número válido (no negativo).";
+                        }
+                    }
+                }
+            });
+
+            if (isValid) {
+                const buttonText = document.getElementById('button-text');
+                const spinner = document.querySelector('.spinner');
+                form.querySelector('button[type="submit"]').classList.add('loading');
+                buttonText.classList.add('hidden');
+                spinner.classList.remove('hidden');
+
+                setTimeout(() => {
+                    form.querySelector('button[type="submit"]').classList.remove('loading');
+                    buttonText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+
+                    document.getElementById('success-message').classList.remove('hidden');
+                    document.getElementById('error-message').classList.add('hidden');
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 2000);
+            } else {
+                const firstInvalidField = form.querySelector('.border-red-500');
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+
+        // Atajo de teclado para guardar
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault();
+                document.getElementById('treatment-form').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

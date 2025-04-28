@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Edad Biofísica</title>
+  <link rel="stylesheet" href="edad_biofisica.css">
+  <!-- Se asume que ya tienes FontAwesome y Google Fonts en tu proyecto -->
+</head>
+<body>
+  <header>
+    <h1>Test Edad Biofísica</h1>
+  </header>
+
+  <div class="bio-container">
+    <form id="biofisica-form">
+      <div class="form-grid">
+        <!-- Género -->
+        <div class="form-group">
+          <label for="genero">Género</label>
+          <select id="genero">
+            <option value="femenino">Femenino</option>
+            <option value="masculino">Masculino</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        
+        <!-- % Grasa -->
+        <div class="form-group">
+          <label for="porcentaje-grasa">% Grasa</label>
+          <input type="number" id="porcentaje-grasa" placeholder="e.g. 25">
+        </div>
+        
+        <!-- IMC -->
+        <div class="form-group">
+          <label for="imc">Índice de masa corporal (IMC)</label>
+          <input type="number" step="0.1" id="imc" placeholder="e.g. 22.5">
+        </div>
+
+        <!-- Reflejos Digitales -->
+        <div class="form-group">
+          <label for="reflejos">Reflejos Digitales (cm)</label>
+          <input type="number" step="0.1" id="reflejos" placeholder="e.g. 15.2">
+        </div>
+
+        <!-- Acomodación Visual -->
+        <div class="form-group">
+          <label for="acomodacion">Acomodación Visual (cm)</label>
+          <input type="number" step="0.1" id="acomodacion" placeholder="e.g. 12.3">
+        </div>
+
+        <!-- Balance Estático -->
+        <div class="form-group">
+          <label for="balance">Balance Estático (seg)</label>
+          <input type="number" step="0.1" id="balance" placeholder="e.g. 30">
+        </div>
+
+        <!-- Hidratación Cutánea -->
+        <div class="form-group">
+          <label for="hidratacion">Hidratación Cutánea (seg)</label>
+          <input type="number" step="0.1" id="hidratacion" placeholder="e.g. 5.2">
+        </div>
+
+        <!-- Presión Sistólica -->
+        <div class="form-group">
+          <label for="sistolica">Sistólica (mmHg)</label>
+          <input type="number" id="sistolica" placeholder="e.g. 120">
+        </div>
+
+        <!-- Presión Diastólica -->
+        <div class="form-group">
+          <label for="diastolica">Diastólica (mmHg)</label>
+          <input type="number" id="diastolica" placeholder="e.g. 80">
+        </div>
+
+        <!-- Edad Cronológica -->
+        <div class="form-group">
+          <label for="edad-cronologica">Edad Cronológica</label>
+          <input type="number" id="edad-cronologica" placeholder="e.g. 82">
+        </div>
+
+        <!-- Edad Biofísica -->
+        <div class="form-group">
+          <label for="edad-biofisica">Edad Biofísica</label>
+          <input type="number" id="edad-biofisica" value="0" readonly>
+        </div>
+
+        <!-- Edad Diferencial -->
+        <div class="form-group">
+          <label for="edad-diferencial">Edad Diferencial</label>
+          <input type="text" id="edad-diferencial" value="0" readonly>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="form-buttons">
+        <button type="button" onclick="calcularEdadBiofisica()">Calcular</button>
+        <button type="button" onclick="guardarDatos()">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function calcularEdadBiofisica() {
+      // Ejemplo muy simple (simulado)
+      // En la práctica, podrías usar fórmulas reales o un servicio IA
+      const edadCrono = parseInt(document.getElementById('edad-cronologica').value || '0');
+      // Suponiendo que la edad biofísica se calcule con un factor (ejemplo al azar)
+      const randomFactor = Math.random() * 10 - 5; // entre -5 y +5
+      const edadBio = edadCrono + randomFactor;
+
+      document.getElementById('edad-biofisica').value = edadBio.toFixed(1);
+
+      const edadDif = edadBio - edadCrono;
+      const textoDif = edadDif.toFixed(1) + (edadDif < 0 ? ' Menos' : ' Más');
+      document.getElementById('edad-diferencial').value = textoDif;
+    }
+
+    function guardarDatos() {
+      alert('Datos de Edad Biofísica guardados (simulado).');
+      // Aquí podrías enviar el formulario al backend
+    }
+  </script>
+</body>
+</html>

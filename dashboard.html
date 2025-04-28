@@ -1,0 +1,2827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLongevity AI Assistant</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+    
+    <style>
+        :root {
+            --primary-color: #62B6CB; /* Sky blue */
+            --primary-dark: #1B98E0;
+            --primary-light: #8ECAE6;
+            --secondary-color: #13293D;
+            --secondary-light: #247BA0;
+            --text-dark: #2C3E50;
+            --text-medium: #546E7A;
+            --text-light: #78909C;
+            --bg-light: #F8F9FA;
+            --bg-white: #FFFFFF;
+            --bg-card: #EEF1F5; /* Pearl gray */
+            --danger: #E63946;
+            --warning: #F9A826;
+            --success: #2DC653;
+            --info: #5BC0EB;
+            --border-color: #D9E2EC;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            
+            --transition: all 0.3s ease;
+        }
+        
+        /* Dark Mode Colors */
+        .dark-mode {
+            --primary-color: #62B6CB; 
+            --primary-dark: #3D8DAE;
+            --primary-light: #8ECAE6;
+            --text-dark: #E0E6ED;
+            --text-medium: #B8C4CF;
+            --text-light: #8D99A4;
+            --bg-light: #1A2634;
+            --bg-white: #242F3F;
+            --bg-card: #2E3A4A; 
+            --border-color: #3A4858;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            list-style-type: none;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-color);
+            background-color: rgba(98, 182, 203, 0.05);
+            transform: translateX(3px);
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(98, 182, 203, 0.1);
+            border-left-color: var(--primary-color);
+        }
+        
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .user-profile {
+            padding: 1rem 1.5rem;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            border-top: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .user-profile:hover {
+            background-color: rgba(98, 182, 203, 0.05);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .user-profile:hover .user-avatar {
+            transform: scale(1.05);
+        }
+        
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-role {
+            color: var(--text-light);
+            font-size: 0.813rem;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .patient-header {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem;
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .patient-header:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .patient-header:hover .patient-avatar {
+            transform: scale(1.05);
+        }
+        
+        .patient-info {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .patient-details {
+            color: var(--text-medium);
+            font-size: 0.875rem;
+        }
+        
+        .health-metrics {
+            display: flex;
+            gap: 1.25rem;
+            margin-left: auto;
+        }
+        
+        .metric {
+            text-align: center;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+        }
+        
+        .metric:hover {
+            background-color: rgba(98, 182, 203, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .metric-value .trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--success);
+        }
+        
+        /* AI Assistant Section */
+        .section-header {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .assistant-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .assistant-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .assistant-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-card);
+        }
+        
+        .assistant-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .assistant-tabs::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+        
+        .assistant-tabs::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 20px;
+        }
+        
+        .assistant-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .assistant-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .assistant-tab:hover:not(.active) {
+            color: var(--text-dark);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .assistant-content {
+            padding: 1.5rem;
+            min-height: 500px;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Chat interface */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+        
+        .chat-message {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.3s ease forwards;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.ai {
+            align-items: flex-start;
+        }
+        
+        .chat-message.user {
+            align-items: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        
+        .message-bubble:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chat-message.ai .message-bubble {
+            background-color: var(--bg-card);
+            border-bottom-left-radius: 0;
+        }
+        
+        .chat-message.user .message-bubble {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            padding-right: 6rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.938rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            transition: var(--transition);
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(98, 182, 203, 0.2);
+        }
+        
+        .voice-button {
+            position: absolute;
+            right: 6.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.15rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.3rem;
+        }
+        
+        .voice-button:hover {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .attach-button {
+            position: absolute;
+            right: 4.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.15rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.3rem;
+        }
+        
+        .attach-button:hover {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .send-button {
+            padding: 0.75rem 1.25rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Document Upload & Analysis */
+        .document-tab {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .document-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            background-color: var(--bg-light);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .document-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(98, 182, 203, 0.05);
+        }
+        
+        .document-upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(98, 182, 203, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        
+        .document-upload-area:hover .upload-icon {
+            transform: translateY(-5px);
+        }
+        
+        .upload-text {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-subtext {
+            color: var(--text-medium);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .upload-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .document-preview {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+        
+        .document-preview.active {
+            display: flex;
+        }
+        
+        .document-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .document-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .document-action-button {
+            padding: 0.5rem;
+            border: none;
+            background-color: var(--bg-white);
+            color: var(--text-medium);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .document-action-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .document-content {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .document-content img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+        }
+        
+        .document-content pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+        }
+        
+        .document-analysis {
+            display: none;
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .document-analysis.active {
+            display: block;
+        }
+        
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .analysis-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .analysis-status {
+            font-size: 0.813rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .analysis-status.complete {
+            color: var(--success);
+        }
+        
+        .analysis-content {
+            margin-bottom: 1.5rem;
+        }
+        
+        .analysis-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .analysis-section-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .analysis-highlight {
+            background-color: rgba(98, 182, 203, 0.1);
+            border-left: 3px solid var(--primary-color);
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        
+        .analysis-highlight.warning {
+            background-color: rgba(249, 168, 38, 0.1);
+            border-left-color: var(--warning);
+        }
+        
+        .analysis-highlight.danger {
+            background-color: rgba(230, 57, 70, 0.1);
+            border-left-color: var(--danger);
+        }
+        
+        .analysis-highlight.success {
+            background-color: rgba(45, 198, 83, 0.1);
+            border-left-color: var(--success);
+        }
+        
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+        }
+        
+        .document-table th, 
+        .document-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .document-table th {
+            font-weight: 600;
+            color: var(--text-dark);
+            background-color: var(--bg-card);
+        }
+        
+        .document-table tr:hover {
+            background-color: rgba(98, 182, 203, 0.05);
+        }
+        
+        .document-table td.highlight {
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+        
+        .document-action-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            gap: 0.75rem;
+        }
+        
+        .load-more-btn {
+            padding: 0.5rem 0.75rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .load-more-btn:hover {
+            background-color: var(--bg-light);
+            transform: translateY(-2px);
+        }
+        
+        .analyze-btn {
+            padding: 0.5rem 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .analyze-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .integrate-btn {
+            padding: 0.5rem 0.75rem;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .integrate-btn:hover {
+            background-color: #25A244;
+            transform: translateY(-2px);
+        }
+        
+        /* Document records */
+        .document-records {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .document-record {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .document-record:hover {
+            border-color: var(--primary-color);
+            transform: translateX(3px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .document-record-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .document-record-icon {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+        
+        .document-record-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .document-record-name {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .document-record-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        .document-record-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .document-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .document-badge.genomic {
+            background-color: var(--success);
+        }
+        
+        .document-badge.lab {
+            background-color: var(--info);
+        }
+        
+        .document-badge.report {
+            background-color: var(--warning);
+        }
+        
+        /* Loading Wave Animation */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: fit-content;
+            margin-bottom: 1rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-light);
+            animation: typingAnimation 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            } 
+            40% { 
+                transform: scale(1);
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(98, 182, 203, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner-text {
+            color: var(--text-medium);
+            font-weight: 500;
+        }
+        
+        /* Document message in chat */
+        .document-message {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .document-message-icon {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+        
+        .document-message-info {
+            flex: 1;
+        }
+        
+        .document-message-name {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .document-message-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        /* Toggle Theme Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background-color: var(--primary-dark);
+        }
+        
+        /* Document Viewer Modal */
+        .document-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .document-viewer-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .document-viewer-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+        
+        .document-viewer-modal.active .document-viewer-container {
+            transform: scale(1);
+        }
+        
+        .document-viewer-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .document-viewer-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .document-viewer-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .document-viewer-close:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+        
+        .document-viewer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .document-viewer-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .document-viewer-button {
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .document-viewer-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .document-viewer-button.primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .document-viewer-button.secondary {
+            background-color: var(--bg-card);
+            color: var(--text-medium);
+            border: 1px solid var(--border-color);
+        }
+        
+        .document-viewer-button.secondary:hover {
+            background-color: var(--bg-light);
+            transform: translateY(-2px);
+        }
+        
+        /* Toast notification */
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .toast {
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+        
+        .toast-icon.success {
+            color: var(--success);
+        }
+        
+        .toast-icon.warning {
+            color: var(--warning);
+        }
+        
+        .toast-icon.error {
+            color: var(--danger);
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .toast-message {
+            color: var(--text-medium);
+            font-size: 0.813rem;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .toast-close:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 64px;
+            }
+            
+            .logo span, .nav-item span, .user-info {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .user-profile {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .patient-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .patient-avatar {
+                margin-bottom: 1rem;
+            }
+            
+            .health-metrics {
+                margin-left: 0;
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .document-content {
+                max-height: 200px;
+            }
+            
+            .document-viewer-container {
+                width: 95%;
+                max-height: 95vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1rem 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .sidebar-header {
+                padding: 0 1rem 1rem;
+            }
+            
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                padding: 0.5rem;
+                flex-direction: column;
+                align-items: center;
+                font-size: 0.75rem;
+            }
+            
+            .nav-item span {
+                display: block;
+                font-size: 0.75rem;
+            }
+            
+            .user-profile {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .assistant-tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .assistant-content {
+                padding: 1rem;
+            }
+            
+            .health-metrics {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+            
+            .metric {
+                flex: 1;
+                min-width: 45%;
+            }
+            
+            .document-record-meta {
+                display: none;
+            }
+            
+            .document-action-row {
+                flex-direction: column;
+            }
+            
+            .analyze-btn, .integrate-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-dna"></i>
+                    <span>MediLongevity</span>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-flask"></i>
+                    <span>Biomarkers</span>
+                </li>
+                <li class="nav-item active">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Assistant</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-dna"></i>
+                    <span>Genomics</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Protocols</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Reports</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Patients</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Dr. María García</div>
+                    <div class="user-role">Longevity Specialist</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Patient Info Header -->
+            <div class="patient-header">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-info">
+                    <h2 class="patient-name">Isabel Romero</h2>
+                    <div class="patient-details">58 years • Female • ID: 458912</div>
+                </div>
+                <div class="health-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Biological Age</div>
+                        <div class="metric-value">52.3 <span class="trend">(-5.7)</span></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Health Score</div>
+                        <div class="metric-value">84/100</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Last Checkup</div>
+                        <div class="metric-value">12/04/2023</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Assistant Section -->
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-brain"></i> AI Longevity Assistant</h2>
+            </div>
+            
+            <div class="assistant-container">
+                <div class="assistant-tabs">
+                    <div class="assistant-tab active" data-tab="chat">
+                        <i class="fas fa-comments"></i> Conversational Assistant
+                    </div>
+                    <div class="assistant-tab" data-tab="documents">
+                        <i class="fas fa-file-medical"></i> Document Analysis
+                    </div>
+                    <div class="assistant-tab" data-tab="knowledge">
+                        <i class="fas fa-database"></i> Knowledge Base
+                    </div>
+                    <div class="assistant-tab" data-tab="analysis">
+                        <i class="fas fa-chart-bar"></i> Analysis & Interpretation
+                    </div>
+                    <div class="assistant-tab" data-tab="recommendations">
+                        <i class="fas fa-clipboard-check"></i> Recommendations
+                    </div>
+                    <div class="assistant-tab" data-tab="pathways">
+                        <i class="fas fa-project-diagram"></i> Pathway Analysis
+                    </div>
+                </div>
+                
+                <div class="assistant-content">
+                    <!-- Chat Interface Tab -->
+                    <div class="tab-content" id="chat-tab">
+                        <div class="chat-container">
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>Hello Dr. García. I've analyzed Isabel's latest biomarkers, genetic variants, and multi-omic data. Her inflammatory markers show significant improvement since starting the Immune Modulator therapy. What specific aspect of her health would you like to discuss today?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message user">
+                                <div class="message-bubble">
+                                    <p>Can you interpret her genome test results related to metabolic health?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>I'd be happy to analyze Isabel's genomic test results related to metabolic health. Please upload her genomic test report and I'll provide a comprehensive interpretation.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message user">
+                                <div class="message-bubble">
+                                    <p>Here's her recent genetic test report.</p>
+                                    <div class="document-message">
+                                        <i class="fas fa-dna document-message-icon"></i>
+                                        <div class="document-message-info">
+                                            <div class="document-message-name">GenomicHealth_IsabelRomero.pdf</div>
+                                            <div class="document-message-meta">PDF Document • 2.4 MB • Uploaded June 5, 2024</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>Thank you for sharing Isabel's genomic test report. I've analyzed the results focusing on metabolic health markers. Here are my key findings:</p>
+                                    
+                                    <p style="margin-top: 0.75rem;"><strong>Significant Metabolic Genetic Variants:</strong></p>
+                                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                                        <li><strong>TCF7L2 (rs7903146)</strong>: Heterozygous (CT) - This is one of the strongest genetic risk factors for type 2 diabetes. Isabel carries one risk allele, which increases her risk by approximately 40% compared to non-carriers.</li>
+                                        <li><strong>PPARG (Pro12Ala, rs1801282)</strong>: Heterozygous (CG) - This is actually a protective variant that enhances insulin sensitivity and reduces diabetes risk by approximately 15%.</li>
+                                        <li><strong>FTO (rs9939609)</strong>: Heterozygous (AT) - Associated with increased BMI and altered satiety signaling, this variant may contribute to weight management challenges.</li>
+                                        <li><strong>MTHFR (C677T, rs1801133)</strong>: Heterozygous (CT) - While primarily affecting methylation, this variant indirectly impacts metabolic health through homocysteine metabolism and mitochondrial function.</li>
+                                    </ul>
+                                    
+                                    <p style="margin-top: 0.75rem;"><strong>Pathway Impact Analysis:</strong></p>
+                                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                                        <li><strong>Incretin Signaling</strong>: The TCF7L2 variant primarily affects GLP-1 signaling and pancreatic β-cell function, reducing insulin secretion in response to glucose.</li>
+                                        <li><strong>Insulin Sensitivity</strong>: The PPARG protective variant partially counterbalances the TCF7L2 risk by improving peripheral insulin sensitivity.</li>
+                                        <li><strong>Glucose Transportation</strong>: No significant variants affecting GLUT transporters were identified.</li>
+                                        <li><strong>Metabolic Flexibility</strong>: The genetic profile suggests moderately reduced metabolic flexibility, particularly in switching between glucose and fat metabolism.</li>
+                                    </ol>
+                                    
+                                    <p style="margin-top: 0.75rem;"><strong>Integration with Current Biomarkers:</strong></p>
+                                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                                        <li>Isabel's fasting glucose (105 mg/dL) aligns with her TCF7L2 status, showing the expected mild glucose dysregulation.</li>
+                                        <li>Her HOMA-IR of 2.86 indicates insulin resistance despite the protective PPARG variant, suggesting environmental factors are currently outweighing genetic protection.</li>
+                                        <li>The MTHFR variant correlates with her elevated homocysteine (12.4 μmol/L), which can indirectly impair insulin signaling.</li>
+                                    </ul>
+                                    
+                                    <p style="margin-top: 0.75rem;"><strong>Personalized Recommendations Based on Genomic Profile:</strong></p>
+                                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                                        <li><strong>TCF7L2-Targeted Approach</strong>: Time-restricted eating (8-hour window) would be particularly effective for this genotype as it improves incretin sensitivity. The Berberine supplement is also genetically aligned as it works well for TCF7L2 variants.</li>
+                                        <li><strong>PPARG Activation</strong>: To leverage her protective PPARG variant, incorporate more foods rich in monounsaturated fats (olive oil, avocados) and consider omega-3 supplementation (3g daily).</li>
+                                        <li><strong>FTO Considerations</strong>: Due to the FTO variant, a higher-protein breakfast (25-30g) would help regulate appetite signals and improve satiety.</li>
+                                        <li><strong>MTHFR Support</strong>: Methylated B vitamins to address homocysteine, which will indirectly support metabolic function.</li>
+                                    </ol>
+                                    
+                                    <p style="margin-top: 0.75rem;">Would you like me to generate a comprehensive genetically-tailored protocol specifically addressing these metabolic variants? Or would you prefer me to analyze other aspects of her genomic report?</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" placeholder="Ask a detailed question about Isabel's health..." id="chat-input">
+                            <button class="voice-button" id="voice-button" title="Voice input">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="attach-button" id="attach-button" title="Attach document">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="file" id="file-input" class="file-input" accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xls,.xlsx">
+                            <button class="send-button" id="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Document Analysis Tab -->
+                    <div class="tab-content" id="documents-tab" style="display: none;">
+                        <div class="document-tab">
+                            <div class="document-upload-area" id="upload-area">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <h3 class="upload-text">Upload Medical Documents</h3>
+                                <p class="upload-subtext">Drag and drop files here or click to browse</p>
+                                <button class="upload-button" id="browse-files">
+                                    <i class="fas fa-folder-open"></i>
+                                    <span>Browse Files</span>
+                                </button>
+                                <input type="file" id="document-file-input" class="file-input" accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx,.csv,.xls,.xlsx">
+                            </div>
+                            
+                            <div class="document-preview" id="document-preview">
+                                <div class="document-preview-header">
+                                    <h3 class="document-title">
+                                        <i class="fas fa-file-medical"></i>
+                                        <span id="document-name">Document Name</span>
+                                    </h3>
+                                    <div class="document-actions">
+                                        <button class="document-action-button" id="zoom-in" title="Zoom In">
+                                            <i class="fas fa-search-plus"></i>
+                                        </button>
+                                        <button class="document-action-button" id="zoom-out" title="Zoom Out">
+                                            <i class="fas fa-search-minus"></i>
+                                        </button>
+                                        <button class="document-action-button" id="close-preview" title="Close">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="document-content" id="document-content">
+                                    <!-- Document content will be displayed here -->
+                                </div>
+                                
+                                <div class="document-action-row">
+                                    <button class="load-more-btn" id="load-more-btn">
+                                        Load More Content
+                                    </button>
+                                    <button class="analyze-btn" id="analyze-document-btn">
+                                        <i class="fas fa-brain"></i>
+                                        <span>Analyze Document</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="document-analysis" id="document-analysis">
+                                <div class="analysis-header">
+                                    <h3 class="analysis-title">
+                                        <i class="fas fa-microscope"></i>
+                                        Document Analysis
+                                    </h3>
+                                    <div class="analysis-status complete">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Analysis Complete</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="analysis-content" id="analysis-content">
+                                    <div class="analysis-section">
+                                        <h4 class="analysis-section-title">
+                                            <i class="fas fa-dna"></i>
+                                            Genomic Variants Detected
+                                        </h4>
+                                        
+                                        <table class="document-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Gene</th>
+                                                    <th>Variant</th>
+                                                    <th>Genotype</th>
+                                                    <th>Clinical Significance</th>
+                                                    <th>Health Impact</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>TCF7L2</td>
+                                                    <td>rs7903146</td>
+                                                    <td class="highlight">CT</td>
+                                                    <td>Increased diabetes risk (OR 1.4)</td>
+                                                    <td>Metabolic dysregulation</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>MTHFR</td>
+                                                    <td>C677T (rs1801133)</td>
+                                                    <td class="highlight">CT</td>
+                                                    <td>Reduced enzyme activity (~30%)</td>
+                                                    <td>Methylation cycle impairment</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>APOE</td>
+                                                    <td>rs429358, rs7412</td>
+                                                    <td class="highlight">ε3/ε4</td>
+                                                    <td>Moderate risk factor</td>
+                                                    <td>Lipid metabolism alterations</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>COMT</td>
+                                                    <td>Val158Met (rs4680)</td>
+                                                    <td class="highlight">AG</td>
+                                                    <td>Intermediate enzyme activity</td>
+                                                    <td>Stress response modulation</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="analysis-section">
+                                        <h4 class="analysis-section-title">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Key Health Considerations
+                                        </h4>
+                                        
+                                        <div class="analysis-highlight warning">
+                                            <strong>Metabolic Health:</strong> The TCF7L2 (CT) variant indicates increased diabetes susceptibility, primarily through impaired incretin signaling and pancreatic β-cell function. This correlates with Isabel's borderline fasting glucose levels.
+                                        </div>
+                                        
+                                        <div class="analysis-highlight danger">
+                                            <strong>Methylation:</strong> MTHFR C677T heterozygous status may contribute to elevated homocysteine levels, which can indirectly impact cardiovascular and cognitive health as well as detoxification pathways.
+                                        </div>
+                                        
+                                        <div class="analysis-highlight warning">
+                                            <strong>Cognitive Health:</strong> APOE ε3/ε4 genotype requires monitoring for cognitive function and cardiovascular health as this is a moderate risk factor for neurodegenerative conditions with age.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="analysis-section">
+                                        <h4 class="analysis-section-title">
+                                            <i class="fas fa-file-medical-alt"></i>
+                                            Recommended Interventions
+                                        </h4>
+                                        
+                                        <div class="analysis-highlight success">
+                                            <strong>TCF7L2 (rs7903146 CT):</strong> Time-restricted eating (8-hour window), berberine supplementation (500mg 2x daily), and strength training 3x weekly. Research shows these interventions are particularly effective for this specific genetic variant.
+                                        </div>
+                                        
+                                        <div class="analysis-highlight success">
+                                            <strong>MTHFR (C677T CT):</strong> Methylated B vitamins (methylfolate 800-1000 mcg, methylcobalamin 1000 mcg), riboflavin (25mg daily) which can specifically boost MTHFR enzyme activity in this genotype.
+                                        </div>
+                                        
+                                        <div class="analysis-highlight success">
+                                            <strong>APOE (ε3/ε4):</strong> Mediterranean diet pattern with emphasis on omega-3 fatty acids, phosphatidylcholine (300mg daily), and consistent cardiovascular exercise to support cognitive health.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="document-action-row">
+                                    <button class="integrate-btn" id="integrate-analysis-btn">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <span>Integrate with Patient Profile</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="document-records">
+                                <h3 class="upload-text">Previously Analyzed Documents</h3>
+                                
+                                <div class="document-record">
+                                    <div class="document-record-info">
+                                        <i class="fas fa-dna document-record-icon"></i>
+                                        <div class="document-record-details">
+                                            <div class="document-record-name">GenomicHealth_IsabelRomero.pdf</div>
+                                            <div class="document-record-meta">Uploaded on June 5, 2024 • 2.4 MB</div>
+                                        </div>
+                                    </div>
+                                    <div class="document-record-actions">
+                                        <span class="document-badge genomic">Genomic Test</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="document-record">
+                                    <div class="document-record-info">
+                                        <i class="fas fa-file-medical-alt document-record-icon"></i>
+                                        <div class="document-record-details">
+                                            <div class="document-record-name">BloodWork_March2024.pdf</div>
+                                            <div class="document-record-meta">Uploaded on March 24, 2024 • 1.8 MB</div>
+                                        </div>
+                                    </div>
+                                    <div class="document-record-actions">
+                                        <span class="document-badge lab">Lab Results</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="document-record">
+                                    <div class="document-record-info">
+                                        <i class="fas fa-heartbeat document-record-icon"></i>
+                                        <div class="document-record-details">
+                                            <div class="document-record-name">CardiovascularAssessment.pdf</div>
+                                            <div class="document-record-meta">Uploaded on February 12, 2024 • 3.1 MB</div>
+                                        </div>
+                                    </div>
+                                    <div class="document-record-actions">
+                                        <span class="document-badge report">Clinical Report</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Other tabs as in the previous version -->
+                    <div class="tab-content" id="knowledge-tab" style="display: none;">
+                        <!-- Knowledge Base Content -->
+                        <p>Knowledge Base Tab Content</p>
+                    </div>
+                    
+                    <div class="tab-content" id="analysis-tab" style="display: none;">
+                        <!-- Analysis Tab Content -->
+                        <p>Analysis & Interpretation Tab Content</p>
+                    </div>
+                    
+                    <div class="tab-content" id="recommendations-tab" style="display: none;">
+                        <!-- Recommendations Tab Content -->
+                        <p>Recommendations Tab Content</p>
+                    </div>
+                    
+                    <div class="tab-content" id="pathways-tab" style="display: none;">
+                        <!-- Pathways Tab Content -->
+                        <p>Pathway Analysis Tab Content</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Document Viewer Modal -->
+    <div class="document-viewer-modal" id="document-viewer-modal">
+        <div class="document-viewer-container">
+            <div class="document-viewer-header">
+                <h3 class="document-viewer-title">
+                    <i class="fas fa-file-medical"></i>
+                    <span id="modal-document-name">Document Name</span>
+                </h3>
+                <button class="document-viewer-close" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="document-viewer-content" id="modal-document-content">
+                <!-- Document content will be displayed here -->
+            </div>
+            
+            <div class="document-viewer-footer">
+                <button class="document-viewer-button secondary" id="previous-page">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous Page</span>
+                </button>
+                <button class="document-viewer-button secondary" id="next-page">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Next Page</span>
+                </button>
+                <button class="document-viewer-button primary" id="analyze-modal-document">
+                    <i class="fas fa-brain"></i>
+                    <span>Analyze Document</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toast notifications will be added here dynamically -->
+    </div>
+    
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for dark mode preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+                const icon = document.querySelector('#theme-toggle i');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+            
+            // Listen for dark mode changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.body.classList.add('dark-mode');
+                    const icon = document.querySelector('#theme-toggle i');
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    const icon = document.querySelector('#theme-toggle i');
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+            
+            // Tab Switching
+            const tabs = document.querySelectorAll('.assistant-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Show content for active tab
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId + '-tab').style.display = 'block';
+                });
+            });
+            
+            // Chat Functionality
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const voiceButton = document.getElementById('voice-button');
+            const attachButton = document.getElementById('attach-button');
+            const fileInput = document.getElementById('file-input');
+            const chatContainer = document.querySelector('.chat-container');
+            
+            attachButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(event) {
+                if (event.target.files.length > 0) {
+                    const file = event.target.files[0];
+                    uploadFile(file);
+                }
+            });
+            
+            function uploadFile(file) {
+                // Create message for file upload
+                const fileMessage = `Here's a document I'd like you to analyze: ${file.name}`;
+                addMessage(fileMessage, 'user');
+                
+                // Add document attachment to the message
+                const lastMessage = chatContainer.querySelector('.chat-message:last-child .message-bubble');
+                
+                // Create document message element
+                const documentElement = document.createElement('div');
+                documentElement.className = 'document-message';
+                
+                // Determine icon based on file type
+                let iconClass = 'fas fa-file';
+                if (file.name.toLowerCase().endsWith('.pdf')) {
+                    iconClass = 'fas fa-file-pdf';
+                } else if (file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)) {
+                    iconClass = 'fas fa-file-image';
+                } else if (file.name.toLowerCase().match(/\.(doc|docx)$/)) {
+                    iconClass = 'fas fa-file-word';
+                } else if (file.name.toLowerCase().match(/\.(xls|xlsx|csv)$/)) {
+                    iconClass = 'fas fa-file-excel';
+                } else if (file.name.toLowerCase().includes('genomic') || file.name.toLowerCase().includes('genetic')) {
+                    iconClass = 'fas fa-dna';
+                }
+                
+                documentElement.innerHTML = `
+                    <i class="${iconClass} document-message-icon"></i>
+                    <div class="document-message-info">
+                        <div class="document-message-name">${file.name}</div>
+                        <div class="document-message-meta">${getFileType(file)} • ${formatFileSize(file.size)} • Uploaded ${getCurrentDate()}</div>
+                    </div>
+                `;
+                
+                lastMessage.appendChild(documentElement);
+                
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                chatContainer.appendChild(typingIndicator);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate AI processing and response
+                setTimeout(() => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    
+                    // Generate response based on file type
+                    let aiResponse = '';
+                    
+                    if (file.name.toLowerCase().includes('genome') || 
+                        file.name.toLowerCase().includes('genetic') || 
+                        file.name.toLowerCase().includes('dna')) {
+                        aiResponse = generateGenomicReportResponse(file.name);
+                    } else if (file.name.toLowerCase().includes('blood') || 
+                               file.name.toLowerCase().includes('lab')) {
+                        aiResponse = generateLabReportResponse(file.name);
+                    } else if (file.name.toLowerCase().includes('cardio') || 
+                               file.name.toLowerCase().includes('heart')) {
+                        aiResponse = generateCardioReportResponse(file.name);
+                    } else {
+                        aiResponse = generateGenericDocumentResponse(file.name);
+                    }
+                    
+                    // Add AI response
+                    addMessage(aiResponse, 'ai');
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    
+                    // Show toast notification
+                    showToast('Document Analyzed', 'The document has been successfully analyzed', 'success');
+                }, 3000);
+            }
+            
+            function getCurrentDate() {
+                const now = new Date();
+                return now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            function getFileType(file) {
+                const extension = file.name.split('.').pop().toLowerCase();
+                const mimeType = file.type;
+                
+                if (mimeType.includes('pdf')) return 'PDF Document';
+                if (mimeType.includes('image')) return 'Image';
+                if (mimeType.includes('word')) return 'Word Document';
+                if (mimeType.includes('excel') || mimeType.includes('spreadsheet') || extension === 'csv') return 'Spreadsheet';
+                if (mimeType.includes('text')) return 'Text Document';
+                
+                // Special case for genomic data
+                if (file.name.toLowerCase().includes('genomic') || 
+                    file.name.toLowerCase().includes('genetic') || 
+                    file.name.toLowerCase().includes('dna')) {
+                    return 'Genomic Data';
+                }
+                
+                return 'Document';
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                else return (bytes / 1048576).toFixed(1) + ' MB';
+            }
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                addMessage(message, 'user');
+                chatInput.value = '';
+                
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                chatContainer.appendChild(typingIndicator);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate AI response after delay
+                setTimeout(() => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    
+                    // Generate AI response based on user message
+                    let aiResponse = generateEnhancedAIResponse(message);
+                    
+                    // Add AI response
+                    addMessage(aiResponse, 'ai');
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 1500);
+            }
+            
+            function addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${sender}`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                
+                // Check if content has HTML formatting
+                if (content.includes('<') && content.includes('>')) {
+                    bubble.innerHTML = content;
+                } else {
+                    bubble.textContent = content;
+                }
+                
+                messageDiv.appendChild(bubble);
+                chatContainer.appendChild(messageDiv);
+            }
+            
+            function generateGenomicReportResponse(fileName) {
+                return `
+                    <p>Thank you for sharing this genomic report. I've analyzed the data and identified several key findings relevant to Isabel's health.</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Key Genetic Variants Identified:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>TCF7L2 (rs7903146)</strong>: Heterozygous (CT) - Associated with a 40% increased risk for type 2 diabetes through impaired beta-cell function.</li>
+                        <li><strong>MTHFR (C677T, rs1801133)</strong>: Heterozygous (CT) - Resulting in approximately 30% reduced enzyme activity affecting methylation and homocysteine metabolism.</li>
+                        <li><strong>APOE (rs429358, rs7412)</strong>: ε3/ε4 genotype - Associated with altered lipid metabolism and moderate increased risk for cardiovascular and neurodegenerative conditions.</li>
+                        <li><strong>COMT (Val158Met, rs4680)</strong>: Heterozygous (AG) - Balanced dopamine metabolism affecting stress response and cognitive function.</li>
+                        <li><strong>FTO (rs9939609)</strong>: Heterozygous (AT) - Associated with increased BMI and altered satiety signals.</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Pathway Analysis:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Metabolic Health:</strong> Multiple variants affecting glucose regulation and insulin sensitivity, particularly TCF7L2.</li>
+                        <li><strong>Methylation:</strong> MTHFR variant impacting one-carbon metabolism and homocysteine processing.</li>
+                        <li><strong>Cardiovascular:</strong> APOE status affecting lipid metabolism and vascular health.</li>
+                        <li><strong>Neurocognitive:</strong> Variants in COMT and APOE affecting cognitive resilience pathways.</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Integration with Current Biomarkers:</strong></p>
+                    <p>These genetic findings align with Isabel's clinical presentation, particularly her borderline glucose levels (105 mg/dL) and elevated homocysteine (12.4 μmol/L). The TCF7L2 variant helps explain the glucose dysregulation despite her healthy lifestyle, while the MTHFR variant clarifies the persistent homocysteine elevation.</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Personalized Recommendations:</strong></p>
+                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Metabolic Optimization:</strong> Time-restricted eating (8-hour window), berberine supplementation, and zone 2 cardio exercise would be particularly effective for her TCF7L2 genotype.</li>
+                        <li><strong>Methylation Support:</strong> Methylated B vitamins (methylfolate 800-1000 mcg, methylcobalamin 1000 mcg) and riboflavin (25mg) to support MTHFR function.</li>
+                        <li><strong>Cognitive Protection:</strong> Omega-3 fatty acids (2-3g daily), phosphatidylcholine (300mg), and regular cognitive challenges for APOE ε4 carrier status.</li>
+                    </ol>
+                    
+                    <p style="margin-top: 0.75rem;">Would you like me to generate a comprehensive protocol tailored to her genetic profile? Or would you prefer to focus on a specific aspect of these findings?</p>
+                `;
+            }
+            
+            function generateLabReportResponse(fileName) {
+                return `
+                    <p>I've analyzed Isabel's laboratory results from ${fileName} and identified several key findings that require attention.</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Key Biomarker Findings:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Fasting Glucose:</strong> 105 mg/dL (Reference: 70-99 mg/dL) - Mildly elevated, suggesting prediabetic tendency</li>
+                        <li><strong>HbA1c:</strong> 5.6% (Reference: <5.7%) - At upper limit of normal range</li>
+                        <li><strong>Homocysteine:</strong> 12.4 μmol/L (Reference: <10 μmol/L) - Moderately elevated</li>
+                        <li><strong>hsCRP:</strong> 2.1 mg/L (Reference: <1.0 mg/L) - Indicating mild systemic inflammation</li>
+                        <li><strong>Vitamin D (25-OH):</strong> 32 ng/mL (Reference: 30-50 ng/mL) - Within range but barely optimal</li>
+                        <li><strong>LDL Particle Number:</strong> 1480 nmol/L (Reference: <1300 nmol/L) - Mildly elevated</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Interpretation & Pattern Analysis:</strong></p>
+                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Metabolic Dysregulation:</strong> The pattern of elevated glucose, borderline HbA1c, and elevated LDL particle number suggests early insulin resistance.</li>
+                        <li><strong>Inflammatory Status:</strong> hsCRP elevation indicates low-grade systemic inflammation, which may be contributing to metabolic dysregulation.</li>
+                        <li><strong>Methylation Challenge:</strong> Elevated homocysteine suggests impaired methylation capacity, consistent with her MTHFR heterozygous status.</li>
+                    </ol>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Trend Analysis (Compared to Previous Results):</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Improving:</strong> hsCRP has decreased from 3.8 to 2.1 mg/L (45% improvement)</li>
+                        <li><strong>Improving:</strong> Glucose has decreased from 118 to 105 mg/dL (11% improvement)</li>
+                        <li><strong>Stable:</strong> Homocysteine remains elevated despite intervention</li>
+                        <li><strong>Improving:</strong> Vitamin D has increased from 24 to 32 ng/mL</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Recommended Follow-up Testing:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li>Consider advanced lipoprotein testing to assess LDL particle size distribution</li>
+                        <li>HOMA-IR calculation to quantify insulin resistance</li>
+                        <li>Consider organic acid testing to assess mitochondrial function</li>
+                        <li>Micronutrient testing for B vitamin status (particularly B2, B6, B9, B12)</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;">Would you like me to integrate these laboratory findings with Isabel's genetic profile for a comprehensive analysis? Or would you prefer specific recommendations based solely on these lab results?</p>
+                `;
+            }
+            
+            function generateCardioReportResponse(fileName) {
+                return `
+                    <p>I've analyzed Isabel's cardiovascular assessment report and identified several findings relevant to her longevity profile.</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Key Cardiovascular Findings:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Carotid Intima-Media Thickness (CIMT):</strong> 0.8mm (Reference: <0.9mm for age) - Within normal limits but trend shows slight increase from previous measurement</li>
+                        <li><strong>Coronary Artery Calcium Score:</strong> 23 Agatston units (Age-adjusted percentile: 52nd) - Indicates early subclinical atherosclerosis</li>
+                        <li><strong>Endothelial Function:</strong> Flow-mediated dilation of 9% (Reference: >10%) - Slightly reduced endothelial function</li>
+                        <li><strong>Arterial Stiffness:</strong> Pulse wave velocity of 8.3 m/s (Reference: <9.0 m/s) - Within normal range but trending upward</li>
+                        <li><strong>Blood Pressure Variability:</strong> Standard deviation of 9.2 mmHg (Reference: <8.0 mmHg) - Mildly elevated</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Interpretation & Risk Assessment:</strong></p>
+                    <p>Isabel's cardiovascular assessment reveals early signs of vascular aging and subclinical atherosclerosis. Her APOE ε3/ε4 genetic status likely contributes to these findings. While none of the individual parameters indicate severe pathology, the collective pattern suggests accelerated vascular aging that warrants intervention.</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Relationship to Other Biomarkers:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li>The elevated homocysteine (12.4 μmol/L) likely contributes to endothelial dysfunction</li>
+                        <li>Low-grade inflammation (hsCRP 2.1 mg/L) is a likely contributor to arterial stiffness</li>
+                        <li>Borderline glucose metabolism may be affecting vascular health</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Personalized Recommendations:</strong></p>
+                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Targeted Supplementation:</strong>
+                            <ul style="margin-left: 1rem; margin-top: 0.25rem;">
+                                <li>Citrulline (2000mg daily) to enhance nitric oxide production</li>
+                                <li>Omega-3 fatty acids (3g EPA+DHA daily) for APOE ε4 carriers</li>
+                                <li>Grape seed extract (300mg daily) for endothelial support</li>
+                            </ul>
+                        </li>
+                        <li><strong>Lifestyle Modifications:</strong>
+                            <ul style="margin-left: 1rem; margin-top: 0.25rem;">
+                                <li>Zone 2 cardiovascular training (40-60 minutes, 4x weekly)</li>
+                                <li>Heat therapy (sauna 20 minutes, 3x weekly) for vascular compliance</li>
+                                <li>Mediterranean diet pattern with emphasis on polyphenol-rich foods</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    
+                    <p style="margin-top: 0.75rem;">Would you like me to create a comprehensive cardiovascular optimization protocol integrating these findings with Isabel's genetic profile and other biomarkers? Or would you prefer to focus on a specific aspect of her cardiovascular health?</p>
+                `;
+            }
+            
+            function generateGenericDocumentResponse(fileName) {
+                return `
+                    <p>Thank you for sharing this document. I've reviewed ${fileName} and extracted the relevant information for Isabel's health profile.</p>
+                    
+                    <p style="margin-top: 0.75rem;">Without knowing the specific type of document, I've done a general analysis. Please let me know if you'd like me to focus on particular aspects or if there are specific questions you have about this document.</p>
+                    
+                    <p style="margin-top: 0.75rem;">Would you like me to:</p>
+                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li>Provide a detailed summary of the document contents?</li>
+                        <li>Extract specific health-related data points from the document?</li>
+                        <li>Integrate this information with Isabel's existing health profile?</li>
+                        <li>Generate recommendations based on the document contents?</li>
+                    </ol>
+                    
+                    <p style="margin-top: 0.75rem;">Please let me know how you'd like to proceed with analyzing this document.</p>
+                `;
+            }
+            
+            function generateEnhancedAIResponse(userMessage) {
+                // Response generation based on keywords and context
+                const userMessageLower = userMessage.toLowerCase();
+                
+                // Genomic analysis related questions
+                if (userMessageLower.includes('genomic') || userMessageLower.includes('genetic') || 
+                    userMessageLower.includes('dna') || userMessageLower.includes('gene')) {
+                    return `
+                        <p>Based on Isabel's genomic profile, I can provide the following analysis:</p>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Key Genetic Variants:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li><strong>TCF7L2 (rs7903146)</strong>: Heterozygous (CT) - This is one of the strongest T2D risk variants, affecting incretin signaling and β-cell function. Isabel has one risk allele, increasing her diabetes risk by approximately 40%.</li>
+                            <li><strong>MTHFR (C677T, rs1801133)</strong>: Heterozygous (CT) - Reduces enzyme activity by ~30%, affecting folate metabolism and homocysteine processing.</li>
+                            <li><strong>APOE (rs429358, rs7412)</strong>: ε3/ε4 genotype - One copy of the ε4 allele, which affects lipid transport, cholesterol metabolism, and is associated with altered cardiovascular and cognitive risk.</li>
+                            <li><strong>FTO (rs9939609)</strong>: Heterozygous (AT) - Associated with increased BMI and altered satiety signaling.</li>
+                            <li><strong>PPARG (Pro12Ala, rs1801282)</strong>: Heterozygous (CG) - A protective variant that enhances insulin sensitivity.</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Pathway Integration Analysis:</strong></p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li><strong>Glucose Metabolism:</strong> The TCF7L2 risk variant is partially offset by the PPARG protective variant, resulting in a moderate net risk for glucose dysregulation.</li>
+                            <li><strong>Methylation Cycle:</strong> MTHFR heterozygosity creates a 30% reduction in enzyme activity, creating a rate-limiting step in homocysteine metabolism.</li>
+                            <li><strong>Lipid Metabolism:</strong> APOE ε3/ε4 status affects ApoE protein function in cholesterol transport and clearance, particularly affecting small dense LDL particles.</li>
+                            <li><strong>Energy Homeostasis:</strong> FTO variant affects leptin signaling and satiety regulation, potentially influencing dietary adherence.</li>
+                        </ol>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Genomically-Tailored Interventions:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li><strong>For TCF7L2 (CT):</strong> Time-restricted eating (8-hour window), berberine supplementation, and post-meal walking have shown particular efficacy for this variant.</li>
+                            <li><strong>For MTHFR (CT):</strong> Methylated B vitamins (methylfolate 800-1000 mcg, methylcobalamin 1000 mcg), riboflavin (25mg) which specifically boosts MTHFR enzyme activity.</li>
+                            <li><strong>For APOE (ε3/ε4):</strong> Mediterranean diet pattern, omega-3 supplementation (EPA>DHA ratio), phosphatidylcholine, and regular cardio exercise.</li>
+                            <li><strong>For FTO (AT):</strong> Higher protein breakfast (25-30g), fiber-rich meals, and intermittent higher intensity exercise.</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">Would you like me to generate a complete genomically-tailored protocol integrating all these variants? Or would you prefer focusing on a specific genetic pathway?</p>
+                    `;
+                }
+                
+                // Document analysis or interpretation questions
+                if (userMessageLower.includes('interpret') || userMessageLower.includes('analyze') || 
+                    userMessageLower.includes('report') || userMessageLower.includes('document')) {
+                    return `
+                        <p>I'd be happy to analyze and interpret medical documents for Isabel. Please upload the document you'd like me to analyze, and I'll provide a comprehensive interpretation.</p>
+                        
+                        <p style="margin-top: 0.75rem;">I can interpret various types of medical documents, including:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li><strong>Genomic Test Reports:</strong> DNA sequencing results, SNP analysis, genetic risk assessments</li>
+                            <li><strong>Laboratory Results:</strong> Blood tests, metabolic panels, hormone assessments, inflammatory markers</li>
+                            <li><strong>Imaging Reports:</strong> CIMT, coronary calcium scores, bone density, body composition</li>
+                            <li><strong>Functional Medicine Tests:</strong> Microbiome analysis, organic acid tests, food sensitivity panels</li>
+                            <li><strong>Clinical Assessments:</strong> Cardiovascular evaluations, cognitive assessments, biological age calculations</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">For each document, I'll provide:</p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>Extraction of key data points and abnormal findings</li>
+                            <li>Clinical interpretation within the context of longevity medicine</li>
+                            <li>Integration with Isabel's existing health profile</li>
+                            <li>Pattern recognition across multiple biomarkers</li>
+                            <li>Evidence-based recommendations based on the findings</li>
+                        </ol>
+                        
+                        <p style="margin-top: 0.75rem;">You can upload a document by clicking the paperclip icon below the chat input, or you can switch to the Document Analysis tab for more advanced document processing options.</p>
+                    `;
+                }
+                
+                // Default response
+                return `
+                    <p>I'm here to help with Isabel's longevity and anti-aging protocol. I can assist with analyzing medical documents, interpreting genomic data, and providing personalized recommendations.</p>
+                    
+                    <p style="margin-top: 0.75rem;">Here are some ways I can help:</p>
+                    <ol style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li><strong>Document Analysis:</strong> Upload medical reports, lab results, or genomic tests for AI interpretation</li>
+                        <li><strong>Biomarker Interpretation:</strong> Get detailed explanations of Isabel's health markers and trends</li>
+                        <li><strong>Genomic Insights:</strong> Understand how her genetic variants affect her health and longevity</li>
+                        <li><strong>Personalized Recommendations:</strong> Receive evidence-based, genetically-tailored protocols</li>
+                        <li><strong>Pathway Analysis:</strong> Explore biological pathways affected by her specific genetic variants</li>
+                    </ol>
+                    
+                    <p style="margin-top: 0.75rem;">You can upload documents directly in this chat by clicking the paperclip icon, or use the Document Analysis tab for more advanced options. What specific aspect of Isabel's health would you like to explore today?</p>
+                `;
+            }
+            
+            // Voice input functionality
+            voiceButton.addEventListener('click', function() {
+                // This would typically use the Web Speech API
+                // For simulation purposes, we'll just show a notification
+                const recognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                
+                if (recognition) {
+                    voiceButton.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+                    voiceButton.classList.add('pulse-animation');
+                    
+                    // Simulate voice recognition after a delay
+                    setTimeout(() => {
+                        voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                        voiceButton.classList.remove('pulse-animation');
+                        chatInput.value = "Can you interpret her latest genomic test results?";
+                        chatInput.focus();
+                    }, 3000);
+                } else {
+                    showToast('Not Supported', 'Speech recognition is not supported in your browser.', 'warning');
+                }
+            });
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Document Upload Functionality
+            const uploadArea = document.getElementById('upload-area');
+            const browseFiles = document.getElementById('browse-files');
+            const documentFileInput = document.getElementById('document-file-input');
+            const documentPreview = document.getElementById('document-preview');
+            const documentName = document.getElementById('document-name');
+            const documentContent = document.getElementById('document-content');
+            const closePreview = document.getElementById('close-preview');
+            const analyzeDocumentBtn = document.getElementById('analyze-document-btn');
+            const documentAnalysis = document.getElementById('document-analysis');
+            const integrateAnalysisBtn = document.getElementById('integrate-analysis-btn');
+            
+            // Drag and drop functionality
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                uploadArea.classList.remove('dragover');
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    handleFiles(files[0]);
+                }
+            }
+            
+            browseFiles.addEventListener('click', function() {
+                documentFileInput.click();
+            });
+            
+            documentFileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFiles(e.target.files[0]);
+                }
+            });
+            
+            function handleFiles(file) {
+                showDocument(file);
+            }
+            
+            function showDocument(file) {
+                // Update document name
+                documentName.textContent = file.name;
+                
+                // Clear previous content
+                documentContent.innerHTML = '';
+                
+                // Check file type and display appropriate content
+                if (file.type.startsWith('image/')) {
+                    // For image files
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.onload = function() {
+                        URL.revokeObjectURL(this.src);
+                    };
+                    documentContent.appendChild(img);
+                } else if (file.type === 'application/pdf') {
+                    // For PDF files - in a real app would use PDF.js to render
+                    documentContent.innerHTML = `
+                        <div style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-file-pdf" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                            <p>PDF Document: ${file.name}</p>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-medium);">Size: ${formatFileSize(file.size)}</p>
+                            <p style="margin-top: 1rem;">PDF content would be displayed here using PDF.js in a real application.</p>
+                        </div>
+                    `;
+                } else {
+                    // For text and other file types - simplified for demo
+                    if (file.name.toLowerCase().includes('genomic') || file.name.toLowerCase().includes('genetic')) {
+                        // Simulate genomic report content
+                        documentContent.innerHTML = `
+                            <pre>
+GENOMIC HEALTH ANALYSIS - ISABEL ROMERO
+Test Date: June 5, 2024
+Method: SNP Genotyping Array
+Sample ID: GEN-2024-458912
+
+SIGNIFICANT VARIANTS:
+
+Gene: TCF7L2
+Variant ID: rs7903146
+Chromosome Position: chr10:114758349
+Genotype: CT (Heterozygous)
+Clinical Significance: Risk allele for type 2 diabetes
+Literature: PMID 32550757, PMID 31177129
+
+Gene: MTHFR
+Variant ID: rs1801133 (C677T)
+Chromosome Position: chr1:11856378
+Genotype: CT (Heterozygous)
+Clinical Significance: Reduced enzyme activity (~30%)
+Literature: PMID 29263811, PMID 30188285
+
+Gene: APOE
+Variant IDs: rs429358, rs7412
+Genotype: ε3/ε4
+Clinical Significance: Altered lipid metabolism and increased cardiovascular risk
+Literature: PMID 31843318, PMID 29874532
+
+Gene: COMT
+Variant ID: rs4680 (Val158Met)
+Chromosome Position: chr22:19951271
+Genotype: AG (Heterozygous)
+Clinical Significance: Intermediate enzyme activity
+Literature: PMID 31177229, PMID 29951232
+
+Gene: FTO
+Variant ID: rs9939609
+Chromosome Position: chr16:53820527
+Genotype: AT (Heterozygous)
+Clinical Significance: Associated with increased BMI and altered satiety
+Literature: PMID 28448062, PMID 31289881
+
+Gene: PPARG
+Variant ID: rs1801282 (Pro12Ala)
+Chromosome Position: chr3:12393125
+Genotype: CG (Heterozygous)
+Clinical Significance: Protective variant for insulin sensitivity
+Literature: PMID 29264969, PMID 31488631
+
+[Additional variants and detailed analysis available on full report]
+                            </pre>
+                        `;
+                    } else if (file.name.toLowerCase().includes('blood') || file.name.toLowerCase().includes('lab')) {
+                        // Simulate lab report content
+                        documentContent.innerHTML = `
+                            <pre>
+COMPREHENSIVE METABOLIC PANEL - ISABEL ROMERO
+Test Date: March 24, 2024
+Patient ID: 458912
+
+METABOLIC MARKERS:
+Fasting Glucose: 105 mg/dL     (Reference: 70-99 mg/dL)    HIGH
+HbA1c: 5.6%                    (Reference: <5.7%)          BORDERLINE
+Insulin: 11 μIU/mL             (Reference: <8 μIU/mL)      HIGH
+HOMA-IR: 2.86                  (Reference: <1.9)           HIGH
+
+LIPID PANEL:
+Total Cholesterol: 198 mg/dL   (Reference: <200 mg/dL)     NORMAL
+HDL: 56 mg/dL                  (Reference: >50 mg/dL)      NORMAL
+LDL: 122 mg/dL                 (Reference: <100 mg/dL)     HIGH
+Triglycerides: 132 mg/dL       (Reference: <150 mg/dL)     NORMAL
+LDL Particle Number: 1480 nmol/L (Reference: <1300 nmol/L) HIGH
+LDL Particle Size: 20.8 nm     (Reference: >21.0 nm)       LOW
+
+INFLAMMATORY MARKERS:
+hsCRP: 2.1 mg/L                (Reference: <1.0 mg/L)      HIGH
+IL-6: 2.8 pg/mL                (Reference: <1.8 pg/mL)     HIGH
+TNF-α: 4.9 pg/mL               (Reference: <4.0 pg/mL)     HIGH
+Homocysteine: 12.4 μmol/L      (Reference: <10 μmol/L)     HIGH
+
+NUTRIENT STATUS:
+Vitamin D (25-OH): 32 ng/mL    (Reference: 30-50 ng/mL)    NORMAL
+Vitamin B12: 498 pg/mL         (Reference: 400-1000 pg/mL) NORMAL
+Folate: 16.2 ng/mL             (Reference: >5.0 ng/mL)     NORMAL
+Magnesium: 1.8 mg/dL           (Reference: 1.7-2.2 mg/dL)  NORMAL
+Zinc: 72 μg/dL                 (Reference: 70-120 μg/dL)   NORMAL
+Ferritin: 68 ng/mL             (Reference: 30-150 ng/mL)   NORMAL
+
+THYROID PANEL:
+TSH: 2.4 μIU/mL                (Reference: 0.4-4.0 μIU/mL) NORMAL
+Free T4: 1.1 ng/dL             (Reference: 0.8-1.8 ng/dL)  NORMAL
+Free T3: 3.2 pg/mL             (Reference: 2.3-4.2 pg/mL)  NORMAL
+Reverse T3: 18 ng/dL           (Reference: 10-24 ng/dL)    NORMAL
+
+HORMONES:
+DHEA-S: 98 μg/dL               (Reference: 45-270 μg/dL)   NORMAL
+Estradiol: 24 pg/mL            (Reference: <30 pg/mL)      NORMAL
+                            </pre>
+                        `;
+                    } else if (file.name.toLowerCase().includes('cardio') || file.name.toLowerCase().includes('heart')) {
+                        // Simulate cardio report
+                        documentContent.innerHTML = `
+                            <pre>
+CARDIOVASCULAR ASSESSMENT - ISABEL ROMERO
+Test Date: February 12, 2024
+Patient ID: 458912
+
+STRUCTURAL ASSESSMENTS:
+
+Carotid Intima-Media Thickness (CIMT):
+- Right Carotid: 0.79 mm           (Reference: <0.9 mm)    NORMAL
+- Left Carotid: 0.81 mm            (Reference: <0.9 mm)    NORMAL
+- Average: 0.80 mm                 (Reference: <0.9 mm)    NORMAL
+- Previous (6 months ago): 0.77 mm                         SLIGHT INCREASE
+
+Coronary Artery Calcium Score:
+- Agatston Score: 23               (Age-adjusted: 52%)     EARLY ATHEROSCLEROSIS
+- Previous (12 months ago): 18                             PROGRESSION
+
+FUNCTIONAL ASSESSMENTS:
+
+Endothelial Function:
+- Flow-mediated dilation: 9%       (Reference: >10%)       SLIGHTLY REDUCED
+- Nitroglycerin response: 16%      (Reference: >15%)       NORMAL
+
+Arterial Stiffness:
+- Pulse wave velocity: 8.3 m/s     (Reference: <9.0 m/s)   NORMAL
+- Augmentation index: 24%          (Reference: <30%)       NORMAL
+
+Blood Pressure Profile:
+- Office BP: 118/76 mmHg           (Reference: <120/80)    NORMAL
+- 24-hour average: 116/74 mmHg     (Reference: <130/80)    NORMAL
+- Nocturnal dipping: 11%           (Reference: >10%)       NORMAL
+- BP variability (SD): 9.2 mmHg    (Reference: <8.0 mmHg)  SLIGHTLY ELEVATED
+
+CARDIAC FUNCTION:
+
+- Ejection fraction: 64%           (Reference: 55-70%)     NORMAL
+- LV mass index: 78 g/m²           (Reference: <95 g/m²)   NORMAL
+- E/A ratio: 1.2                   (Reference: >1.0)       NORMAL
+- E/e' ratio: 7.8                  (Reference: <8.0)       NORMAL
+
+METABOLIC MARKERS AFFECTING CARDIOVASCULAR HEALTH:
+
+- LDL-P: 1480 nmol/L               (Reference: <1300)      ELEVATED
+- Small dense LDL: 52%             (Reference: <40%)       ELEVATED
+- Oxidized LDL: 48 U/L             (Reference: <45 U/L)    SLIGHTLY ELEVATED
+- Lipoprotein(a): 28 mg/dL         (Reference: <30 mg/dL)  NORMAL
+- Homocysteine: 12.4 μmol/L        (Reference: <10 μmol/L) ELEVATED
+- hsCRP: 2.1 mg/L                  (Reference: <1.0 mg/L)  ELEVATED
+
+AUTONOMIC FUNCTION:
+
+- Heart rate variability (SDNN): 42ms (Reference: >35ms)   NORMAL
+- Heart rate recovery (1-min): 24 bpm (Reference: >20 bpm) NORMAL
+                            </pre>
+                        `;
+                    } else {
+                        // Generic document content
+                        documentContent.innerHTML = `
+                            <div style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-file-alt" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                                <p>Document: ${file.name}</p>
+                                <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-medium);">Size: ${formatFileSize(file.size)}</p>
+                                <p style="margin-top: 1rem;">The document content would be displayed here in a real application.</p>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Show document preview
+                documentPreview.classList.add('active');
+                
+                // Hide document analysis if visible
+                documentAnalysis.classList.remove('active');
+            }
+            
+            closePreview.addEventListener('click', function() {
+                documentPreview.classList.remove('active');
+            });
+            
+            analyzeDocumentBtn.addEventListener('click', function() {
+                // Show loading state
+                documentContent.innerHTML = `
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="spinner-text">Analyzing document...</div>
+                    </div>
+                `;
+                
+                // Simulate analysis delay
+                setTimeout(() => {
+                    // Restore document content based on document name
+                    const filename = documentName.textContent;
+                    
+                    if (filename.toLowerCase().includes('genomic') || filename.toLowerCase().includes('genetic')) {
+                        // Simulate genomic report content
+                        documentContent.innerHTML = `
+                            <pre>
+GENOMIC HEALTH ANALYSIS - ISABEL ROMERO
+Test Date: June 5, 2024
+Method: SNP Genotyping Array
+Sample ID: GEN-2024-458912
+
+SIGNIFICANT VARIANTS:
+
+Gene: TCF7L2
+Variant ID: rs7903146
+Chromosome Position: chr10:114758349
+Genotype: CT (Heterozygous)
+Clinical Significance: Risk allele for type 2 diabetes
+Literature: PMID 32550757, PMID 31177129
+
+Gene: MTHFR
+Variant ID: rs1801133 (C677T)
+Chromosome Position: chr1:11856378
+Genotype: CT (Heterozygous)
+Clinical Significance: Reduced enzyme activity (~30%)
+Literature: PMID 29263811, PMID 30188285
+
+Gene: APOE
+Variant IDs: rs429358, rs7412
+Genotype: ε3/ε4
+Clinical Significance: Altered lipid metabolism and increased cardiovascular risk
+Literature: PMID 31843318, PMID 29874532
+
+Gene: COMT
+Variant ID: rs4680 (Val158Met)
+Chromosome Position: chr22:19951271
+Genotype: AG (Heterozygous)
+Clinical Significance: Intermediate enzyme activity
+Literature: PMID 31177229, PMID 29951232
+
+Gene: FTO
+Variant ID: rs9939609
+Chromosome Position: chr16:53820527
+Genotype: AT (Heterozygous)
+Clinical Significance: Associated with increased BMI and altered satiety
+Literature: PMID 28448062, PMID 31289881
+
+Gene: PPARG
+Variant ID: rs1801282 (Pro12Ala)
+Chromosome Position: chr3:12393125
+Genotype: CG (Heterozygous)
+Clinical Significance: Protective variant for insulin sensitivity
+Literature: PMID 29264969, PMID 31488631
+
+[Additional variants and detailed analysis available on full report]
+                            </pre>
+                        `;
+                    } else if (filename.toLowerCase().includes('blood') || filename.toLowerCase().includes('lab')) {
+                        // Same as above for lab reports
+                        documentContent.innerHTML = `
+                            <pre>
+COMPREHENSIVE METABOLIC PANEL - ISABEL ROMERO
+Test Date: March 24, 2024
+Patient ID: 458912
+
+METABOLIC MARKERS:
+Fasting Glucose: 105 mg/dL     (Reference: 70-99 mg/dL)    HIGH
+HbA1c: 5.6%                    (Reference: <5.7%)          BORDERLINE
+Insulin: 11 μIU/mL             (Reference: <8 μIU/mL)      HIGH
+HOMA-IR: 2.86                  (Reference: <1.9)           HIGH
+
+LIPID PANEL:
+Total Cholesterol: 198 mg/dL   (Reference: <200 mg/dL)     NORMAL
+HDL: 56 mg/dL                  (Reference: >50 mg/dL)      NORMAL
+LDL: 122 mg/dL                 (Reference: <100 mg/dL)     HIGH
+Triglycerides: 132 mg/dL       (Reference: <150 mg/dL)     NORMAL
+LDL Particle Number: 1480 nmol/L (Reference: <1300 nmol/L) HIGH
+LDL Particle Size: 20.8 nm     (Reference: >21.0 nm)       LOW
+
+INFLAMMATORY MARKERS:
+hsCRP: 2.1 mg/L                (Reference: <1.0 mg/L)      HIGH
+IL-6: 2.8 pg/mL                (Reference: <1.8 pg/mL)     HIGH
+TNF-α: 4.9 pg/mL               (Reference: <4.0 pg/mL)     HIGH
+Homocysteine: 12.4 μmol/L      (Reference: <10 μmol/L)     HIGH
+
+NUTRIENT STATUS:
+Vitamin D (25-OH): 32 ng/mL    (Reference: 30-50 ng/mL)    NORMAL
+Vitamin B12: 498 pg/mL         (Reference: 400-1000 pg/mL) NORMAL
+Folate: 16.2 ng/mL             (Reference: >5.0 ng/mL)     NORMAL
+Magnesium: 1.8 mg/dL           (Reference: 1.7-2.2 mg/dL)  NORMAL
+Zinc: 72 μg/dL                 (Reference: 70-120 μg/dL)   NORMAL
+Ferritin: 68 ng/mL             (Reference: 30-150 ng/mL)   NORMAL
+
+THYROID PANEL:
+TSH: 2.4 μIU/mL                (Reference: 0.4-4.0 μIU/mL) NORMAL
+Free T4: 1.1 ng/dL             (Reference: 0.8-1.8 ng/dL)  NORMAL
+Free T3: 3.2 pg/mL             (Reference: 2.3-4.2 pg/mL)  NORMAL
+Reverse T3: 18 ng/dL           (Reference: 10-24 ng/dL)    NORMAL
+
+HORMONES:
+DHEA-S: 98 μg/dL               (Reference: 45-270 μg/dL)   NORMAL
+Estradiol: 24 pg/mL            (Reference: <30 pg/mL)      NORMAL
+                            </pre>
+                        `;
+                    }
+                    
+                    // Show document analysis
+                    documentAnalysis.classList.add('active');
+                    
+                    // Show success toast
+                    showToast('Analysis Complete', 'Document has been successfully analyzed', 'success');
+                }, 2000);
+            });
+            
+            integrateAnalysisBtn.addEventListener('click', function() {
+                showToast('Analysis Integrated', 'Document analysis has been integrated with Isabel\'s profile', 'success');
+            });
+            
+            // Document record click handler
+            const documentRecords = document.querySelectorAll('.document-record');
+            documentRecords.forEach(record => {
+                record.addEventListener('click', function() {
+                    const recordName = record.querySelector('.document-record-name').textContent;
+                    documentName.textContent = recordName;
+                    
+                    // Simulate loading content based on document name
+                    if (recordName.toLowerCase().includes('genomic')) {
+                        // Load genomic content (already defined above)
+                        showDocument({
+                            name: recordName,
+                            type: 'text/plain',
+                            size: 2.4 * 1024 * 1024
+                        });
+                    } else if (recordName.toLowerCase().includes('blood')) {
+                        // Load blood work content
+                        showDocument({
+                            name: recordName,
+                            type: 'text/plain',
+                            size: 1.8 * 1024 * 1024
+                        });
+                    } else if (recordName.toLowerCase().includes('cardio')) {
+                        // Load cardiovascular content
+                        showDocument({
+                            name: recordName,
+                            type: 'text/plain',
+                            size: 3.1 * 1024 * 1024
+                        });
+                    }
+                    
+                    // Show document preview
+                    documentPreview.classList.add('active');
+                    
+                    // Show document analysis since this is a previously analyzed document
+                    documentAnalysis.classList.add('active');
+                });
+            });
+            
+            // Toggle Theme
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+            
+            // Toast notification function
+            function showToast(title, message, type = 'success') {
+                const toastContainer = document.getElementById('toast-container');
+                
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                
+                // Set icon based on type
+                let iconClass = 'fas fa-check-circle';
+                if (type === 'warning') iconClass = 'fas fa-exclamation-triangle';
+                if (type === 'error') iconClass = 'fas fa-times-circle';
+                
+                toast.innerHTML = `
+                    <div class="toast-icon ${type}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Set up close button
+                const closeButton = toast.querySelector('.toast-close');
+                closeButton.addEventListener('click', () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                });
+                
+                // Show toast with animation
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.classList.remove('show');
+                        setTimeout(() => {
+                            if (toast.parentNode) {
+                                toast.remove();
+                            }
+                        }, 300);
+                    }
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

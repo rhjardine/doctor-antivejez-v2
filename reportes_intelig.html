@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longevity Agent AI - Dashboard & Reports</title>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* --- Variables (Mostly reused) --- */
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #3aafa9;
+            --accent-color: #f7b733;
+            --background-color: #f4f7fc;
+            --card-background: #ffffff;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --border-color: #e8edf3;
+            --shadow-color: rgba(0, 0, 0, 0.07);
+
+            --status-optimal: #2ecc71;
+            --status-caution: #f39c12;
+            --status-alert: #e74c3c;
+            --status-neutral: #3498db;
+
+            --status-optimal-bg: rgba(46, 204, 113, 0.1);
+            --status-caution-bg: rgba(243, 156, 18, 0.1);
+            --status-alert-bg: rgba(231, 76, 60, 0.1);
+            --status-neutral-bg: rgba(52, 152, 219, 0.1);
+        }
+
+        /* --- Base & Layout (Reused) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--background-color); color: var(--text-color); line-height: 1.6; padding: 20px; }
+        .dashboard-container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: auto; gap: 25px; }
+        .card { background-color: var(--card-background); padding: 25px; border-radius: 16px; box-shadow: 0 6px 20px var(--shadow-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .card-header i { color: var(--primary-color); font-size: 1.4em; width: 30px; text-align: center; }
+        .card-header h2 { font-size: 1.25em; font-weight: 600; color: var(--text-color); margin: 0; }
+        .card-content { flex-grow: 1; }
+
+        /* --- Specific Card Spanning (Adjusted for Report Section) --- */
+        .agent-status-card { grid-column: span 12; }
+        .monitoring-card { grid-column: span 4; }
+        .aging-clocks-card { grid-column: span 8; }
+        .insights-card { grid-column: span 6; }
+        .digital-twin-card { grid-column: span 6; }
+        /* Report Generator and Display now take full width below */
+        .report-generator-card { grid-column: span 12; }
+        .report-display-card { grid-column: span 12; display: none; /* Hidden initially */ } /* IMPORTANT */
+
+        /* --- Styles from previous Agent simulation (Reused/Condensed) --- */
+        .agent-status-card .card-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .agent-summary p { margin: 0; color: var(--text-light); }
+        .agent-summary strong { color: var(--primary-color); font-weight: 600; }
+        .agent-status-indicator { padding: 8px 15px; border-radius: 20px; font-weight: 600; font-size: 0.9em; }
+        .agent-status-optimal { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .agent-status-monitoring { background-color: var(--status-neutral-bg); color: var(--status-neutral); }
+        .agent-status-intervention { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .monitoring-sources ul { list-style: none; padding: 0; margin-top: 10px; }
+        .monitoring-sources li { display: flex; align-items: center; justify-content: space-between; font-size: 0.95em; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
+        .monitoring-sources li:last-child { border-bottom: none; }
+        .monitoring-sources li i { color: var(--secondary-color); margin-right: 10px; width: 20px; text-align: center;}
+        .source-status { font-size: 0.8em; font-weight: 500; padding: 3px 8px; border-radius: 10px; }
+        .status-connected { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .status-pending { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .status-error { background-color: var(--status-alert-bg); color: var(--status-alert); }
+        .insights-list ul, .recommendations-list ul { list-style: none; padding: 0; }
+        /* (Other styles for insights, digital twin, recommendations, ai-interface reused implicitly if needed) */
+
+        /* --- Report Generator Card --- */
+        .report-generator-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .report-generator-controls label {
+            font-weight: 500;
+            color: var(--text-light);
+        }
+        .report-generator-controls select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            flex-grow: 1; /* Take available space */
+            min-width: 200px;
+        }
+
+        /* --- Report Display Card & Content --- */
+        .report-content {
+            padding: 20px; /* Internal padding for report content */
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--background-color); /* Slightly different bg */
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .report-header .logos { display: flex; align-items: center; gap: 15px; }
+        .report-header .logos i { font-size: 2.5em; }
+        .report-header .logo-main { color: var(--status-alert); /* Blood drop */ }
+        .report-header .logo-secondary { color: var(--status-optimal); /* Leaf */ }
+        .report-header .title h3 { font-size: 1.4em; margin: 0; color: var(--primary-color); text-align: right; }
+        .report-header .title p { font-size: 0.9em; color: var(--text-light); margin: 0; text-align: right; }
+
+        .report-footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            color: var(--text-light);
+        }
+        .report-footer i { color: var(--status-alert); }
+
+        /* Report Specific Styles */
+        .report-section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+         .report-section-title i { font-size: 1em; } /* Icon size matches text */
+
+        /* Nutrient Table */
+        .nutrient-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+        .nutrient-table th, .nutrient-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .nutrient-table th { background-color: #eaf2fa; font-weight: 600; color: var(--primary-color); }
+        .nutrient-table tbody tr:nth-child(even) { background-color: #f8fafd; }
+        .nutrient-table .unit { color: var(--text-light); font-size: 0.9em; }
+        .nutrient-table .value { font-weight: 500; }
+
+        /* Diet/Exercise Plan Grid */
+        .weekly-plan-grid { display: grid; grid-template-columns: auto 1fr 1fr 1fr 1fr; /* Day | Col1 | Col2 | Col3 | Col4(Snack) */ gap: 10px; margin-top: 15px; }
+        .grid-header { font-weight: 600; text-align: center; padding-bottom: 10px; color: var(--primary-color); font-size: 0.95em;}
+        .day-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            background-color: #eaf2fa;
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            writing-mode: vertical-lr; /* Vertical text if needed, or just keep horizontal */
+            transform: rotate(180deg); /* Correct orientation if vertical */
+             writing-mode: horizontal-tb; /* Keep horizontal for simplicity */
+             transform: none;
+             align-self: center; /* Center vertically */
+             font-size: 1em;
+        }
+        .plan-cell {
+            background-color: #f8fafd;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            border: 1px solid #e8edf3;
+        }
+         .plan-cell strong { display: block; margin-bottom: 5px; color: var(--secondary-color); font-weight: 600;}
+         .plan-cell p { margin: 0; color: var(--text-light); line-height: 1.4; }
+         .plan-cell i { margin-right: 5px; color: var(--secondary-color); } /* Icon for exercise */
+
+        /* Lifestyle/Supplements */
+        .lifestyle-tips ul, .supplements-list ul { list-style: disc; margin-left: 20px; padding-left: 10px; margin-bottom: 20px;}
+        .lifestyle-tips li, .supplements-list li { margin-bottom: 8px; font-size: 0.95em; }
+        .supplement-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+        .supplement-table th, .supplement-table td { padding: 10px 12px; text-align: left; border: 1px solid var(--border-color); }
+        .supplement-table th { background-color: #eaf2fa; font-weight: 600; color: var(--primary-color); }
+        .supplement-table td:first-child { font-weight: 500; }
+
+        /* --- Utility & Loading --- */
+        .hidden { display: none !important; }
+        .loading-overlay { /* Reused from Agent */ position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.7); display: flex; justify-content: center; align-items: center; border-radius: 12px; z-index: 10; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .button { /* Reused */ display: inline-block; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 10px 20px; border: none; border-radius: 25px; font-size: 0.9em; font-weight: 500; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.3s ease; box-shadow: 0 4px 10px rgba(58, 123, 213, 0.2); text-align: center; }
+        .button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(58, 123, 213, 0.3); }
+        .button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; }
+        .button i { margin-right: 8px; }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .monitoring-card { grid-column: span 6; }
+            .aging-clocks-card { grid-column: span 6; }
+            .insights-card { grid-column: span 12; }
+            .digital-twin-card { grid-column: span 12; }
+             .weekly-plan-grid { grid-template-columns: auto repeat(4, 1fr); gap: 5px;} /* Adjust grid for smaller screens */
+             .plan-cell { padding: 8px; font-size: 0.8em; }
+             .day-label { font-size: 0.9em; padding: 10px 5px;}
+        }
+         @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .agent-status-card, .monitoring-card, .aging-clocks-card,
+            .insights-card, .digital-twin-card, .recommendations-card,
+            .ai-interface-card, .report-generator-card, .report-display-card { grid-column: span 1; }
+            .agent-status-card .card-content { justify-content: center; }
+            .report-generator-controls { flex-direction: column; align-items: stretch; }
+            .weekly-plan-grid { grid-template-columns: auto 1fr; /* Day | Content */} /* Stack days */
+             .weekly-plan-grid .grid-header { display: none; } /* Hide headers in stacked view */
+             .plan-cell { grid-column: 2 / -1; } /* Make content span full width */
+             .day-label { writing-mode: horizontal-tb; transform: none; grid-row: span 1; margin-bottom: 5px; /* Space between days */ }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Agent Status (Reused) -->
+        <section class="card agent-status-card">
+             <div class="card-header"> <i class="fas fa-shield-heart"></i> <h2>Agente de Longevidad AI</h2> </div>
+             <div class="card-content">
+                 <div class="agent-summary"> <p>Monitorizando tu bienestar 24/7.</p> <p>Último análisis: <strong id="lastAnalysisTime">Nunca</strong></p> </div>
+                 <div class="agent-status-indicator agent-status-monitoring" id="agentStatusIndicator"> Estado: Monitorizando </div>
+                 <button class="button" id="runAnalysisBtn"><i class="fas fa-play-circle"></i> Ejecutar Análisis Completo</button>
+             </div>
+        </section>
+
+        <!-- Monitoring Card (Reused - Simplified for Brevity) -->
+        <section class="card monitoring-card">
+             <div class="card-header"> <i class="fas fa-satellite-dish"></i> <h2>Monitoreo Continuo</h2> </div>
+             <div class="card-content monitoring-sources">
+                 <ul id="monitoringSourcesList"> <li><i class="fas fa-watch"></i> Reloj Inteligente <span class="source-status status-connected">Conectado</span></li> <!-- ... other sources --> </ul>
+                 <button class="button" id="syncSourcesBtn" style="font-size: 0.85em;"><i class="fas fa-sync-alt"></i> Sincronizar</button>
+             </div>
+        </section>
+
+        <!-- Aging Clocks (Reused - Simplified for Brevity) -->
+        <section class="card aging-clocks-card">
+            <div class="card-header"> <i class="fas fa-clock"></i> <h2>Relojes de Envejecimiento</h2> </div>
+            <div class="card-content"> <div style="position: relative; height: 150px;"> <canvas id="agingClocksChart"></canvas> <div id="agingClockLoader" class="loading-overlay hidden"><div class="spinner"></div></div> </div> </div>
+        </section>
+
+        <!-- Report Generator -->
+        <section class="card report-generator-card">
+            <div class="card-header">
+                <i class="fas fa-file-medical-alt"></i>
+                <h2>Generador de Reportes</h2>
+            </div>
+            <div class="card-content report-generator-controls">
+                <label for="reportTypeSelect">Seleccionar Tipo de Reporte:</label>
+                <select id="reportTypeSelect">
+                    <option value="nutrients">Resumen Nutricional Semanal</option>
+                    <option value="diet">Plan de Dieta Semanal</option>
+                    <option value="exercise">Plan de Ejercicio Semanal</option>
+                    <option value="lifestyle">Cambios Estilo de Vida y Suplementos</option>
+                </select>
+                <button class="button" id="generateReportBtn"><i class="fas fa-cogs"></i> Generar Reporte</button>
+                <span id="reportGenStatus" style="margin-left: 10px; font-style: italic; color: var(--text-light);"></span>
+            </div>
+        </section>
+
+        <!-- Report Display Area (Initially Hidden) -->
+        <section class="card report-display-card" id="reportDisplayCard">
+             <div class="card-header">
+                 <i class="fas fa-eye"></i>
+                 <h2 id="reportDisplayTitle">Vista Previa del Reporte</h2>
+                 <button class="button" id="closeReportBtn" style="margin-left: auto; background: var(--status-alert); box-shadow: none; padding: 5px 10px; font-size: 0.8em;"><i class="fas fa-times"></i> Cerrar</button>
+             </div>
+             <div class="card-content" id="reportDisplayContent">
+                 <!-- Generated Report HTML will be injected here -->
+             </div>
+        </section>
+
+        <!-- Other cards like Insights, Digital Twin, etc. would go here -->
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            // (Previous elements like runAnalysisBtn, agingClocksChart, etc. are assumed available if needed)
+            const reportTypeSelect = document.getElementById('reportTypeSelect');
+            const generateReportBtn = document.getElementById('generateReportBtn');
+            const reportGenStatus = document.getElementById('reportGenStatus');
+            const reportDisplayCard = document.getElementById('reportDisplayCard');
+            const reportDisplayTitle = document.getElementById('reportDisplayTitle');
+            const reportDisplayContent = document.getElementById('reportDisplayContent');
+            const closeReportBtn = document.getElementById('closeReportBtn');
+
+            // --- Event Listeners ---
+            generateReportBtn.addEventListener('click', handleGenerateReport);
+            closeReportBtn.addEventListener('click', () => {
+                reportDisplayCard.style.display = 'none';
+                reportDisplayContent.innerHTML = ''; // Clear content
+            });
+            // (Other listeners from previous Agent simulation are assumed)
+
+            // --- Report Generation Logic ---
+
+            function handleGenerateReport() {
+                const reportType = reportTypeSelect.value;
+                reportGenStatus.textContent = 'Generando...';
+                generateReportBtn.disabled = true;
+                reportDisplayCard.style.display = 'none'; // Hide previous report
+                reportDisplayContent.innerHTML = '<div class="loading-overlay" style="position: static; height: 100px;"><div class="spinner"></div></div>'; // Show loader inside content area
+
+                 // Simulate backend generation delay
+                setTimeout(() => {
+                    let reportHTML = '';
+                    let reportTitle = '';
+
+                    // Generate simulated data and HTML based on type
+                    switch (reportType) {
+                        case 'nutrients':
+                            reportTitle = 'Resumen Nutricional Semanal';
+                            reportHTML = generateNutrientReportHTML(generateNutrientData());
+                            break;
+                        case 'diet':
+                             reportTitle = 'Plan de Dieta Semanal';
+                             reportHTML = generateDietPlanHTML(generateDietPlanData());
+                            break;
+                        case 'exercise':
+                             reportTitle = 'Plan de Ejercicio Semanal';
+                             reportHTML = generateExercisePlanHTML(generateExercisePlanData());
+                            break;
+                        case 'lifestyle':
+                            reportTitle = 'Cambios Estilo de Vida y Suplementos';
+                            reportHTML = generateLifestyleReportHTML(generateLifestyleData());
+                            break;
+                         default:
+                             reportHTML = '<p>Tipo de reporte no válido.</p>';
+                             reportTitle = 'Error';
+                    }
+
+                    // Inject HTML into the display area
+                    reportDisplayTitle.textContent = reportTitle;
+                    reportDisplayContent.innerHTML = reportHTML; // Replace loader with content
+                    reportDisplayCard.style.display = 'flex'; // Show the report card
+
+                    reportGenStatus.textContent = ''; // Clear status
+                    generateReportBtn.disabled = false;
+
+                     // Scroll to the report card
+                     reportDisplayCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                }, 1500); // Simulate 1.5 second generation
+            }
+
+            // --- HTML Generation Functions ---
+
+            function generateReportHeaderFooter(title) {
+                const header = `
+                    <div class="report-header">
+                        <div class="logos">
+                            <i class="fas fa-tint logo-main"></i> <!-- Blood drop -->
+                            <i class="fas fa-leaf logo-secondary"></i> <!-- Leaf -->
+                        </div>
+                        <div class="title">
+                            <h3>${title}</h3>
+                            <p>Reporte de Edad Biológica</p>
+                        </div>
+                    </div>`;
+                const footer = `
+                    <div class="report-footer">
+                        <span>© Vitalytics.io Limited 2023. All Rights Reserved.</span>
+                        <i class="fas fa-tint"></i>
+                    </div>`;
+                 return { header, footer };
+            }
+
+            function generateNutrientReportHTML(data) {
+                 const { header, footer } = generateReportHeaderFooter("Resumen Nutricional");
+                 const tableRows = (category) => data[category]
+                    .map(item => `<tr><td>${item.name}</td><td class="unit">${item.unit}</td><td class="value">${item.value}</td><td>${item.rda}</td></tr>`)
+                    .join('');
+
+                 return `
+                    <div class="report-content">
+                        ${header}
+                        <h4 class="report-section-title"><i class="fas fa-apple-alt"></i> Macro Nutrientes</h4>
+                        <table class="nutrient-table">
+                            <thead><tr><th>Nutriente</th><th>Unidad</th><th>Valor Estimado</th><th>Rango Óptimo</th></tr></thead>
+                            <tbody>${tableRows('macro')}</tbody>
+                        </table>
+                        <h4 class="report-section-title"><i class="fas fa-capsules"></i> Micro Nutrientes - Vitaminas</h4>
+                        <table class="nutrient-table">
+                            <thead><tr><th>Nutriente</th><th>Unidad</th><th>Valor Estimado</th><th>RDA</th></tr></thead>
+                            <tbody>${tableRows('vitamins')}</tbody>
+                        </table>
+                         <h4 class="report-section-title"><i class="fas fa-atom"></i> Micro Nutrientes - Minerales</h4>
+                         <table class="nutrient-table">
+                            <thead><tr><th>Nutriente</th><th>Unidad</th><th>Valor Estimado</th><th>RDA</th></tr></thead>
+                            <tbody>${tableRows('minerals')}</tbody>
+                        </table>
+                        ${footer}
+                    </div>`;
+            }
+
+             function generateDietPlanHTML(data) {
+                 const { header, footer } = generateReportHeaderFooter("Plan de Dieta Semanal");
+                 let gridHTML = `<div class="weekly-plan-grid">
+                                    <div class="grid-header">Día</div>
+                                    <div class="grid-header">Desayuno</div>
+                                    <div class="grid-header">Almuerzo</div>
+                                    <div class="grid-header">Cena</div>
+                                    <div class="grid-header">Snack (Opcional)</div>`;
+                 data.forEach(day => {
+                    gridHTML += `<div class="day-label">${day.day}</div>
+                                 <div class="plan-cell">${day.breakfast}</div>
+                                 <div class="plan-cell">${day.lunch}</div>
+                                 <div class="plan-cell">${day.dinner}</div>
+                                 <div class="plan-cell">${day.snack}</div>`;
+                 });
+                 gridHTML += `</div>`;
+                 return `<div class="report-content">${header}${gridHTML}${footer}</div>`;
+            }
+
+             function generateExercisePlanHTML(data) {
+                 const { header, footer } = generateReportHeaderFooter("Plan de Ejercicio Semanal");
+                  let gridHTML = `<div class="weekly-plan-grid" style="grid-template-columns: auto 1fr 1fr;"> <!-- Day | Activity | Details -->
+                                    <div class="grid-header">Día</div>
+                                    <div class="grid-header">Actividad</div>
+                                    <div class="grid-header">Detalles / Notas</div>`;
+                  const icons = { "Cardio": "fa-person-running", "Fuerza": "fa-dumbbell", "Yoga": "fa-person-praying", "Descanso": "fa-bed" };
+                  data.forEach(day => {
+                      gridHTML += `<div class="day-label">${day.day}</div>
+                                  <div class="plan-cell"><strong><i class="fas ${icons[day.activity] || 'fa-question'}"></i> ${day.activity}</strong> ${day.details}</div>
+                                  <div class="plan-cell">${day.notes}</div>`;
+                  });
+                  gridHTML += `</div>`;
+                  return `<div class="report-content">${header}${gridHTML}${footer}</div>`;
+            }
+
+            function generateLifestyleReportHTML(data) {
+                 const { header, footer } = generateReportHeaderFooter("Estilo de Vida y Suplementos");
+                 const dailyTipsHTML = data.dailyTips.map(tip => `<li>${tip}</li>`).join('');
+                 const weeklyTipsHTML = data.weeklyTips.map(tip => `<li>${tip}</li>`).join('');
+                 const supplementsHTML = data.supplements.map(sup => `<tr><td>${sup.name}</td><td>${sup.benefits}</td></tr>`).join('');
+
+                 return `
+                     <div class="report-content">
+                         ${header}
+                         <div class="lifestyle-tips">
+                             <h4 class="report-section-title"><i class="fas fa-check-circle"></i> Tips - Inducción Diaria</h4>
+                             <ul>${dailyTipsHTML}</ul>
+                             <h4 class="report-section-title"><i class="fas fa-calendar-check"></i> Tips - Inducción Semanal</h4>
+                             <ul>${weeklyTipsHTML}</ul>
+                         </div>
+                          <div class="supplements-list">
+                             <h4 class="report-section-title"><i class="fas fa-pills"></i> Suplementos Sugeridos</h4>
+                             <table class="supplement-table">
+                                 <thead><tr><th>Nombre</th><th>Beneficios Clave</th></tr></thead>
+                                 <tbody>${supplementsHTML}</tbody>
+                             </table>
+                         </div>
+                         ${footer}
+                     </div>`;
+            }
+
+
+            // --- Data Generation Helpers (SIMULATED DATA) ---
+
+            function generateNutrientData() {
+                // Simulate plausible nutrient values
+                 return {
+                    macro: [
+                        { name: "Calorías", unit: "kcal", value: (2000 + Math.random()*400).toFixed(0), rda: "~2000-2500" },
+                        { name: "Proteína", unit: "g", value: (80 + Math.random()*40).toFixed(0), rda: "0.8-1.2g/kg" },
+                        { name: "Carbs", unit: "g", value: (250 + Math.random()*100).toFixed(0), rda: "45-65% total kcal" },
+                        { name: "Grasa", unit: "g", value: (60 + Math.random()*30).toFixed(0), rda: "20-35% total kcal" },
+                         { name: "Fibra", unit: "g", value: (25 + Math.random()*10).toFixed(0), rda: ">25-30g" },
+                    ],
+                    vitamins: [
+                        { name: "Vitamina A", unit: "mcg RAE", value: (700 + Math.random()*300).toFixed(0), rda: "700-900" },
+                        { name: "Vitamina C", unit: "mg", value: (90 + Math.random()*50).toFixed(0), rda: "75-90" },
+                        { name: "Vitamina D", unit: "UI", value: (1500 + Math.random()*1000).toFixed(0), rda: "600-4000" },
+                        { name: "Vitamina E", unit: "mg", value: (12 + Math.random()*6).toFixed(0), rda: "15" },
+                        { name: "Vitamina K", unit: "mcg", value: (100 + Math.random()*50).toFixed(0), rda: "90-120" },
+                         { name: "Vitamina B12", unit: "mcg", value: (3 + Math.random()*3).toFixed(1), rda: "2.4" },
+                    ],
+                    minerals: [
+                        { name: "Calcio", unit: "mg", value: (1000 + Math.random()*300).toFixed(0), rda: "1000-1200" },
+                        { name: "Hierro", unit: "mg", value: (12 + Math.random()*6).toFixed(0), rda: "8-18" },
+                        { name: "Magnesio", unit: "mg", value: (350 + Math.random()*100).toFixed(0), rda: "310-420" },
+                        { name: "Potasio", unit: "mg", value: (3000 + Math.random()*1000).toFixed(0), rda: "~3400" },
+                        { name: "Zinc", unit: "mg", value: (10 + Math.random()*5).toFixed(0), rda: "8-11" },
+                        { name: "Selenio", unit: "mcg", value: (50 + Math.random()*20).toFixed(0), rda: "55" },
+                    ]
+                };
+            }
+
+             function generateDietPlanData() {
+                const days = ["LU", "MA", "MI", "JU", "VI", "SA", "DO"];
+                const breakfasts = ["Avena con frutas y nueces", "Yogur griego con granola", "Huevos revueltos con espinaca", "Tostada integral con aguacate", "Batido verde (kale, manzana)", "Panqueques de avena", "Omelette de vegetales"];
+                const lunches = ["Ensalada de quinoa con pollo", "Lentejas guisadas con arroz integral", "Salmón al horno con brócoli", "Wrap de vegetales con hummus", "Sopa de vegetales y garbanzos", "Bowl de atún y aguacate", "Pasta integral con pesto y tomates"];
+                const dinners = ["Pechuga de pavo a la plancha con batata", "Pescado blanco con espárragos", "Curry de vegetales con tofu", "Chili vegetariano", "Ensalada grande con legumbres", "Sopa de miso con edamame", "Pollo asado con ensalada"];
+                const snacks = ["Manzana con mantequilla de almendra", "Puñado de nueces mixtas", "Palitos de zanahoria con hummus", "Queso cottage", "Fruta de temporada", "Edamame cocido", "Yogur natural"];
+                return days.map(day => ({
+                    day: day,
+                    breakfast: breakfasts[Math.floor(Math.random() * breakfasts.length)],
+                    lunch: lunches[Math.floor(Math.random() * lunches.length)],
+                    dinner: dinners[Math.floor(Math.random() * dinners.length)],
+                    snack: snacks[Math.floor(Math.random() * snacks.length)]
+                }));
+             }
+
+            function generateExercisePlanData() {
+                const days = ["LU", "MA", "MI", "JU", "VI", "SA", "DO"];
+                const activities = ["Cardio", "Fuerza", "Yoga", "Cardio", "Fuerza", "Descanso", "Yoga"];
+                const details = ["Sets: 3 Duración: 45 mins", "Sets: 3-4 Duración: 50 mins", "Sets: 1 Duración: 60 mins", "Sets: 1 Duración: 30 mins", "Sets: 3 Duración: 45 mins", "Activo / Ligero", "Sets: 1 Duración: 60 mins"];
+                const notes = [
+                    "Incorporar intervalos de alta intensidad (HIIT).",
+                    "Enfocarse en grupos musculares grandes (piernas, espalda).",
+                    "Incluir posturas de flexibilidad y balance.",
+                    "Cardio moderado constante (correr, bici).",
+                    "Trabajar tren superior y core.",
+                    "Caminata ligera, estiramientos suaves.",
+                    "Yoga restaurativo o Vinyasa suave."
+                ];
+                 return days.map((day, index) => ({
+                    day: day,
+                    activity: activities[index],
+                    details: details[index],
+                    notes: notes[index]
+                 }));
+            }
+
+             function generateLifestyleData() {
+                 return {
+                     dailyTips: [
+                         "Consume una dieta balanceada rica en frutas, vegetales, granos enteros y proteínas magras.",
+                         "Realiza ejercicio de intensidad moderada por al menos 30 minutos.",
+                         "Bebe al menos 8 vasos (2L) de agua diariamente.",
+                         "Prioriza 7-8 horas de sueño de calidad."
+                     ],
+                     weeklyTips: [
+                         "Incorpora más hojas verdes, frutas cítricas, bayas y granos enteros.",
+                         "Realiza entrenamiento de fuerza al menos 2 veces por semana.",
+                         "Dedica tiempo a actividades que reduzcan el estrés (meditación, hobbies)."
+                     ],
+                     supplements: [
+                         { name: "Vitamina D3", benefits: "Soporte inmunológico, salud ósea, regulación ánimo." },
+                         { name: "Omega-3 (EPA/DHA)", benefits: "Salud cardiovascular, función cerebral, anti-inflamatorio." },
+                         { name: "Magnesio", benefits: "Función muscular y nerviosa, producción energía, sueño." },
+                         // Add more based on simulated needs if desired
+                         // { name: "CoQ10", benefits: "Producción energía celular, antioxidante." }
+                     ]
+                 };
+             }
+
+            // --- Helper: Simulate Button State ---
+            function showTemporaryButtonState(button, text, duration) {
+                 const originalText = button.innerHTML;
+                 button.disabled = true;
+                 button.innerHTML = text;
+                 setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                 }, duration);
+              }
+
+            // --- Initial Setup ---
+            // (Assume chart setup from previous example exists and is referenced by agingClocksChart)
+
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Edad Genética</title>
+  <link rel="stylesheet" href="edad_genetica.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <h1><i class="fas fa-dna"></i> Test Edad Genética</h1>
+  </header>
+  
+  <div class="container">
+    <form id="genetica-form">
+      <h2>Datos del Test</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="riesgoGlobal">Riesgo Global</label>
+          <input type="number" id="riesgoGlobal" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="riesgoVascular">Riesgo Vascular</label>
+          <input type="number" id="riesgoVascular" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="metabolismoLipidico">Metabolismo Lipídico</label>
+          <input type="number" id="metabolismoLipidico" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="trombosis">Trombosis</label>
+          <input type="number" id="trombosis" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="ictusHemorragico">Ictus Hemorrágico</label>
+          <input type="number" id="ictusHemorragico" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="hipertension">Hipertensión arterial</label>
+          <input type="number" id="hipertension" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="vulnerabilidadEndotelial">Vulnerabilidad endotelial</label>
+          <input type="number" id="vulnerabilidadEndotelial" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="riesgoOsteoporosis">Riesgo de osteoporosis</label>
+          <input type="number" id="riesgoOsteoporosis" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="riesgoCarcinogenico">Riesgo Carcinogénico</label>
+          <input type="number" id="riesgoCarcinogenico" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="estresOxidativo">Estrés Oxidativo</label>
+          <input type="number" id="estresOxidativo" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="hemodinamicaAdrener">Hemodinámica y Adrener</label>
+          <input type="number" id="hemodinamicaAdrener" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="potencialLongevidad">Potencial Longevidad</label>
+          <input type="number" id="potencialLongevidad" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="sindromeMetabolico">Síndrome Metabólico</label>
+          <input type="number" id="sindromeMetabolico" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="toleranciaAmbiental">Tolerancia ambiental</label>
+          <input type="number" id="toleranciaAmbiental" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="respuestaInmune">Respuesta inmune</label>
+          <input type="number" id="respuestaInmune" placeholder="Ingrese valor">
+        </div>
+        <div class="form-group">
+          <label for="potencialPsicoafectivo">Potencial psico afectivo</label>
+          <input type="number" id="potencialPsicoafectivo" placeholder="Ingrese valor">
+        </div>
+      </div>
+      
+      <h2>Resultados</h2>
+      <div class="result-fields">
+        <div class="result-field">
+          <label>Edad Cronológica</label>
+          <input type="number" id="edadCrono" value="47" readonly>
+        </div>
+        <div class="result-field">
+          <label>Edad Genética</label>
+          <input type="number" id="edadGenetica" value="0" readonly>
+        </div>
+        <div class="result-field">
+          <label>Edad Diferencial</label>
+          <input type="text" id="edadDiferencial" value="0 Menos" readonly>
+        </div>
+      </div>
+      
+      <!-- Selección de NAT y CYPs -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="nat">NAT</label>
+          <select id="nat">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cyp2d6">CYP2D6</label>
+          <select id="cyp2d6">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cyp2c19">CYP2C19</label>
+          <select id="cyp2c19">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cyp2c9">CYP2C9</label>
+          <select id="cyp2c9">
+            <option value="">Seleccione</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-buttons center">
+        <button type="button" onclick="calcularEdadGenetica()"><i class="fas fa-calculator"></i> Calcular</button>
+        <button type="submit"><i class="fas fa-save"></i> Guardar</button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    function calcularEdadGenetica() {
+      const edadCrono = parseFloat(document.getElementById('edadCrono').value);
+      const campos = ['riesgoGlobal', 'riesgoVascular', 'metabolismoLipidico', 'trombosis', 'ictusHemorragico', 'hipertension', 'vulnerabilidadEndotelial', 'riesgoOsteoporosis', 'riesgoCarcinogenico', 'estresOxidativo', 'hemodinamicaAdrener', 'potencialLongevidad', 'sindromeMetabolico', 'toleranciaAmbiental', 'respuestaInmune', 'potencialPsicoafectivo'];
+      
+      let suma = 0, count = 0;
+      campos.forEach(id => {
+        const val = parseFloat(document.getElementById(id).value);
+        if (!isNaN(val)) {
+          suma += val;
+          count++;
+        }
+      });
+      
+      const edadGenetica = count ? (suma / count) : 0;
+      document.getElementById('edadGenetica').value = edadGenetica.toFixed(2);
+      
+      const diferencial = (edadGenetica - edadCrono).toFixed(2);
+      document.getElementById('edadDiferencial').value = diferencial + (diferencial < 0 ? ' Menos' : ' Más');
+    }
+    
+    document.getElementById('genetica-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Datos de Edad Genética guardados (simulado).');
+    });
+  </script>
+</body>
+</html>

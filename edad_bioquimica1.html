@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edad Bioquímica - Edades Biológicas</title>
+  <!-- Enlazar CSS de pestañas y estilo adaptado -->
+  <link rel="stylesheet" href="historias_tabs_bio.css">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Variables CSS */
+    :root {
+      --primary-color: #293B64;
+      --sky-blue: #23BCEF;
+      --bg-color: #f0f2f5;
+      --bg-gradient: linear-gradient(145deg, #293B64, #1e2b4a);
+      --neumorph-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2), -6px -6px 12px rgba(255, 255, 255, 0.1);
+      --neumorph-shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+      --biochem-color: #FF7F50; /* Color específico para bioquímica */
+    }
+
+    /* Estructura principal */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Barra lateral */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-gradient);
+      box-shadow: var(--neumorph-shadow);
+      padding: 1rem;
+      transition: width 0.3s ease;
+      position: fixed;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .menu-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #ffffffcc;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .menu-item:hover {
+      background: rgba(79, 209, 225, 0.1);
+      box-shadow: var(--neumorph-shadow-inset);
+      color: var(--sky-blue);
+    }
+
+    .menu-item.active {
+      background: rgba(79, 209, 225, 0.1);
+      color: var(--sky-blue);
+      box-shadow: var(--neumorph-shadow-inset);
+    }
+
+    .menu-item i {
+      font-size: 1.2rem;
+      width: 30px;
+    }
+
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      padding: 20px;
+    }
+
+    header {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Estilos específicos para la página de edad bioquímica */
+    .bio-section {
+      margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .lab-panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .panel-card {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .lab-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .lab-item label {
+      font-weight: normal;
+    }
+
+    .lab-item input {
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .lab-item .reference {
+      color: #777;
+      font-size: 0.9em;
+    }
+
+    .chart-container {
+      height: 400px;
+      margin: 30px 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: var(--biochem-color);
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    .abnormal {
+      color: red !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar lateral izquierdo -->
+  <div class="sidebar">
+    <div class="menu-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="menu-item active" onclick="window.location.href='historias.html'">
+      <i class="fas fa-folder-open"></i>
+      <span>Historias</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='profesionales.html'">
+      <i class="fas fa-user-md"></i>
+      <span>Profesionales</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='analitica.html'">
+      <i class="fas fa-chart-pie"></i>
+      <span>Analítica</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='reportes.html'">
+      <i class="fas fa-file-alt"></i>
+      <span>Reportes</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='configuracion.html'">
+      <i class="fas fa-cog"></i>
+      <span>Configuración</span>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <header>
+      <div class="header-logo">
+        <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+        <h1>Edad Bioquímica</h1>
+      </div>
+      <div class="header-dark-toggle">
+        <i class="fas fa-moon" id="theme-toggle"></i>
+      </div>
+    </header>
+
+    <div class="bio-section">
+      <h2><i class="fas fa-vial"></i> Evaluación Bioquímica</h2>
+      <p>La edad bioquímica evalúa la condición interna de los sistemas corporales a través de marcadores sanguíneos y otros parámetros bioquímicos. Esta medición ayuda a identificar procesos inflamatorios, riesgos metabólicos y alteraciones hormonales.</p>
+      
+      <!-- Fecha de análisis -->
+      <div class="form-group">
+        <label for="fecha-analisis">Fecha de Análisis:</label>
+        <input type="date" id="fecha-analisis">
+      </div>
+      
+      <!-- Paneles de laboratorio -->
+      <div class="lab-panels">
+        <!-- Panel Metabólico -->
+        <div class="panel-card">
+          <h3>Panel Metabólico</h3>
+          
+          <div class="lab-item">
+            <label for="glucosa">Glucosa en ayuno</label>
+            <input type="number" id="glucosa" step="0.01" onchange="checkNormal(this, 70, 100)">
+            <span class="reference">70-100 mg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="hemoglobina-glicosilada">Hemoglobina glicosilada (HbA1c)</label>
+            <input type="number" id="hemoglobina-glicosilada" step="0.1" onchange="checkNormal(this, 4.0, 5.7)">
+            <span class="reference">4.0-5.7 %</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="insulina">Insulina en ayuno</label>
+            <input type="number" id="insulina" step="0.1" onchange="checkNormal(this, 2.6, 24.9)">
+            <span class="reference">2.6-24.9 μU/mL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="homa-ir">HOMA-IR</label>
+            <input type="number" id="homa-ir" step="0.01" onchange="checkNormal(this, 0.5, 2.5)">
+            <span class="reference">0.5-2.5</span>
+          </div>
+        </div>
+        
+        <!-- Panel Lipídico -->
+        <div class="panel-card">
+          <h3>Panel Lipídico</h3>
+          
+          <div class="lab-item">
+            <label for="colesterol-total">Colesterol Total</label>
+            <input type="number" id="colesterol-total" onchange="checkNormal(this, 0, 200)">
+            <span class="reference">< 200 mg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="hdl">HDL</label>
+            <input type="number" id="hdl" onchange="checkNormal(this, 40, 1000)">
+            <span class="reference">> 40 mg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="ldl">LDL</label>
+            <input type="number" id="ldl" onchange="checkNormal(this, 0, 130)">
+            <span class="reference">< 130 mg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="trigliceridos">Triglicéridos</label>
+            <input type="number" id="trigliceridos" onchange="checkNormal(this, 0, 150)">
+            <span class="reference">< 150 mg/dL</span>
+          </div>
+        </div>
+        
+        <!-- Panel Inflamatorio -->
+        <div class="panel-card">
+          <h3>Marcadores Inflamatorios</h3>
+          
+          <div class="lab-item">
+            <label for="proteina-c-reactiva">Proteína C Reactiva (PCR)</label>
+            <input type="number" id="proteina-c-reactiva" step="0.01" onchange="checkNormal(this, 0, 3)">
+            <span class="reference">< 3.0 mg/L</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="homocisteina">Homocisteína</label>
+            <input type="number" id="homocisteina" step="0.1" onchange="checkNormal(this, 0, 15)">
+            <span class="reference">< 15 μmol/L</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="interleucina-6">Interleucina-6 (IL-6)</label>
+            <input type="number" id="interleucina-6" step="0.01" onchange="checkNormal(this, 0, 1.8)">
+            <span class="reference">< 1.8 pg/mL</span>
+          </div>
+        </div>
+        
+        <!-- Panel Hormonal -->
+        <div class="panel-card">
+          <h3>Panel Hormonal</h3>
+          
+          <div class="lab-item">
+            <label for="cortisol">Cortisol</label>
+            <input type="number" id="cortisol" step="0.1" onchange="checkNormal(this, 6.2, 19.4)">
+            <span class="reference">6.2-19.4 μg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="dhea-s">DHEA-S</label>
+            <input type="number" id="dhea-s" step="0.1" onchange="checkNormal(this, 80, 560)">
+            <span class="reference">80-560 μg/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="testosterona">Testosterona Total</label>
+            <input type="number" id="testosterona" step="0.1" onchange="checkNormal(this, 280, 1100)">
+            <span class="reference">280-1100 ng/dL</span>
+          </div>
+          
+          <div class="lab-item">
+            <label for="estradiol">Estradiol</label>
+            <input type="number" id="estradiol" step="0.1" onchange="checkNormal(this, 15, 350)">
+            <span class="reference">15-350 pg/mL</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráfico de marcadores bioquímicos -->
+      <h3>Tendencias de Marcadores Clave</h3>
+      <div class="chart-container">
+        <canvas id="biochemicalChart"></canvas>
+      </div>
+      
+      <!-- Resultado -->
+      <div class="result-section">
+        <h3>Resultado de Edad Bioquímica</h3>
+        <div class="form-group">
+          <label for="resultado-bioquimico">Edad Bioquímica (años)</label>
+          <input type="number" id="resultado-bioquimico">
+        </div>
+        <div class="form-group">
+          <label for="diferencia-bioquimica">Diferencia con Edad Cronológica</label>
+          <input type="text" id="diferencia-bioquimica" readonly>
+        </div>
+      </div>
+      
+      <!-- Botones de acción -->
+      <div class="action-buttons">
+        <button type="button" onclick="calcularEdadBioquimica()">Calcular Edad Bioquímica</button>
+        <button type="button" onclick="guardarResultados()">Guardar Resultados</button>
+      </div>
+    </div>
+    
+    <!-- Botón para volver a la página principal -->
+    <div class="back-button" onclick="window.location.href='historias.html'">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicializar el gráfico de marcadores bioquímicos
+      const ctx = document.getElementById('biochemicalChart').getContext('2d');
+      const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'Glucosa',
+              data: [105, 102, 100, 98, 96, 94],
+              borderColor: '#FF7F50',
+              backgroundColor: 'rgba(255, 127, 80, 0.1)',
+              tension: 0.4
+            },
+            {
+              label: 'HbA1c',
+              data: [6.2, 6.0, 5.9, 5.8, 5.7, 5.6],
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              tension: 0.4
+            },
+            {
+              label: 'PCR',
+              data: [3.5, 3.2, 2.9, 2.7, 2.5, 2.2],
+              borderColor: '#9C27B0',
+              backgroundColor: 'rgba(156, 39, 176, 0.1)',
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true },
+            title: {
+              display: true,
+              text: 'Evolución de Marcadores Bioquímicos'
+            }
+          },
+          scales: {
+            y: { beginAtZero: false }
+          }
+        }
+      });
+    });
+    
+    // Función para verificar si un valor está fuera del rango normal
+    function checkNormal(input, min, max) {
+      const value = parseFloat(input.value);
+      if (value < min || value > max) {
+        input.classList.add('abnormal');
+      } else {
+        input.classList.remove('abnormal');
+      }
+    }
+    
+    // Función para calcular la edad bioquímica (simulada)
+    function calcularEdadBioquimica() {
+      // Simulación de cálculo basado en los valores ingresados
+      const edad = 63 + Math.floor(Math.random() * 10);
+      document.getElementById('resultado-bioquimico').value = edad;
+      
+      // Calcular diferencia con edad cronológica (simulado)
+      const edadCronologica = 70; // Esto debería obtenerse de la base de datos del paciente
+      const diferencia = edadCronologica - edad;
+      const texto = diferencia >= 0 ? 
+        `${Math.abs(diferencia)} años menor que la edad cronológica` : 
+        `${Math.abs(diferencia)} años mayor que la edad cronológica`;
+      
+      document.getElementById('diferencia-bioquimica').value = texto;
+    }
+    
+    // Función para guardar resultados (simulada)
+    function guardarResultados() {
+      alert('Resultados de Edad Bioquímica guardados correctamente.');
+    }
+    
+    // Modo oscuro
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>

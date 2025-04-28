@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longevity Agent AI - Edad Biológica Avanzada</title>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* --- Variables Mejoradas --- */
+        :root {
+            --primary-color: #4a69bd; /* Azul más profundo */
+            --secondary-color: #1dd1a1; /* Verde menta brillante */
+            --accent-color: #ffc107; /* Amarillo ámbar para alertas */
+            --background-color: #f8f9fa; /* Gris muy claro */
+            --card-background: #ffffff;
+            --text-color: #343a40; /* Gris oscuro */
+            --text-light: #6c757d; /* Gris medio */
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --gradient-start: var(--primary-color);
+            --gradient-end: #6a89cc; /* Azul más claro para gradiente */
+
+            /* Status Colors */
+            --status-optimal: #20c997; /* Verde azulado */
+            --status-caution: #ffc107; /* Amarillo ámbar */
+            --status-alert: #dc3545;   /* Rojo */
+            --status-neutral: #0d6efd; /* Azul estándar */
+
+            --status-optimal-bg: rgba(32, 201, 151, 0.1);
+            --status-caution-bg: rgba(255, 193, 7, 0.1);
+            --status-alert-bg: rgba(220, 53, 69, 0.1);
+            --status-neutral-bg: rgba(13, 110, 253, 0.1);
+
+            /* Data Availability Status */
+            --status-available: var(--status-optimal);
+            --status-processing: var(--status-neutral);
+            --status-missing: var(--status-alert);
+        }
+
+        /* --- Base & Layout --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .dashboard-container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: repeat(12, 1fr); gap: 25px; }
+
+        /* --- Card Styling Mejorado --- */
+        .card {
+            background-color: var(--card-background);
+            padding: 25px 30px;
+            border-radius: 20px; /* Más redondeado */
+            box-shadow: 0 8px 25px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: relative; /* For loader */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        /* .card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); } */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* Slightly more space */
+            margin: -5px 0 20px 0; /* Adjust margin */
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card-header i {
+            color: var(--primary-color);
+            font-size: 1.5em; /* Larger icon */
+            width: 35px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+             text-fill-color: transparent; /* Fallback */
+        }
+        .card-header h2 { font-size: 1.3em; font-weight: 600; color: var(--text-color); margin: 0; }
+        .card-content { flex-grow: 1; }
+
+        /* --- Specific Card Spanning --- */
+        .agent-status-card { grid-column: span 12; }
+        .advanced-bioage-card { grid-column: span 12; min-height: 350px; } /* Full width for focus */
+        /* Hide other less relevant cards for this specific view */
+        .monitoring-card, .insights-card, .digital-twin-card, .report-generator-card, .report-display-card { display: none; }
+
+
+        /* --- Agent Status Card Refined --- */
+        .agent-status-card .card-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .agent-info { display: flex; flex-direction: column; gap: 5px; }
+        .agent-info label { font-weight: 500; color: var(--text-light); font-size: 0.9em; }
+        .agent-info input[type="number"] { padding: 8px 10px; width: 80px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 1em; text-align: center;}
+        .agent-info p { margin: 0; color: var(--text-light); font-size: 0.9em;}
+        .agent-info strong { color: var(--primary-color); font-weight: 600; }
+        .agent-status-indicator { padding: 8px 18px; border-radius: 25px; font-weight: 600; font-size: 0.95em; transition: all 0.3s ease; }
+        /* Status classes reused */
+        .agent-status-optimal { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .agent-status-monitoring { background-color: var(--status-neutral-bg); color: var(--status-neutral); }
+        .agent-status-caution { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .agent-status-alert { background-color: var(--status-alert-bg); color: var(--status-alert); }
+
+
+        /* --- Advanced BioAge Module Styles Refined --- */
+        .advanced-bioage-card .sections-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr; /* Sidebar for data, main area for results */
+            gap: 30px;
+        }
+
+        .advanced-bioage-card .data-section { /* Was data-availability */
+            border-right: 1px solid var(--border-color);
+            padding-right: 30px;
+        }
+        .advanced-bioage-card .data-section h3 { font-size: 1.1em; font-weight: 600; color: var(--text-light); margin-bottom: 15px; }
+        .advanced-bioage-card .data-section ul { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+        .advanced-bioage-card .data-section li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95em;
+            color: var(--text-color);
+        }
+        .advanced-bioage-card .data-section li i.icon { /* Specific class for data icons */
+            font-size: 1.4em;
+            width: 25px;
+            text-align: center;
+            color: var(--primary-color);
+             opacity: 0.7;
+        }
+        .advanced-bioage-card .data-section li .status {
+            font-weight: 500;
+            margin-left: auto; /* Push status to the right */
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+         .advanced-bioage-card .data-section li .status i { font-size: 0.9em; } /* Smaller status icon */
+        /* Status colors */
+        .status-available i { color: var(--status-available); }
+        .status-processing i { color: var(--status-processing); animation: spin 1.5s linear infinite; }
+        .status-missing i { color: var(--status-alert); }
+        .status-available span { color: var(--status-available); }
+        .status-processing span { color: var(--status-processing); font-style: italic; }
+        .status-missing span { color: var(--status-alert); }
+
+        .advanced-bioage-card .results-section { /* Was analysis-result */
+            padding-left: 0; /* No left padding needed due to grid gap */
+        }
+        .analysis-result h3 { font-size: 1.2em; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; }
+
+        .bioage-result-display { /* Unchanged */ display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px; gap: 20px; flex-wrap: wrap; }
+        .bioage-result-display .value-box { text-align: center; }
+        .bioage-result-display label { display: block; font-size: 0.95em; color: var(--text-light); margin-bottom: 2px; }
+        .bioage-result-display .value { font-size: 2.8em; font-weight: 700; line-height: 1.1; }
+        .bioage-result-display .unit { font-size: 0.8em; font-weight: 500; margin-left: 3px; color: var(--text-light); }
+        #advancedBioAgeOutput.value-optimal { color: var(--status-optimal); }
+        #advancedBioAgeOutput.value-caution { color: var(--status-caution); }
+        #advancedBioAgeOutput.value-alert { color: var(--status-alert); }
+        #advancedBioAgeOutput.value-neutral { color: var(--primary-color); }
+
+        #bioAgeDifferenceDisplay { font-weight: 600; font-size: 1.15em; text-align: center; margin-top: -15px; margin-bottom: 30px;}
+        #bioAgeDifferenceDisplay.diff-optimal { color: var(--status-optimal); }
+        #bioAgeDifferenceDisplay.diff-caution { color: var(--status-caution); }
+        #bioAgeDifferenceDisplay.diff-alert { color: var(--status-alert); }
+
+        /* Contribution Visualization Improved */
+        .contribution-vis { margin-bottom: 30px; }
+        .contribution-item { margin-bottom: 12px; }
+        .contribution-item label { display: block; font-size: 0.95em; color: var(--text-light); margin-bottom: 5px; display: flex; justify-content: space-between;}
+        .contribution-item .impact-value { font-weight: 600; font-size: 0.9em;}
+        .impact-increase { color: var(--status-alert); }
+        .impact-decrease { color: var(--status-optimal); }
+        .impact-neutral { color: var(--status-neutral); }
+
+        .contribution-bar-container { background-color: #e9ecef; border-radius: 10px; overflow: hidden; height: 12px; /* Thinner bar */ }
+        .contribution-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.25, 0.1, 0.25, 1); /* Smoother transition */
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end)); /* Default gradient */
+        }
+        .contribution-bar.impact-increase { background: linear-gradient(90deg, #ff7e8a, var(--status-alert)); }
+        .contribution-bar.impact-decrease { background: linear-gradient(90deg, #a8e063, var(--status-optimal)); }
+        .contribution-bar.impact-neutral { background: linear-gradient(90deg, #7faded, var(--status-neutral)); }
+
+
+        .ai-interpretation {
+            background-color: var(--background-color); /* Lighter background */
+            border-left: 5px solid var(--secondary-color); /* Use secondary color */
+            padding: 18px 20px;
+            border-radius: 8px;
+            font-size: 1em; /* Slightly larger */
+            color: var(--text-color);
+            margin-top: 25px;
+            line-height: 1.7;
+        }
+         .ai-interpretation strong { color: var(--primary-color); font-weight: 600;}
+         .ai-interpretation .placeholder { color: var(--text-light); font-style: italic; }
+
+        /* --- Utility & Loading --- */
+        .hidden { display: none !important; }
+        .loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.85); display: flex; justify-content: center; align-items: center; border-radius: 20px; /* Match card */ z-index: 10; backdrop-filter: blur(3px); }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--primary-color); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Button Style Refined --- */
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: #fff;
+            padding: 12px 28px; /* Slightly larger */
+            border: none;
+            border-radius: 30px;
+            font-size: 1em;
+            font-weight: 600; /* Bolder */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(74, 105, 189, 0.3);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(74, 105, 189, 0.4); }
+        .button:active { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(74, 105, 189, 0.3); }
+        .button:disabled { background: #adb5bd; cursor: not-allowed; box-shadow: none; transform: none; }
+        .button i { margin-right: 10px; }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 992px) {
+            .advanced-bioage-card .sections-wrapper { grid-template-columns: 1fr; /* Stack sections */ }
+            .advanced-bioage-card .data-section { border-right: none; padding-right: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 25px; margin-bottom: 25px; }
+             .advanced-bioage-card .results-section { padding-left: 0; }
+             .bioage-result-display { justify-content: space-between; } /* Spread out values */
+        }
+         @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+            .agent-status-card, .advanced-bioage-card { grid-column: span 1; }
+            .agent-status-card .card-content { flex-direction: column; align-items: stretch; gap: 15px;}
+            .agent-info { align-items: center; }
+             .bioage-result-display .value { font-size: 2.4em; }
+         }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Agent Status Refined -->
+        <section class="card agent-status-card">
+             <div class="card-header"> <i class="fas fa-robot"></i> <h2>Agente de Longevidad AI</h2> </div>
+             <div class="card-content">
+                 <div class="agent-info">
+                     <label for="chronoAgeInput">Edad Cronológica (Referencia):</label>
+                     <input type="number" id="chronoAgeInput" value="50" min="18" max="120" step="1">
+                    <p>Último análisis avanzado: <strong id="lastAnalysisTimeAdv">Nunca</strong></p>
+                </div>
+                 <div class="agent-status-indicator agent-status-monitoring" id="agentStatusIndicatorAdv">
+                    <i class="fas fa-hourglass-half"></i> Listo para Análisis
+                 </div>
+                 <button class="button" id="runAnalysisBtnAdv"><i class="fas fa-brain"></i> Analizar Edad Biológica Avanzada</button>
+             </div>
+        </section>
+
+        <!-- Advanced Biological Age Module Refined -->
+        <section class="card advanced-bioage-card">
+            <div id="advancedBioAgeLoader" class="loading-overlay hidden"><div class="spinner"></div></div>
+            <div class="card-header">
+                <i class="fas fa-atom"></i>
+                <h2>Estimación Avanzada de Edad Biológica</h2>
+            </div>
+            <div class="card-content sections-wrapper">
+                 <!-- Data Availability Sidebar -->
+                 <div class="data-section">
+                     <h3><i class="fas fa-database" style="opacity: 0.7; margin-right: 5px;"></i>Disponibilidad de Datos</h3>
+                     <ul id="dataAvailabilityList">
+                         <li><i class="fas fa-ruler-combined icon"></i>Antropometría<span class="status status-missing" data-category="anthropometric"><i class="fas fa-times-circle"></i><span>Pendiente</span></span></li>
+                         <li><i class="fas fa-dna icon"></i>Epigenética (ADN)<span class="status status-missing" data-category="epigenetic"><i class="fas fa-times-circle"></i><span>Pendiente</span></span></li>
+                         <li><i class="fas fa-flask-vial icon"></i>Metabol./Bioquím.<span class="status status-missing" data-category="metabolic"><i class="fas fa-times-circle"></i><span>Pendiente</span></span></li>
+                         <li><i class="fas fa-camera-retro icon"></i>Imágenes (Fenotipo)<span class="status status-missing" data-category="imaging"><i class="fas fa-times-circle"></i><span>Pendiente</span></span></li>
+                         <li><i class="fas fa-shield-virus icon"></i>Inmunología<span class="status status-missing" data-category="immunologic"><i class="fas fa-times-circle"></i><span>Pendiente</span></span></li>
+                     </ul>
+                     <p style="font-size: 0.8em; color: var(--text-light); margin-top: 15px; font-style: italic;">*La IA ajustará la estimación basada en los datos disponibles.</p>
+                 </div>
+
+                 <!-- Results Area -->
+                 <div class="results-section hidden" id="analysisResultSection">
+                    <h3><i class="fas fa-poll" style="opacity: 0.7; margin-right: 5px;"></i>Resultado del Análisis</h3>
+                    <div class="bioage-result-display">
+                        <div class="value-box">
+                            <label>Edad Cronológica</label>
+                            <span id="chronoAgeRefDisplay" class="value">--<span class="unit">años</span></span>
+                        </div>
+                        <div class="value-box">
+                             <label>Edad Biológica Estimada (IA)</label>
+                             <span id="advancedBioAgeOutput" class="value value-neutral">--<span class="unit">años</span></span>
+                        </div>
+                    </div>
+                    <div id="bioAgeDifferenceDisplay" class="diff-neutral">Esperando análisis...</div>
+
+                     <div class="contribution-vis">
+                         <h3 style="font-size: 1.1em; margin-bottom: 15px;">Factores Contribuyentes (Estimado)</h3>
+                         <ul id="contributionList" style="list-style: none; padding: 0;">
+                             <li class="placeholder-text" style="color: var(--text-light); font-style: italic;">El análisis detallará la influencia de cada categoría de datos.</li>
+                         </ul>
+                     </div>
+
+                     <div class="ai-interpretation" id="aiInterpretation">
+                         <strong style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-comment-dots"></i> Interpretación IA:</strong>
+                         <span class="placeholder"> Ejecute el análisis para obtener una interpretación personalizada basada en sus datos.</span>
+                     </div>
+                </div>
+                 <!-- Initial placeholder for results section -->
+                 <div class="results-section" id="analysisPlaceholderSection">
+                     <div style="text-align: center; padding: 40px 20px; color: var(--text-light);">
+                         <i class="fas fa-chart-pie" style="font-size: 3em; opacity: 0.5; margin-bottom: 15px;"></i>
+                         <p>Los resultados del análisis avanzado aparecerán aquí.</p>
+                         <p style="font-size: 0.9em;">Haga clic en "Analizar Edad Biológica Avanzada" para comenzar.</p>
+                     </div>
+                 </div>
+
+            </div>
+        </section>
+
+        <!-- Other cards (Monitoring, Insights, Digital Twin, Reports) would normally go here, but are hidden via CSS for this focused view -->
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const runAnalysisBtnAdv = document.getElementById('runAnalysisBtnAdv');
+            const agentStatusIndicatorAdv = document.getElementById('agentStatusIndicatorAdv');
+            const lastAnalysisTimeAdv = document.getElementById('lastAnalysisTimeAdv');
+            const dataAvailabilityList = document.getElementById('dataAvailabilityList');
+            const analysisResultSection = document.getElementById('analysisResultSection');
+            const analysisPlaceholderSection = document.getElementById('analysisPlaceholderSection'); // Placeholder view
+            const chronoAgeInput = document.getElementById('chronoAgeInput');
+            const chronoAgeRefDisplay = document.getElementById('chronoAgeRefDisplay');
+            const advancedBioAgeOutput = document.getElementById('advancedBioAgeOutput');
+            const bioAgeDifferenceDisplay = document.getElementById('bioAgeDifferenceDisplay');
+            const contributionList = document.getElementById('contributionList');
+            const aiInterpretation = document.getElementById('aiInterpretation');
+            const advancedBioAgeLoader = document.getElementById('advancedBioAgeLoader');
+
+            // --- State ---
+            let isAnalyzingAdv = false;
+            let lastAdvancedAnalysisDate = null;
+            let currentAdvancedBioAge = null;
+
+            // --- Get CSS Colors ---
+             const rootStyle = getComputedStyle(document.documentElement);
+             const COLOR_OPTIMAL = rootStyle.getPropertyValue('--status-optimal').trim();
+             const COLOR_CAUTION = rootStyle.getPropertyValue('--status-caution').trim();
+             const COLOR_ALERT = rootStyle.getPropertyValue('--status-alert').trim();
+             const COLOR_NEUTRAL = rootStyle.getPropertyValue('--status-neutral').trim();
+
+
+            // --- Event Listeners ---
+            runAnalysisBtnAdv.addEventListener('click', simulateAdvancedAnalysis);
+             // Update reference display when input changes
+             chronoAgeInput.addEventListener('input', () => {
+                const chronoAgeVal = parseFloat(chronoAgeInput.value);
+                chronoAgeRefDisplay.innerHTML = `${!isNaN(chronoAgeVal) ? chronoAgeVal : '--'}<span class="unit">años</span>`;
+             });
+              // Trigger initial display update for chrono age reference
+             chronoAgeRefDisplay.innerHTML = `${parseFloat(chronoAgeInput.value)}<span class="unit">años</span>`;
+
+
+            // --- Simulation Functions ---
+
+            function simulateAdvancedAnalysis() {
+                if (isAnalyzingAdv) return;
+                isAnalyzingAdv = true;
+
+                const chronoAge = parseFloat(chronoAgeInput.value);
+                if (isNaN(chronoAge) || chronoAge < 18 || chronoAge > 120) {
+                    alert("Ingrese una Edad Cronológica de referencia válida (18-120).");
+                    isAnalyzingAdv = false;
+                    return;
+                }
+
+                // --- UI Updates: Start Analysis ---
+                runAnalysisBtnAdv.disabled = true;
+                runAnalysisBtnAdv.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analizando...`;
+                agentStatusIndicatorAdv.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Procesando Datos'; // More dynamic status
+                agentStatusIndicatorAdv.className = 'agent-status-indicator agent-status-monitoring';
+                advancedBioAgeLoader.classList.remove('hidden');
+                analysisResultSection.classList.add('hidden'); // Hide previous results
+                analysisPlaceholderSection.classList.add('hidden'); // Hide placeholder
+                updateDataAvailabilityStatus('processing');
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    // --- Generate FAKE Advanced Results ---
+                    lastAdvancedAnalysisDate = new Date();
+
+                    // Simulate available data randomly
+                    const availableDataCategories = simulateAvailableData();
+
+                    // Simulate Bio Age based on available data (crude simulation)
+                    const randomFactorAdv = (Math.random() - 0.55) * 22; // Skew slightly higher, wider range
+                    let baseBioAge = chronoAge + randomFactorAdv;
+                    // Adjust based on missing data (simple penalty)
+                    const missingPenalty = (5 - availableDataCategories.length) * (Math.random() * 1.5 + 0.5); // Penalty per missing category
+                    currentAdvancedBioAge = baseBioAge + missingPenalty; // Add penalty if data missing
+                    currentAdvancedBioAge = Math.max(18, Math.min(MAX_AGE, Math.round(currentAdvancedBioAge))); // Clamp
+
+
+                    const contributionData = generateContributionData(currentAdvancedBioAge, chronoAge, availableDataCategories);
+                    const interpretationText = generateAIInterpretation(currentAdvancedBioAge, chronoAge, contributionData, availableDataCategories);
+                    const statusInfo = getBioAgeStatusStyle(currentAdvancedBioAge, chronoAge);
+
+                    // --- UI Updates: Show Results ---
+                    updateDataAvailabilityStatus('available', availableDataCategories); // Show final availability
+                    chronoAgeRefDisplay.innerHTML = `${chronoAge}<span class="unit">años</span>`;
+                    advancedBioAgeOutput.innerHTML = `${currentAdvancedBioAge}<span class="unit">años</span>`;
+                    advancedBioAgeOutput.className = `value ${statusInfo.valueClass}`;
+
+                     // Display Difference
+                     const diff = currentAdvancedBioAge - chronoAge;
+                     let diffText = `${diff > 0 ? '+' : ''}${diff} años ${diff == 0 ? 'vs Cronológica' : (diff > 0 ? 'mayor' : 'menor')} que Cronológica`;
+                     bioAgeDifferenceDisplay.textContent = diffText;
+                     bioAgeDifferenceDisplay.className = statusInfo.diffClass || 'diff-neutral';
+
+
+                    renderContributionVisualization(contributionData);
+                    aiInterpretation.innerHTML = `<strong style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-comment-dots"></i> Interpretación IA:</strong> <span>${interpretationText}</span>`; // Use span for text
+
+                    analysisResultSection.classList.remove('hidden');
+                    advancedBioAgeLoader.classList.add('hidden');
+
+                    // Update general status
+                    agentStatusIndicatorAdv.innerHTML = `<i class="fas ${statusInfo.icon}"></i> Análisis Completo (${statusInfo.statusText})`;
+                    agentStatusIndicatorAdv.className = `agent-status-indicator ${statusInfo.indicatorClass}`;
+                    lastAnalysisTimeAdv.textContent = lastAdvancedAnalysisDate.toLocaleTimeString();
+                    runAnalysisBtnAdv.disabled = false;
+                    runAnalysisBtnAdv.innerHTML = `<i class="fas fa-redo"></i> Re-Analizar Datos`; // Change button text
+                    isAnalyzingAdv = false;
+
+
+                }, 3500);
+            }
+
+            // --- Helper Functions ---
+
+             function simulateAvailableData() {
+                 const allCategories = ['anthropometric', 'epigenetic', 'metabolic', 'imaging', 'immunologic'];
+                 const available = [];
+                 allCategories.forEach(cat => {
+                     // Higher chance for metabolic/anthropometric, lower for epigenetic/imaging
+                     let chance = 0.7;
+                     if (cat === 'epigenetic' || cat === 'imaging') chance = 0.3;
+                     if (cat === 'immunologic') chance = 0.5;
+                     if (Math.random() < chance) {
+                         available.push(cat);
+                     }
+                 });
+                 // Ensure at least 2 categories are available for a meaningful sim
+                 while(available.length < 2) {
+                     const missing = allCategories.filter(c => !available.includes(c));
+                     if (missing.length > 0) {
+                        available.push(missing[Math.floor(Math.random() * missing.length)]);
+                     } else break; // Should not happen with 5 categories
+                 }
+                 return available;
+             }
+
+            function updateDataAvailabilityStatus(status, availableCategories = []) {
+                const statuses = dataAvailabilityList.querySelectorAll('li');
+                statuses.forEach(li => {
+                    const span = li.querySelector('.status');
+                    const icon = span.querySelector('i');
+                    const text = span.querySelector('span');
+                    const category = span.dataset.category;
+                    let currentStatus = status;
+                    let statusIconClass = 'fa-question-circle'; // Default
+
+                    if (status === 'available') {
+                        if (availableCategories.includes(category)) {
+                           currentStatus = 'available';
+                           statusIconClass = 'fa-check-circle';
+                        } else {
+                           currentStatus = 'missing';
+                           statusIconClass = 'fa-times-circle';
+                        }
+                    } else if (status === 'processing') {
+                         statusIconClass = 'fa-spinner fa-spin';
+                    } else { // missing initially
+                         statusIconClass = 'fa-times-circle';
+                    }
+
+                    text.textContent = currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1);
+                    span.className = `status status-${currentStatus}`; // Apply color class to parent span
+                    icon.className = `fas ${statusIconClass}`; // Update icon
+                });
+            }
+
+            function getBioAgeStatusStyle(bioAge, chronoAge) {
+                const diff = bioAge - chronoAge;
+                // Add icons to status text
+                if (diff <= -7) return { status: 'optimal', statusText: "Óptimo", valueClass: "value-optimal", diffClass: "diff-optimal", indicatorClass: "agent-status-optimal", icon: "fa-star" };
+                if (diff >= 7) return { status: 'alert', statusText: "Alto Riesgo", valueClass: "value-alert", diffClass: "diff-alert", indicatorClass: "agent-status-alert", icon: "fa-triangle-exclamation" };
+                if (diff > 3) return { status: 'caution', statusText: "Precaución", valueClass: "value-caution", diffClass: "diff-caution", indicatorClass: "agent-status-caution", icon: "fa-circle-exclamation" };
+                return { status: 'normal', statusText: "Normal", valueClass: "value-neutral", diffClass: "diff-neutral", indicatorClass: "agent-status-monitoring", icon: "fa-check-circle"};
+            }
+
+
+             function generateContributionData(bioAge, chronoAge, availableCategories) {
+                 const totalDiff = bioAge - chronoAge;
+                 if (Math.abs(totalDiff) < 0.5) return []; // No significant contribution if ages are very close
+
+                 const categories = [ // Added full names for display
+                     { id: 'epigenetic', name: 'Epigenética', baseWeight: 0.35 },
+                     { id: 'metabolic', name: 'Metabol./Bioquím.', baseWeight: 0.25 },
+                     { id: 'immunologic', name: 'Inmunología', baseWeight: 0.15 },
+                     { id: 'anthropometric', name: 'Antropometría', baseWeight: 0.15 },
+                     { id: 'imaging', name: 'Imágenes/Fenotipo', baseWeight: 0.10 }
+                 ];
+
+                 // Filter categories based on availability and adjust weights proportionally
+                 const availableCats = categories.filter(c => availableCategories.includes(c.id));
+                 const totalAvailableWeight = availableCats.reduce((sum, cat) => sum + cat.baseWeight, 0);
+                 if (totalAvailableWeight === 0) return []; // Avoid division by zero
+
+                 let remainingDiff = totalDiff;
+                 const contributions = availableCats.map((cat, index) => {
+                     // Adjusted weight based on available categories
+                     const adjustedWeight = cat.baseWeight / totalAvailableWeight;
+
+                     let assignedDiff;
+                      if (index < availableCats.length - 1) {
+                         // Assign a portion of the difference based on adjusted weight + noise
+                         assignedDiff = totalDiff * adjustedWeight * (0.8 + Math.random() * 0.4);
+                         remainingDiff -= assignedDiff;
+                     } else {
+                         assignedDiff = remainingDiff; // Last one takes remainder
+                     }
+
+                     // Determine impact and percentage as before
+                      const maxScaleDiff = 20; // +/- 10 years = 100%
+                      let percentage = Math.min(100, Math.max(0, (Math.abs(assignedDiff) / maxScaleDiff) * 100));
+                      let impact = 'neutral';
+                      if (assignedDiff > 1) impact = 'increase';
+                      else if (assignedDiff < -1) impact = 'decrease';
+
+                     return { name: cat.name, contributionValue: assignedDiff, percentage: percentage.toFixed(0), impact: impact };
+                 });
+
+                 // Sort by absolute contribution
+                 contributions.sort((a, b) => Math.abs(b.contributionValue) - Math.abs(a.contributionValue));
+                 return contributions;
+             }
+
+             function renderContributionVisualization(data) {
+                 if (!data || data.length === 0) {
+                     contributionList.innerHTML = '<li class="placeholder-text" style="color: var(--text-light); font-style: italic;">No hay datos suficientes o la diferencia de edad es mínima para mostrar contribuciones significativas.</li>';
+                     return;
+                 }
+                 contributionList.innerHTML = data.map(item => `
+                     <li class="contribution-item">
+                         <label>
+                             <span>${item.name}</span>
+                             <span class="impact-value impact-${item.impact}">${item.contributionValue > 0 ? '+' : ''}${item.contributionValue.toFixed(1)} años</span>
+                         </label>
+                         <div class="contribution-bar-container">
+                             <div class="contribution-bar impact-${item.impact}" style="width: ${item.percentage}%;"></div>
+                         </div>
+                     </li>
+                 `).join('');
+             }
+
+             function generateAIInterpretation(bioAge, chronoAge, contributions, availableData) {
+                 const diff = bioAge - chronoAge;
+                 const statusInfo = getBioAgeStatusStyle(bioAge, chronoAge);
+                 let text = `Basado en los datos ${availableData.length === 5 ? 'completos' : 'parciales ('+ availableData.length +'/5 categorías)'} disponibles, tu edad biológica estimada (${bioAge}) es <strong>${statusInfo.statusText.toLowerCase()}</strong> comparada con tu edad cronológica (${chronoAge}). `;
+
+                 if (Math.abs(diff) < 1.5) { // Wider neutral zone for interpretation
+                     text += "El análisis sugiere un ritmo de envejecimiento acorde a tu edad cronológica, con factores mayormente equilibrados.";
+                     return text;
+                 }
+
+                 const topContributor = contributions.length > 0 ? contributions[0] : null;
+                 const secondContributor = contributions.length > 1 ? contributions[1] : null;
+
+                 if (topContributor) {
+                     const impactVerb = topContributor.impact === 'increase' ? 'un factor clave que acelera' : (topContributor.impact === 'decrease' ? 'un elemento protector que reduce' : 'un factor con impacto neutral en');
+                     text += `La categoría <strong>${topContributor.name}</strong> parece ser ${impactVerb} tu edad biológica estimada. `;
+                 }
+
+                 if (secondContributor && Math.abs(secondContributor.contributionValue) > 1) { // Only mention if contributing > 1 year
+                      const secondImpactVerb = secondContributor.impact === 'increase' ? 'también contribuye a acelerarla' : (secondContributor.impact === 'decrease' ? 'también ayuda a reducirla' : 'tiene un impacto menor');
+                     text += `Adicionalmente, ${secondContributor.name.toLowerCase()} ${secondImpactVerb}. `;
+                 }
+
+                 // Tailored closing based on status
+                 switch (statusInfo.status) {
+                     case 'alert':
+                         text += "Es prioritario revisar las recomendaciones asociadas a los factores de mayor impacto negativo.";
+                         break;
+                     case 'caution':
+                         text += "Se recomienda prestar atención a las áreas identificadas, especialmente " + (topContributor ? topContributor.name.toLowerCase() : "los factores contribuyentes") + ".";
+                         break;
+                     case 'optimal':
+                         text += "¡Excelente perfil! Continuar con los hábitos que favorecen estos resultados es clave.";
+                         break;
+                     default: // Normal
+                         text += "Se sugiere mantener un monitoreo regular y considerar optimizaciones en áreas de impacto moderado si existen.";
+                 }
+
+                 if (availableData.length < 5) {
+                    text += " <em style='font-size:0.9em; color:var(--text-light);'> (Estimación ajustada por datos faltantes).</em>";
+                 }
+
+                 return text;
+             }
+
+            // --- Initial State ---
+            updateDataAvailabilityStatus('missing');
+
+        });
+    </script>
+
+</body>
+</html>

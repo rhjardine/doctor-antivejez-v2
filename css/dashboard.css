@@ -1,0 +1,211 @@
+:root {
+    --primary-color: rgb(35, 188, 239);
+    --border-color: rgb(41, 59, 100);
+    --light-blue: #add8e6;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --highlight-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Estilos generales */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(145deg, #f5f5f5, #e6e6e6);
+    min-height: 100vh;
+  }
+  .dark {
+    background: linear-gradient(145deg, #222, #333);
+    color: #f5f5f5;
+  }
+  
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #fff;
+    border-bottom: 2px solid var(--border-color);
+  }
+  header .logo {
+    width: 80px; /* Se aumenta el tamaño del logo */
+    margin-right: 1rem;
+  }
+  header .search-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  header .icons i {
+    margin-left: 1rem;
+    cursor: pointer;
+  }
+  
+  /* Container y Sidebar */
+  .container {
+    display: flex;
+  }
+  .sidebar {
+    width: 250px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 1rem;
+  }
+  .sidebar-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  .sidebar-item i {
+    margin-right: 0.5rem;
+  }
+  .sidebar-item.active {
+    background: rgba(41, 59, 100, 0.9);
+    border-radius: 8px;
+  }
+  
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Cards generales */
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Card base */
+  .card {
+    background-color: var(--primary-color);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    border: 2px solid var(--border-color);
+    box-shadow:
+      -8px -8px 15px var(--highlight-color),
+      8px 8px 15px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex: 1 1 300px;
+    min-width: 250px;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      -10px -10px 20px var(--highlight-color),
+      10px 10px 20px var(--shadow-color);
+  }
+  .card h3 {
+    padding: 1rem;
+    margin: 0;
+    background: rgba(41, 59, 100, 0.9);
+    color: #fff;
+    font-size: 1.2rem;
+  }
+  
+  /* Tarjetas con fondo blanco perlado y borde azul claro */
+  .pearl-card {
+    background: linear-gradient(145deg, #ffffff, #f7f7f7);
+    border: 2px solid var(--light-blue);
+  }
+  
+  /* Card Header & Body (módulos colapsables) */
+  .card-header {
+    display: flex;
+    align-items: center;
+    background-color: rgba(41, 59, 100, 0.9);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .card-header i {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+  }
+  .card-header::after {
+    content: "▼";
+    margin-left: auto;
+    transition: transform 0.3s ease;
+  }
+  .card-header.active::after {
+    transform: rotate(-90deg);
+  }
+  .card-body {
+    padding: 1rem;
+    color: var(--border-color);
+  }
+  .hidden {
+    display: none !important;
+  }
+  
+  /* Patient Details */
+  .patient-details {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+  }
+  .patient-details img {
+    width: 80px;
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+  .patient-info h4 {
+    margin: 0 0 0.5rem;
+  }
+  
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+  }
+  .modal-close {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+    .sidebar {
+      width: 100%;
+      display: flex;
+      overflow-x: auto;
+    }
+    .sidebar-item {
+      flex: 1;
+      text-align: center;
+    }
+    header .logo {
+      width: 70px;
+    }
+  }
+  

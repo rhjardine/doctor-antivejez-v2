@@ -1,0 +1,3713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLongevity AI Assistant</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+    
+    <style>
+        :root {
+            --primary-color: #5D5CDE;
+            --primary-dark: #4B4AB3;
+            --primary-light: #7C7BE5;
+            --secondary-color: #10B981;
+            --secondary-dark: #059669;
+            --text-dark: #1F2937;
+            --text-medium: #4B5563;
+            --text-light: #9CA3AF;
+            --bg-light: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --bg-card: #F3F4F6;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --info: #3B82F6;
+            --border-color: #E5E7EB;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            
+            --transition: all 0.3s ease;
+        }
+        
+        /* Dark Mode Colors */
+        .dark-mode {
+            --primary-color: #7C7BE5;
+            --primary-dark: #6A69D4;
+            --primary-light: #8E8DEB;
+            --text-dark: #F9FAFB;
+            --text-medium: #D1D5DB;
+            --text-light: #9CA3AF;
+            --bg-light: #111827;
+            --bg-white: #1F2937;
+            --bg-card: #374151;
+            --border-color: #4B5563;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 220px;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            list-style-type: none;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-medium);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            color: var(--primary-color);
+            background-color: rgba(93, 92, 222, 0.05);
+            transform: translateX(3px);
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+            background-color: rgba(93, 92, 222, 0.1);
+            border-left-color: var(--primary-color);
+        }
+        
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        
+        .user-profile {
+            padding: 1rem 1.5rem;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            border-top: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .user-profile:hover {
+            background-color: rgba(93, 92, 222, 0.05);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .user-profile:hover .user-avatar {
+            transform: scale(1.05);
+        }
+        
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-role {
+            color: var(--text-light);
+            font-size: 0.813rem;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .patient-header {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem;
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .patient-header:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: #E5E7EB;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-medium);
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .patient-header:hover .patient-avatar {
+            transform: scale(1.05);
+        }
+        
+        .patient-info {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .patient-details {
+            color: var(--text-medium);
+            font-size: 0.875rem;
+        }
+        
+        .health-metrics {
+            display: flex;
+            gap: 1.25rem;
+            margin-left: auto;
+        }
+        
+        .metric {
+            text-align: center;
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+        }
+        
+        .metric:hover {
+            background-color: rgba(93, 92, 222, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .metric-value .trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--success);
+        }
+        
+        /* AI Assistant Section */
+        .section-header {
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .assistant-container {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .assistant-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .assistant-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--bg-card);
+        }
+        
+        .assistant-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .assistant-tabs::-webkit-scrollbar-track {
+            background: var(--bg-card);
+        }
+        
+        .assistant-tabs::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 20px;
+        }
+        
+        .assistant-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .assistant-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .assistant-tab:hover:not(.active) {
+            color: var(--text-dark);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .assistant-content {
+            padding: 1.5rem;
+            min-height: 500px;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* New Digital Twin Simulation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .simulation-modal {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-overlay.active .simulation-modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--text-medium);
+            transition: var(--transition);
+        }
+        
+        .close-modal:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+        
+        .simulation-form {
+            margin-bottom: 1.5rem;
+        }
+        
+        .simulation-form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .simulation-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .simulation-form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .simulation-form-col {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .simulation-input,
+        .simulation-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.938rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            transition: var(--transition);
+        }
+        
+        .simulation-input:focus,
+        .simulation-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2);
+        }
+        
+        .simulation-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .simulation-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .simulation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .simulation-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .simulation-slider-value {
+            width: 50px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .simulation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .simulation-button {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+        
+        .simulation-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .simulation-button.primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .simulation-button.secondary {
+            background-color: var(--bg-card);
+            color: var(--text-medium);
+        }
+        
+        .simulation-button.secondary:hover {
+            background-color: var(--bg-light);
+            transform: translateY(-2px);
+        }
+        
+        .simulation-results {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .simulation-results.active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .simulation-chart-container {
+            height: 300px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .simulation-insights {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .simulation-insights-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .simulation-insights-content {
+            color: var(--text-medium);
+            font-size: 0.938rem;
+        }
+        
+        /* Pathway Analysis Tab */
+        .pathway-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .biomarker-group {
+            background-color: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            transition: var(--transition);
+        }
+        
+        .biomarker-group:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .biomarker-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .biomarker-group-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .biomarker-group-icon {
+            color: var(--primary-color);
+        }
+        
+        .biological-age-section {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        
+        .biological-age-section:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .biological-age-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .biological-age-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .biological-age-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .age-clock {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .age-clock-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            position: relative;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            background: conic-gradient(var(--primary-color) 0%, var(--primary-light) 35%, var(--info) 65%, var(--secondary-color) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .age-clock-inner {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background-color: var(--bg-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .age-clock-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+        
+        .age-clock-label {
+            font-size: 0.813rem;
+            color: var(--text-medium);
+        }
+        
+        .age-difference {
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .age-difference.younger {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .age-difference.older {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .age-clock-info {
+            font-size: 0.813rem;
+            text-align: center;
+            color: var(--text-medium);
+            margin-top: 0.5rem;
+        }
+        
+        /* Biomarker Forecasting */
+        .forecasting-section {
+            margin-top: 1.5rem;
+        }
+        
+        .forecasting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .forecasting-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .forecast-chart-container {
+            height: 350px;
+            position: relative;
+        }
+        
+        .forecast-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .forecast-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-medium);
+        }
+        
+        .forecast-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+        
+        .chat-message {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.3s ease forwards;
+        }
+        
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.ai {
+            align-items: flex-start;
+        }
+        
+        .chat-message.user {
+            align-items: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        
+        .message-bubble:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chat-message.ai .message-bubble {
+            background-color: var(--bg-card);
+            border-bottom-left-radius: 0;
+        }
+        
+        .chat-message.user .message-bubble {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            padding-right: 3rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.938rem;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            transition: var(--transition);
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2);
+        }
+        
+        .voice-button {
+            position: absolute;
+            right: 4.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.15rem;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.3rem;
+        }
+        
+        .voice-button:hover {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .send-button {
+            padding: 0.75rem 1.25rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Citation Styling */
+        .research-citation {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            background-color: rgba(59, 130, 246, 0.05);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            border-left: 2px solid var(--info);
+        }
+        
+        .citation-title {
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+        
+        .citation-authors {
+            font-style: italic;
+            margin-bottom: 0.15rem;
+        }
+        
+        .citation-journal {
+            font-weight: 500;
+        }
+        
+        /* Loading Wave Animation */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: fit-content;
+            margin-bottom: 1rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-light);
+            animation: typingAnimation 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 80%, 100% { 
+                transform: scale(0);
+            } 
+            40% { 
+                transform: scale(1);
+            }
+        }
+        
+        /* Digital Twin Section */
+        .digital-twin-card {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+        
+        .digital-twin-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .digital-twin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .digital-twin-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .digital-twin-icon {
+            color: var(--primary-color);
+        }
+        
+        .digital-twin-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .twin-button {
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.813rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+            color: var(--text-medium);
+        }
+        
+        .twin-button:hover {
+            background-color: var(--bg-card);
+            transform: translateY(-2px);
+        }
+        
+        .twin-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .twin-button.primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .digital-twin-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .twin-parameter {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .parameter-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        .parameter-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .parameter-change {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .parameter-change.positive {
+            color: var(--success);
+        }
+        
+        .parameter-change.negative {
+            color: var(--danger);
+        }
+        
+        .digital-twin-chart {
+            margin-top: 1.5rem;
+            height: 250px;
+        }
+        
+        /* Security Notice */
+        .security-notice {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1rem;
+            background-color: rgba(59, 130, 246, 0.05);
+            border-radius: var(--radius-md);
+            font-size: 0.813rem;
+            color: var(--text-medium);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .security-notice i {
+            color: var(--info);
+            font-size: 1.25rem;
+        }
+        
+        /* Biomarker Cards */
+        .biomarker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .biomarker-card {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            border-left: 4px solid transparent;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .biomarker-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .biomarker-card.normal {
+            border-left-color: var(--success);
+        }
+        
+        .biomarker-card.warning {
+            border-left-color: var(--warning);
+        }
+        
+        .biomarker-card.danger {
+            border-left-color: var(--danger);
+        }
+        
+        .biomarker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .biomarker-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .biomarker-category {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            color: white;
+            background-color: var(--primary-light);
+        }
+        
+        .category-inflammatory {
+            background-color: var(--danger);
+        }
+        
+        .category-metabolic {
+            background-color: var(--warning);
+        }
+        
+        .category-cardiovascular {
+            background-color: var(--info);
+        }
+        
+        .category-nutrient {
+            background-color: var(--success);
+        }
+        
+        .biomarker-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0.5rem 0;
+        }
+        
+        .biomarker-value.normal {
+            color: var(--success);
+        }
+        
+        .biomarker-value.warning {
+            color: var(--warning);
+        }
+        
+        .biomarker-value.danger {
+            color: var(--danger);
+        }
+        
+        .biomarker-range {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .biomarker-trend {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+        
+        .trend-badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 12px;
+        }
+        
+        .trend-badge.improving {
+            color: var(--success);
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        .trend-badge.worsening {
+            color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .trend-badge.stable {
+            color: var(--text-medium);
+            background-color: rgba(107, 114, 128, 0.1);
+        }
+        
+        .predict-button {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-medium);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .predict-button:hover {
+            background-color: var(--bg-card);
+            transform: translateY(-2px);
+        }
+        
+        /* Recommendations */
+        .recommendations-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .recommendation-card {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+        
+        .recommendation-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .recommendation-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(93, 92, 222, 0.05);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .recommendation-icon {
+            color: var(--primary-color);
+        }
+        
+        .recommendation-status {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+        
+        .status-recommended {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-high-priority {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .status-optional {
+            background-color: rgba(107, 114, 128, 0.1);
+            color: var(--text-medium);
+        }
+        
+        .recommendation-body {
+            padding: 1rem;
+        }
+        
+        .recommendation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .recommendation-description {
+            margin: 1rem 0;
+            color: var(--text-medium);
+            line-height: 1.5;
+            font-size: 0.938rem;
+        }
+        
+        .evidence-section {
+            background-color: rgba(59, 130, 246, 0.05);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .evidence-title {
+            font-weight: 600;
+            color: var(--info);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .evidence-content {
+            color: var(--text-medium);
+        }
+        
+        .recommendation-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .recommendation-button {
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+            color: var(--text-medium);
+        }
+        
+        .recommendation-button:hover {
+            background-color: var(--bg-card);
+            transform: translateY(-2px);
+        }
+        
+        .recommendation-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .recommendation-button.primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .recommendation-button.info {
+            background-color: var(--info);
+            color: white;
+            border-color: var(--info);
+        }
+        
+        .recommendation-button.info:hover {
+            background-color: #2563eb;
+        }
+        
+        .recommendation-button.simulate {
+            background-color: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+        
+        .recommendation-button.simulate:hover {
+            background-color: #ea580c;
+        }
+        
+        /* Toggle Theme Button */
+        .theme-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background-color: var(--primary-dark);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 64px;
+            }
+            
+            .logo span, .nav-item span, .user-info {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .user-profile {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .patient-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .patient-avatar {
+                margin-bottom: 1rem;
+            }
+            
+            .health-metrics {
+                margin-left: 0;
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .biomarker-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
+            
+            .age-clock-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .age-clock-inner {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .age-clock-value {
+                font-size: 1.5rem;
+            }
+            
+            .simulation-form-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .simulation-form-col {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1rem 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .sidebar-header {
+                padding: 0 1rem 1rem;
+            }
+            
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                padding: 0.5rem;
+                flex-direction: column;
+                align-items: center;
+                font-size: 0.75rem;
+            }
+            
+            .nav-item span {
+                display: block;
+                font-size: 0.75rem;
+            }
+            
+            .user-profile {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .assistant-tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            .assistant-content {
+                padding: 1rem;
+            }
+            
+            .health-metrics {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+            
+            .metric {
+                flex: 1;
+                min-width: 45%;
+            }
+            
+            .biomarker-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulation-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.813rem;
+            }
+            
+            .recommendation-actions {
+                flex-direction: column;
+            }
+            
+            .recommendation-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>MediLongevity</span>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-flask"></i>
+                    <span>Biomarkers</span>
+                </li>
+                <li class="nav-item active">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Assistant</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-dna"></i>
+                    <span>Aging Clocks</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>Treatment Protocols</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Reports</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Patients</span>
+                </li>
+                <li class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Dr. María García</div>
+                    <div class="user-role">Longevity Specialist</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Patient Info Header -->
+            <div class="patient-header">
+                <div class="patient-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="patient-info">
+                    <h2 class="patient-name">Isabel Romero</h2>
+                    <div class="patient-details">58 years • Female • ID: 458912</div>
+                </div>
+                <div class="health-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Biological Age</div>
+                        <div class="metric-value">52.3 <span class="trend">(-5.7)</span></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Health Score</div>
+                        <div class="metric-value">84/100</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Last Checkup</div>
+                        <div class="metric-value">12/04/2023</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Assistant Section -->
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-brain"></i> AI Longevity Assistant</h2>
+            </div>
+            
+            <div class="assistant-container">
+                <div class="assistant-tabs">
+                    <div class="assistant-tab active" data-tab="chat">
+                        <i class="fas fa-comments"></i> Conversational Assistant
+                    </div>
+                    <div class="assistant-tab" data-tab="insights">
+                        <i class="fas fa-lightbulb"></i> AI Insights
+                    </div>
+                    <div class="assistant-tab" data-tab="biomarkers">
+                        <i class="fas fa-chart-bar"></i> Biomarker Analysis
+                    </div>
+                    <div class="assistant-tab" data-tab="digital-twin">
+                        <i class="fas fa-user-check"></i> Digital Twin & Simulations
+                    </div>
+                    <div class="assistant-tab" data-tab="pathways">
+                        <i class="fas fa-project-diagram"></i> Pathway Analysis
+                    </div>
+                    <div class="assistant-tab" data-tab="treatments">
+                        <i class="fas fa-pills"></i> Treatment Recommendations
+                    </div>
+                </div>
+                
+                <div class="assistant-content">
+                    <!-- Chat Interface Tab -->
+                    <div class="tab-content" id="chat-tab">
+                        <div class="chat-container">
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>Hello Dr. García. I've analyzed Isabel's latest biomarkers. Her inflammatory markers show significant improvement since starting the Immune Modulator therapy. What specific aspect of her health would you like to discuss today?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message user">
+                                <div class="message-bubble">
+                                    <p>Can you analyze her metabolic health trends and suggest optimizations to her current protocol?</p>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-message ai">
+                                <div class="message-bubble">
+                                    <p>Isabel's metabolic markers are showing gradual improvement:</p>
+                                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                        <li>Fasting glucose reduced from 118 to 105 mg/dL (still above optimal range)</li>
+                                        <li>HbA1c improved from 5.9% to 5.6% (now within normal range)</li>
+                                        <li>Insulin sensitivity increased by 18%</li>
+                                    </ul>
+                                    
+                                    <p style="margin-top: 0.75rem;">Recommendations to optimize her protocol:</p>
+                                    <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                        <li>Increase Magnesio Quelado to 400mg daily (currently at 300mg)</li>
+                                        <li>Add Alpha Lipoic Acid 600mg daily to improve insulin sensitivity</li>
+                                        <li>Consider time-restricted eating (8-hour window) to improve metabolic flexibility</li>
+                                        <li>Continue current VIT C/Zinc supplementation which supports these pathways</li>
+                                    </ol>
+                                    
+                                    <p style="margin-top: 0.75rem;">Would you like me to generate a detailed protocol update?</p>
+                                    
+                                    <div class="research-citation">
+                                        <div class="citation-title">Research Reference:</div>
+                                        <div class="citation-authors">Brandhorst S, et al.</div>
+                                        <div class="citation-journal">Cell Metabolism (2021). "Time-Restricted Eating Effects on Body Weight and Metabolism"</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" placeholder="Ask a question about Isabel's longevity protocol..." id="chat-input">
+                            <button class="voice-button" id="voice-button" title="Voice input">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="send-button" id="send-button">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Insights Tab -->
+                    <div class="tab-content" id="insights-tab" style="display: none;">
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <div class="insight-icon health">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <h3 class="insight-title">Key Health Insights</h3>
+                            </div>
+                            <div class="insight-content">
+                                <p>Isabel's inflammatory markers show consistent improvement following implementation of the Immune Modulator therapy. The combination with Ginkgo biloba appears to have synergistic effects on both inflammation and circulation.</p>
+                                
+                                <p style="margin-top: 0.5rem;">Analysis of her metabolic parameters suggests she would benefit significantly from a personalized time-restricted eating protocol based on her continuous glucose monitoring patterns.</p>
+                                
+                                <div class="research-citation">
+                                    <div class="citation-title">Research Reference:</div>
+                                    <div class="citation-authors">Longo VD, Panda S.</div>
+                                    <div class="citation-journal">Cell Metabolism (2023). "Fasting, Circadian Rhythms, and Time-Restricted Feeding in Healthy Living"</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <div class="insight-icon biomarker">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3 class="insight-title">Biomarker Pattern Detection</h3>
+                            </div>
+                            <div class="insight-content">
+                                <p>A correlation analysis reveals that Isabel's inflammatory markers improve significantly 3-4 days after each Hidroterapia Ionizante session, suggesting this therapy is particularly effective for her specific inflammatory profile.</p>
+                                
+                                <p style="margin-top: 0.5rem;">Our AI model has identified a time-dependent pattern in her glucose response that suggests her metabolic flexibility is optimal in the morning hours (8AM-12PM), which should be considered when scheduling meals and supplements.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <div class="insight-icon recommendation">
+                                    <i class="fas fa-search-plus"></i>
+                                </div>
+                                <h3 class="insight-title">Research-Based Recommendations</h3>
+                            </div>
+                            <div class="insight-content">
+                                <p>Recent studies in individuals with similar metabolic profiles to Isabel show significant benefits from adding Berberine (500mg 2x daily) alongside magnesium supplementation. This combination improved insulin sensitivity by 24% in a 12-week trial.</p>
+                                
+                                <p style="margin-top: 0.5rem;">Based on her epigenetic aging markers, NAD+ precursors (NMN or NR) could potentially provide additional benefits for cellular rejuvenation, with a recommended starting dose of 250mg daily.</p>
+                                
+                                <div class="research-citation">
+                                    <div class="citation-title">Research Reference:</div>
+                                    <div class="citation-authors">Rajman L, et al.</div>
+                                    <div class="citation-journal">Nature Metabolism (2022). "Therapeutic potential of NAD-boosting molecules"</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <div class="insight-icon alert">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h3 class="insight-title">Potential Interaction Alert</h3>
+                            </div>
+                            <div class="insight-content">
+                                <p>The current dosage of Ginkgo biloba may interact with VIT C/Zinc when taken simultaneously. Recommend separating these supplements by at least 2 hours for optimal absorption and effectiveness.</p>
+                                
+                                <p style="margin-top: 0.5rem;">Our analysis suggests a potential gene-nutrient interaction affecting folate metabolism (MTHFR polymorphism). Consider switching from standard B-complex to methylated forms of B vitamins for improved effectiveness.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>Blockchain-Secured Data:</strong> All patient biomarker data and AI insights are encrypted and secured using MediLedger blockchain technology, ensuring HIPAA compliance and data integrity.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Biomarker Analysis Tab -->
+                    <div class="tab-content" id="biomarkers-tab" style="display: none;">
+                        <div class="biomarker-grid">
+                            <div class="biomarker-card warning" onclick="showBiomarkerDetail('glucose')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">Glucose</div>
+                                    <div class="biomarker-category category-metabolic">Metabolic</div>
+                                </div>
+                                <div class="biomarker-value warning">105</div>
+                                <div class="biomarker-range">Target: 70-99 mg/dL</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-down"></i> -11%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('glucose', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-card normal" onclick="showBiomarkerDetail('hba1c')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">HbA1c</div>
+                                    <div class="biomarker-category category-metabolic">Metabolic</div>
+                                </div>
+                                <div class="biomarker-value normal">5.6%</div>
+                                <div class="biomarker-range">Target: &lt;5.7%</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-down"></i> -5%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('hba1c', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-card warning" onclick="showBiomarkerDetail('hscrp')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">hsCRP</div>
+                                    <div class="biomarker-category category-inflammatory">Inflammatory</div>
+                                </div>
+                                <div class="biomarker-value warning">2.1</div>
+                                <div class="biomarker-range">Target: &lt;1.0 mg/L</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-down"></i> -45%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('hscrp', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-card danger" onclick="showBiomarkerDetail('il6')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">IL-6</div>
+                                    <div class="biomarker-category category-inflammatory">Inflammatory</div>
+                                </div>
+                                <div class="biomarker-value danger">2.8</div>
+                                <div class="biomarker-range">Target: &lt;1.8 pg/mL</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-down"></i> -33%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('il6', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-card normal" onclick="showBiomarkerDetail('vitaminD')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">Vitamin D</div>
+                                    <div class="biomarker-category category-nutrient">Nutrient</div>
+                                </div>
+                                <div class="biomarker-value normal">32</div>
+                                <div class="biomarker-range">Target: 30-50 ng/mL</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-up"></i> +33%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('vitaminD', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-card warning" onclick="showBiomarkerDetail('homocysteine')">
+                                <div class="biomarker-header">
+                                    <div class="biomarker-name">Homocysteine</div>
+                                    <div class="biomarker-category category-cardiovascular">Cardiovascular</div>
+                                </div>
+                                <div class="biomarker-value warning">12.4</div>
+                                <div class="biomarker-range">Target: &lt;10 μmol/L</div>
+                                <div class="biomarker-trend">
+                                    <div class="trend-badge improving">
+                                        <i class="fas fa-arrow-down"></i> -12%
+                                    </div>
+                                    <button class="predict-button" onclick="predictBiomarker('homocysteine', event)">
+                                        <i class="fas fa-chart-line"></i> Predict
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="forecasting-section">
+                            <div class="forecasting-header">
+                                <h3 class="forecasting-title"><i class="fas fa-chart-line"></i> Biomarker Forecasting</h3>
+                            </div>
+                            
+                            <div class="forecast-chart-container">
+                                <canvas id="forecasting-chart"></canvas>
+                            </div>
+                            
+                            <div class="forecast-legend">
+                                <div class="forecast-legend-item">
+                                    <div class="forecast-legend-color" style="background-color: #10B981;"></div>
+                                    <span>Historical Values</span>
+                                </div>
+                                <div class="forecast-legend-item">
+                                    <div class="forecast-legend-color" style="background-color: #3B82F6;"></div>
+                                    <span>Predicted Values</span>
+                                </div>
+                                <div class="forecast-legend-item">
+                                    <div class="forecast-legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></div>
+                                    <span>Risk Zone</span>
+                                </div>
+                                <div class="forecast-legend-item">
+                                    <div class="forecast-legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></div>
+                                    <span>Target Zone</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Digital Twin & Simulations Tab -->
+                    <div class="tab-content" id="digital-twin-tab" style="display: none;">
+                        <div class="biological-age-section">
+                            <div class="biological-age-header">
+                                <h3 class="biological-age-title"><i class="fas fa-hourglass-half"></i> Biological Age Analysis</h3>
+                            </div>
+                            
+                            <div class="biological-age-content">
+                                <div class="age-clock">
+                                    <div class="age-clock-circle">
+                                        <div class="age-clock-inner">
+                                            <div class="age-clock-value">52.3</div>
+                                            <div class="age-clock-label">years</div>
+                                        </div>
+                                    </div>
+                                    <div class="age-difference younger">-5.7 years</div>
+                                    <div class="age-clock-info">Composite Biological Age</div>
+                                </div>
+                                
+                                <div class="age-clock">
+                                    <div class="age-clock-circle">
+                                        <div class="age-clock-inner">
+                                            <div class="age-clock-value">54.1</div>
+                                            <div class="age-clock-label">years</div>
+                                        </div>
+                                    </div>
+                                    <div class="age-difference younger">-3.9 years</div>
+                                    <div class="age-clock-info">Metabolic Age</div>
+                                </div>
+                                
+                                <div class="age-clock">
+                                    <div class="age-clock-circle">
+                                        <div class="age-clock-inner">
+                                            <div class="age-clock-value">51.2</div>
+                                            <div class="age-clock-label">years</div>
+                                        </div>
+                                    </div>
+                                    <div class="age-difference younger">-6.8 years</div>
+                                    <div class="age-clock-info">Inflammatory Age</div>
+                                </div>
+                                
+                                <div class="age-clock">
+                                    <div class="age-clock-circle">
+                                        <div class="age-clock-inner">
+                                            <div class="age-clock-value">59.6</div>
+                                            <div class="age-clock-label">years</div>
+                                        </div>
+                                    </div>
+                                    <div class="age-difference older">+1.6 years</div>
+                                    <div class="age-clock-info">Methylation Age</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="digital-twin-card">
+                            <div class="digital-twin-header">
+                                <div class="digital-twin-title">
+                                    <i class="fas fa-user-circle digital-twin-icon"></i>
+                                    Digital Twin Status
+                                </div>
+                                <div class="digital-twin-actions">
+                                    <button class="twin-button" id="update-twin">
+                                        <i class="fas fa-sync-alt"></i>
+                                        <span>Update Data</span>
+                                    </button>
+                                    <button class="twin-button primary" id="run-simulation">
+                                        <i class="fas fa-flask"></i>
+                                        <span>Run Simulation</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="digital-twin-content">
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Glucose Homeostasis</div>
+                                    <div class="parameter-value">Moderately Dysregulated</div>
+                                    <div class="parameter-change positive">
+                                        <i class="fas fa-arrow-up"></i> Improving
+                                    </div>
+                                </div>
+                                
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Inflammatory Status</div>
+                                    <div class="parameter-value">Mild Systemic Inflammation</div>
+                                    <div class="parameter-change positive">
+                                        <i class="fas fa-arrow-up"></i> Improving Rapidly
+                                    </div>
+                                </div>
+                                
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Oxidative Stress</div>
+                                    <div class="parameter-value">Moderate</div>
+                                    <div class="parameter-change positive">
+                                        <i class="fas fa-arrow-up"></i> Improving
+                                    </div>
+                                </div>
+                                
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Telomere Length</div>
+                                    <div class="parameter-value">Age-appropriate</div>
+                                    <div class="parameter-change stable">
+                                        <i class="fas fa-minus"></i> Stable
+                                    </div>
+                                </div>
+                                
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Mitochondrial Function</div>
+                                    <div class="parameter-value">Suboptimal</div>
+                                    <div class="parameter-change positive">
+                                        <i class="fas fa-arrow-up"></i> Slightly Improving
+                                    </div>
+                                </div>
+                                
+                                <div class="twin-parameter">
+                                    <div class="parameter-label">Autophagy Efficiency</div>
+                                    <div class="parameter-value">Reduced</div>
+                                    <div class="parameter-change stable">
+                                        <i class="fas fa-minus"></i> Stable
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="digital-twin-chart">
+                                <canvas id="digital-twin-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="security-notice">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>Digital Twin Protection:</strong> This digital biomodel is secured using blockchain technology based on MediLedger protocol, ensuring privacy and data integrity for simulation and analysis.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pathway Analysis Tab -->
+                    <div class="tab-content" id="pathways-tab" style="display: none;">
+                        <div class="pathway-container">
+                            <div class="biomarker-group">
+                                <div class="biomarker-group-header">
+                                    <h3 class="biomarker-group-title">
+                                        <i class="fas fa-fire biomarker-group-icon"></i>
+                                        Metabolic Pathway Analysis
+                                    </h3>
+                                </div>
+                                
+                                <div class="chart-container">
+                                    <canvas id="metabolic-pathway-chart" height="250"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-group">
+                                <div class="biomarker-group-header">
+                                    <h3 class="biomarker-group-title">
+                                        <i class="fas fa-wind biomarker-group-icon"></i>
+                                        Inflammatory Pathway Analysis
+                                    </h3>
+                                </div>
+                                
+                                <div class="chart-container">
+                                    <canvas id="inflammatory-pathway-chart" height="250"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="biomarker-group">
+                                <div class="biomarker-group-header">
+                                    <h3 class="biomarker-group-title">
+                                        <i class="fas fa-heartbeat biomarker-group-icon"></i>
+                                        Cardiovascular Pathway Analysis
+                                    </h3>
+                                </div>
+                                
+                                <div class="chart-container">
+                                    <canvas id="cardiovascular-pathway-chart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="security-notice">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Pathway2vec Technology:</strong> This analysis uses AI to convert biological pathways into vector representations that can be analyzed for patterns and interventions, similar to word2vec in language processing.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Treatment Recommendations Tab -->
+                    <div class="tab-content" id="treatments-tab" style="display: none;">
+                        <div class="recommendations-container">
+                            <div class="recommendation-card">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">
+                                        <i class="fas fa-pills recommendation-icon"></i>
+                                        <span>Magnesio Quelado Optimization</span>
+                                    </div>
+                                    <div class="recommendation-status status-recommended">Recommended</div>
+                                </div>
+                                
+                                <div class="recommendation-body">
+                                    <div class="recommendation-details">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Current Dosage</div>
+                                            <div class="detail-value">300mg daily (1-0-1-0)</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Recommended Dosage</div>
+                                            <div class="detail-value">400mg daily (1-0-1-0)</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Target Biomarkers</div>
+                                            <div class="detail-value">Glucose, Insulin Sensitivity</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-description">
+                                        <p>Current dose is showing positive effects but suboptimal response in glucose regulation. Increasing to 400mg daily is expected to improve metabolic markers further based on recent studies and patient's response pattern.</p>
+                                    </div>
+                                    
+                                    <div class="evidence-section">
+                                        <div class="evidence-title">
+                                            <i class="fas fa-search"></i> Research Evidence
+                                        </div>
+                                        <div class="evidence-content">
+                                            <p>Multiple clinical studies show dose-dependent effects of magnesium on glucose metabolism, with optimal results typically seen at 400-500mg daily. Meta-analysis of 18 trials shows an average 15% improvement in insulin sensitivity with dosages in this range.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-actions">
+                                        <button class="recommendation-button primary">
+                                            <i class="fas fa-check"></i>
+                                            <span>Apply Recommendation</span>
+                                        </button>
+                                        <button class="recommendation-button info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>View Research</span>
+                                        </button>
+                                        <button class="recommendation-button simulate" onclick="openSimulationModal('magnesio')">
+                                            <i class="fas fa-flask"></i>
+                                            <span>Simulate Effects</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendation-card">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">
+                                        <i class="fas fa-capsules recommendation-icon"></i>
+                                        <span>Add Alpha Lipoic Acid</span>
+                                    </div>
+                                    <div class="recommendation-status status-high-priority">High Priority</div>
+                                </div>
+                                
+                                <div class="recommendation-body">
+                                    <div class="recommendation-details">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Recommended Dosage</div>
+                                            <div class="detail-value">600mg daily (1-0-0-0)</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Target Biomarkers</div>
+                                            <div class="detail-value">Insulin Sensitivity, Oxidative Stress</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Expected Benefit</div>
+                                            <div class="detail-value">15-25% improvement in insulin sensitivity</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-description">
+                                        <p>Alpha Lipoic Acid has shown synergistic effects with magnesium for metabolic health improvement. Recent research demonstrates significant improvements in glucose metabolism and insulin sensitivity with this combination.</p>
+                                    </div>
+                                    
+                                    <div class="evidence-section">
+                                        <div class="evidence-title">
+                                            <i class="fas fa-search"></i> Research Evidence
+                                        </div>
+                                        <div class="evidence-content">
+                                            <p>Meta-analysis of 18 randomized controlled trials showed an average improvement of 15-25% in insulin sensitivity with daily ALA supplementation of 600mg. Mitochondrial function improvements were also documented in 12 of these studies.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-actions">
+                                        <button class="recommendation-button primary">
+                                            <i class="fas fa-check"></i>
+                                            <span>Apply Recommendation</span>
+                                        </button>
+                                        <button class="recommendation-button info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>View Research</span>
+                                        </button>
+                                        <button class="recommendation-button simulate" onclick="openSimulationModal('ala')">
+                                            <i class="fas fa-flask"></i>
+                                            <span>Simulate Effects</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendation-card">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">
+                                        <i class="fas fa-clock recommendation-icon"></i>
+                                        <span>Time-Restricted Eating Protocol</span>
+                                    </div>
+                                    <div class="recommendation-status status-recommended">Recommended</div>
+                                </div>
+                                
+                                <div class="recommendation-body">
+                                    <div class="recommendation-details">
+                                        <div class="detail-item">
+                                            <div class="detail-label">Protocol</div>
+                                            <div class="detail-value">8-hour eating window (10:00-18:00)</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Target Biomarkers</div>
+                                            <div class="detail-value">Glucose, Insulin, HbA1c</div>
+                                        </div>
+                                        <div class="detail-item">
+                                            <div class="detail-label">Implementation</div>
+                                            <div class="detail-value">Gradual transition over 2 weeks</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-description">
+                                        <p>Time-restricted eating has shown significant benefits for metabolic health in clinical studies. CGM data suggests Isabel experiences prolonged elevated glucose during extended eating periods, making her an ideal candidate for this intervention.</p>
+                                    </div>
+                                    
+                                    <div class="evidence-section">
+                                        <div class="evidence-title">
+                                            <i class="fas fa-search"></i> Research Evidence
+                                        </div>
+                                        <div class="evidence-content">
+                                            <p>Recent research published in Cell Metabolism demonstrated an average 4-11% reduction in fasting glucose and improved insulin sensitivity with 8-hour TRE, independent of caloric restriction. Studies show enhanced autophagy and metabolic flexibility with this approach.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recommendation-actions">
+                                        <button class="recommendation-button primary">
+                                            <i class="fas fa-check"></i>
+                                            <span>Apply Recommendation</span>
+                                        </button>
+                                        <button class="recommendation-button info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>View Research</span>
+                                        </button>
+                                        <button class="recommendation-button simulate" onclick="openSimulationModal('tre')">
+                                            <i class="fas fa-flask"></i>
+                                            <span>Simulate Effects</span>
+                                        </button>
+                                        <button class="recommendation-button">
+                                            <i class="fas fa-file-alt"></i>
+                                            <span>Generate Patient Guide</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Simulation Modal -->
+    <div class="modal-overlay" id="simulation-modal-overlay">
+        <div class="simulation-modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-flask"></i> <span id="simulation-title">Treatment Simulation</span></h3>
+                <button class="close-modal" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="simulation-form" id="simulation-form">
+                <div class="simulation-form-row">
+                    <div class="simulation-form-col">
+                        <div class="simulation-form-group">
+                            <label for="simulation-treatment">Treatment</label>
+                            <select id="simulation-treatment" class="simulation-select">
+                                <option value="magnesio">Magnesio Quelado</option>
+                                <option value="ala">Alpha Lipoic Acid</option>
+                                <option value="tre">Time-Restricted Eating</option>
+                                <option value="combination">Combination Protocol</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="simulation-form-col">
+                        <div class="simulation-form-group">
+                            <label for="simulation-duration">Simulation Duration</label>
+                            <select id="simulation-duration" class="simulation-select">
+                                <option value="1">1 Month</option>
+                                <option value="3" selected>3 Months</option>
+                                <option value="6">6 Months</option>
+                                <option value="12">12 Months</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="simulation-form-group">
+                    <label>Treatment Intensity</label>
+                    <div class="simulation-slider-container">
+                        <input type="range" min="1" max="5" value="3" class="simulation-slider" id="simulation-intensity">
+                        <span class="simulation-slider-value" id="intensity-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="simulation-form-group">
+                    <label>Patient Adherence</label>
+                    <div class="simulation-slider-container">
+                        <input type="range" min="1" max="5" value="4" class="simulation-slider" id="simulation-adherence">
+                        <span class="simulation-slider-value" id="adherence-value">4</span>
+                    </div>
+                </div>
+                
+                <div class="simulation-form-group">
+                    <label for="simulation-target">Target Biomarkers</label>
+                    <select id="simulation-target" class="simulation-select" multiple>
+                        <option value="glucose" selected>Glucose</option>
+                        <option value="hba1c">HbA1c</option>
+                        <option value="hscrp">hsCRP</option>
+                        <option value="il6">IL-6</option>
+                        <option value="homocysteine">Homocysteine</option>
+                        <option value="biological_age">Biological Age</option>
+                    </select>
+                </div>
+                
+                <div class="simulation-actions">
+                    <button type="button" class="simulation-button secondary" id="reset-simulation">
+                        <i class="fas fa-undo"></i>
+                        <span>Reset</span>
+                    </button>
+                    <button type="button" class="simulation-button primary" id="run-simulation-btn">
+                        <i class="fas fa-play"></i>
+                        <span>Run Simulation</span>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="simulation-results" id="simulation-results">
+                <div class="simulation-chart-container">
+                    <canvas id="simulation-chart"></canvas>
+                </div>
+                
+                <div class="simulation-insights">
+                    <h4 class="simulation-insights-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Simulation Insights
+                    </h4>
+                    <div class="simulation-insights-content" id="simulation-insights-content">
+                        Based on this simulation, implementing the selected protocol with moderate adherence is projected to result in:
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>12% reduction in fasting glucose (to ~92 mg/dL) within 3 months</li>
+                            <li>Reduction in HbA1c to 5.3% from current 5.6%</li>
+                            <li>Estimated biological age reduction of 0.8 years based on metabolic improvements</li>
+                        </ul>
+                        <p style="margin-top: 0.5rem;">The simulation suggests significant benefits from combining this protocol with Alpha Lipoic Acid supplementation for synergistic effects on insulin sensitivity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab Switching
+            const tabs = document.querySelectorAll('.assistant-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // Show content for active tab
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId + '-tab').style.display = 'block';
+                    
+                    // Initialize specific tab functionality
+                    if (tabId === 'biomarkers') {
+                        initForecasting();
+                    } else if (tabId === 'digital-twin') {
+                        initDigitalTwin();
+                    } else if (tabId === 'pathways') {
+                        initPathwayAnalysis();
+                    }
+                });
+            });
+            
+            // Chat Functionality
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const voiceButton = document.getElementById('voice-button');
+            const chatContainer = document.querySelector('.chat-container');
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+                
+                // Add user message
+                addMessage(message, 'user');
+                chatInput.value = '';
+                
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                chatContainer.appendChild(typingIndicator);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate AI response after delay
+                setTimeout(() => {
+                    // Remove typing indicator
+                    typingIndicator.remove();
+                    
+                    // Generate AI response based on user message
+                    let aiResponse = generateEnhancedAIResponse(message);
+                    
+                    // Add AI response
+                    addMessage(aiResponse, 'ai');
+                    
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 1500);
+            }
+            
+            function addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${sender}`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                
+                // Check if content has HTML formatting
+                if (content.includes('<') && content.includes('>')) {
+                    bubble.innerHTML = content;
+                } else {
+                    bubble.textContent = content;
+                }
+                
+                messageDiv.appendChild(bubble);
+                chatContainer.appendChild(messageDiv);
+            }
+            
+            function generateEnhancedAIResponse(userMessage) {
+                // More sophisticated response generation based on keywords and context
+                const userMessageLower = userMessage.toLowerCase();
+                
+                // Check for protocol-related questions
+                if (userMessageLower.includes('protocol') || userMessageLower.includes('treatment') || userMessageLower.includes('recommend')) {
+                    return `
+                        <p><strong>Personalized Longevity Protocol for Isabel Romero</strong></p>
+                        <p style="margin-top: 0.5rem;">Based on comprehensive biomarker analysis and biological age assessment, I recommend the following optimized protocol:</p>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Supplementation Protocol:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li><strong>Magnesio Quelado:</strong> Increase to 400mg daily (1-0-1-0)</li>
+                            <li><strong>Alpha Lipoic Acid:</strong> Add 600mg daily (1-0-0-0)</li>
+                            <li><strong>VIT C/Zinc:</strong> Continue current dosage (1000mg/15mg daily, 1-0-0-0)</li>
+                            <li><strong>Ginkgo biloba:</strong> Continue 120mg daily, but separate from VIT C/Zinc by at least 2 hours</li>
+                            <li><strong>NAD+ Precursor:</strong> Consider adding NMN 250mg daily for cellular rejuvenation</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Lifestyle Modifications:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>Implement time-restricted eating with an 8-hour window (recommended 10:00-18:00)</li>
+                            <li>Gradually transition over 2 weeks to minimize stress response</li>
+                            <li>Maintain current physical activity protocol, adding zone 2 cardio training (heart rate at 60-70% of max) 3x/week for 30 minutes</li>
+                            <li>Add 5-10 minutes daily breathwork practice to enhance parasympathetic activation</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Therapy Protocol:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>Increase Hidroterapia Ionizante frequency to weekly sessions (from current bi-weekly)</li>
+                            <li>Continue Nebulización sessions as currently scheduled</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;"><strong>Monitoring Schedule:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                            <li>Fasting glucose and insulin: every 2 weeks</li>
+                            <li>Full metabolic panel: 4 weeks after implementation</li>
+                            <li>Inflammatory markers: 6 weeks after implementation</li>
+                            <li>Optional: 7-day continuous glucose monitoring to optimize timing of supplements and meals</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">Our digital twin simulation predicts these interventions will reduce Isabel's biological age by 1.2-1.8 years over the next 6 months. Would you like me to generate detailed patient instructions for this protocol?</p>
+                        
+                        <div class="research-citation">
+                            <div class="citation-title">Research Reference:</div>
+                            <div class="citation-authors">Brandhorst S, et al.</div>
+                            <div class="citation-journal">Cell Metabolism (2021). "Time-Restricted Eating Effects on Body Weight and Metabolism"</div>
+                        </div>
+                    `;
+                }
+                
+                // Check for biological age questions
+                if (userMessageLower.includes('age') || userMessageLower.includes('aging') || userMessageLower.includes('longevity')) {
+                    return `
+                        <p>Isabel's current biological age assessment indicates a composite biological age of 52.3 years, which is 5.7 years below her chronological age of 58. This is a positive indicator of her overall health status and effectiveness of her current protocols.</p>
+                        
+                        <p style="margin-top: 0.75rem;">Her biological age is calculated using multiple aging clocks:</p>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Metabolic Age:</strong> 54.1 years (-3.9 years vs chronological)</li>
+                            <li><strong>Inflammatory Age:</strong> 51.2 years (-6.8 years vs chronological)</li>
+                            <li><strong>Methylation Age:</strong> 59.6 years (+1.6 years vs chronological)</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">The elevated methylation age suggests epigenetic factors that may benefit from targeted interventions. Our AI model suggests that focusing on metabolic optimization and methylation support could potentially reduce her biological age by an additional 2-3 years over the next 12 months.</p>
+                        
+                        <p style="margin-top: 0.75rem;">Interventions with the highest predicted impact on biological age reduction:</p>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Time-restricted eating (8-hour window)</li>
+                            <li>NAD+ precursor supplementation</li>
+                            <li>Optimization of sleep quality and circadian rhythm</li>
+                            <li>Targeted methylation support with methylated B vitamins</li>
+                            <li>Regular zone 2 cardiovascular training</li>
+                        </ol>
+                        
+                        <p style="margin-top: 0.75rem;">Would you like me to create a detailed intervention plan specifically targeting biological age reduction?</p>
+                        
+                        <div class="research-citation">
+                            <div class="citation-title">Research Reference:</div>
+                            <div class="citation-authors">Rajman L, et al.</div>
+                            <div class="citation-journal">Nature Metabolism (2022). "Therapeutic potential of NAD-boosting molecules in aging"</div>
+                        </div>
+                    `;
+                }
+                
+                // Check for inflammation-related questions
+                if (userMessageLower.includes('inflam') || userMessageLower.includes('immune') || userMessageLower.includes('crp') || userMessageLower.includes('il-6')) {
+                    return `
+                        <p>Isabel's inflammatory markers show significant improvement following the implementation of the Immune Modulator therapy:</p>
+                        
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>hsCRP:</strong> Reduced from 3.8 to 2.1 mg/L (-45%), still above optimal range of <1.0 mg/L</li>
+                            <li><strong>IL-6:</strong> Decreased from 4.2 to 2.8 pg/mL (-33%), still above optimal range of <1.8 pg/mL</li>
+                            <li><strong>TNF-alpha:</strong> Reduced from 6.8 to 4.9 pg/mL (-28%)</li>
+                            <li><strong>Inflammatory Age:</strong> Calculated at 51.2 years (6.8 years below chronological age)</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">Our AI pattern recognition has identified a strong correlation between Hidroterapia Ionizante sessions and inflammatory marker reductions, with the most significant improvements observed 3-4 days post-treatment. The current bi-weekly frequency appears to allow inflammation to partially rebound between sessions.</p>
+                        
+                        <p style="margin-top: 0.75rem;">To further optimize inflammation control:</p>
+                        
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Increase Hidroterapia Ionizante frequency to weekly sessions</li>
+                            <li>Add specialized proteolytic enzymes on an empty stomach (recommend Serratiopeptidase 120,000 SU daily)</li>
+                            <li>Implement 14-day elimination protocol to identify potential dietary inflammatory triggers</li>
+                            <li>Add targeted polyphenols: curcumin (1000mg with enhanced bioavailability) and resveratrol (250mg)</li>
+                            <li>Consider adding omega-3 fatty acids at higher dosage (recommend 2000-3000mg EPA+DHA daily)</li>
+                        </ol>
+                        
+                        <p style="margin-top: 0.75rem;">Our digital twin simulation predicts these interventions could reduce hsCRP to <1.0 mg/L and IL-6 to <1.8 pg/mL within 8-12 weeks, which would significantly improve Isabel's inflammatory age and overall biological age.</p>
+                        
+                        <div class="research-citation">
+                            <div class="citation-title">Research Reference:</div>
+                            <div class="citation-authors">Calder PC, et al.</div>
+                            <div class="citation-journal">Journal of Nutrition (2023). "Omega-3 Fatty Acids and Inflammatory Processes: Effects, Mechanisms and Clinical Relevance"</div>
+                        </div>
+                    `;
+                }
+                
+                // Check for metabolic-related questions
+                if (userMessageLower.includes('metabol') || userMessageLower.includes('glucose') || userMessageLower.includes('insulin') || userMessageLower.includes('diabetes')) {
+                    return `
+                        <p>Isabel's metabolic health markers show improvements but still have opportunities for optimization:</p>
+                        
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li><strong>Fasting glucose:</strong> Reduced from 118 to 105 mg/dL (-11%), still above optimal range of 70-99 mg/dL</li>
+                            <li><strong>HbA1c:</strong> Improved from 5.9% to 5.6% (-5%), now within normal range (<5.7%)</li>
+                            <li><strong>Insulin sensitivity:</strong> Increased by approximately 18% based on HOMA-IR calculations</li>
+                            <li><strong>Metabolic Age:</strong> Currently calculated at 54.1 years (3.9 years below chronological age)</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">Our AI analysis of her continuous glucose monitoring data reveals several key insights:</p>
+                        
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Highest glucose variability occurs in the evening hours (after 7PM)</li>
+                            <li>Morning glucose response is more controlled, suggesting better insulin sensitivity early in the day</li>
+                            <li>Glucose remains elevated for extended periods after dinner, indicating delayed clearance</li>
+                            <li>Current supplementation shows modest impact on postprandial glucose peaks</li>
+                        </ul>
+                        
+                        <p style="margin-top: 0.75rem;">Based on these patterns and recent research on metabolic health optimization, I recommend:</p>
+                        
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Implement time-restricted eating with an 8-hour window (10:00-18:00) to align with her optimal glucose metabolism window</li>
+                            <li>Increase Magnesio Quelado to 400mg daily (1-0-1-0) to enhance mineral-dependent glucose metabolism pathways</li>
+                            <li>Add Alpha Lipoic Acid 600mg (1-0-0-0) to improve insulin sensitivity and mitochondrial function</li>
+                            <li>Consider adding Berberine 500mg twice daily with meals to regulate glucose metabolism (after checking for potential medication interactions)</li>
+                            <li>Incorporate pre-meal exercise (5-minute light activity before meals) to prime muscles for glucose uptake</li>
+                        </ol>
+                        
+                        <p style="margin-top: 0.75rem;">Our digital twin simulation predicts these interventions could normalize fasting glucose to <99 mg/dL and further reduce HbA1c to approximately 5.3% within 3 months, which would improve Isabel's metabolic age by an estimated 1.5-2 years.</p>
+                        
+                        <div class="research-citation">
+                            <div class="citation-title">Research Reference:</div>
+                            <div class="citation-authors">Yin J, et al.</div>
+                            <div class="citation-journal">Metabolism (2023). "Berberine in the treatment of metabolism-related chronic diseases: A drug target-based review of mechanisms of action"</div>
+                        </div>
+                    `;
+                }
+                
+                // Default response for other queries
+                return `
+                    <p>Based on my comprehensive analysis of Isabel's health data, here are the key insights:</p>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>Current Status:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li>Biological age has decreased from 54.4 to 52.3 years over the past 4 months (5.7 years below chronological age)</li>
+                        <li>Key improvements include inflammatory marker reduction (hsCRP down 45%), metabolic health improvement (HbA1c normalized to 5.6%), and enhanced nutrient status</li>
+                        <li>Areas requiring attention include glucose control (still elevated at 105 mg/dL) and methylation status (methylation age is slightly elevated)</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;"><strong>AI-Identified Patterns:</strong></p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+                        <li>Strong correlation between Hidroterapia Ionizante sessions and inflammatory marker reduction (3-4 day optimal response window)</li>
+                        <li>Improved glucose metabolism in response to Magnesio Quelado, but dosage appears suboptimal</li>
+                        <li>Diurnal pattern in glucose response indicates better insulin sensitivity in morning hours</li>
+                        <li>Synergistic effects observed between Immune Modulator and Ginkgo biloba on cognitive markers and circulation</li>
+                    </ul>
+                    
+                    <p style="margin-top: 0.75rem;">Our digital twin simulation indicates that with targeted protocol optimizations, Isabel could potentially reduce her biological age by an additional 1.5-2.5 years over the next 6 months, with the greatest improvements possible in metabolic and inflammatory pathways.</p>
+                    
+                    <p style="margin-top: 0.75rem;">Would you like me to focus on a specific aspect of her health or generate a comprehensive optimized protocol?</p>
+                `;
+            }
+            
+            // Voice input functionality
+            voiceButton.addEventListener('click', function() {
+                // This would typically use the Web Speech API
+                // For simulation purposes, we'll just show a notification
+                const recognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+                
+                if (recognition) {
+                    voiceButton.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+                    voiceButton.classList.add('pulse-animation');
+                    
+                    // Simulate voice recognition after a delay
+                    setTimeout(() => {
+                        voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                        voiceButton.classList.remove('pulse-animation');
+                        chatInput.value = "What are the best interventions to reduce Isabel's biological age?";
+                        chatInput.focus();
+                    }, 3000);
+                } else {
+                    alert("Speech recognition is not supported in your browser.");
+                }
+            });
+            
+            sendButton.addEventListener('click', sendMessage);
+            
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Biomarker Forecasting
+            function initForecasting() {
+                const ctx = document.getElementById('forecasting-chart').getContext('2d');
+                
+                // Check if chart already exists
+                if (window.forecastingChart) {
+                    window.forecastingChart.destroy();
+                }
+                
+                // Generate dates for the chart
+                const dates = [];
+                const now = new Date();
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date();
+                    date.setMonth(now.getMonth() - i);
+                    dates.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                }
+                
+                // Future dates for forecast
+                for (let i = 1; i <= 6; i++) {
+                    const date = new Date();
+                    date.setMonth(now.getMonth() + i);
+                    dates.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                }
+                
+                // Historical and forecast data
+                const hscrpHistorical = [3.8, 3.6, 3.2, 2.8, 2.4, 2.1];
+                const hscrpForecast = [1.8, 1.5, 1.2, 1.0, 0.9, 0.8];
+                
+                const glucoseHistorical = [118, 115, 112, 110, 108, 105];
+                const glucoseForecast = [102, 99, 96, 94, 92, 90];
+                
+                // Create chart
+                window.forecastingChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'hsCRP (mg/L) - Historical',
+                                data: [...hscrpHistorical, null, null, null, null, null, null],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                pointStyle: 'circle',
+                                pointRadius: 4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'hsCRP (mg/L) - Forecast',
+                                data: [null, null, null, null, null, 2.1, ...hscrpForecast],
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                tension: 0.3,
+                                pointStyle: 'triangle',
+                                pointRadius: 4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Glucose (mg/dL) - Historical',
+                                data: [...glucoseHistorical, null, null, null, null, null, null],
+                                borderColor: '#F59E0B',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                pointStyle: 'circle',
+                                pointRadius: 4,
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'Glucose (mg/dL) - Forecast',
+                                data: [null, null, null, null, null, 105, ...glucoseForecast],
+                                borderColor: '#EC4899',
+                                backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                tension: 0.3,
+                                pointStyle: 'triangle',
+                                pointRadius: 4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    boxWidth: 6,
+                                    boxHeight: 6,
+                                    padding: 20,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#1F2937',
+                                bodyColor: '#1F2937',
+                                borderColor: '#E5E7EB',
+                                borderWidth: 1,
+                                padding: 10,
+                                boxPadding: 5,
+                                usePointStyle: true
+                            },
+                            annotation: {
+                                annotations: {
+                                    hscrpTargetZone: {
+                                        type: 'box',
+                                        xMin: 5.5,
+                                        xMax: 11.5,
+                                        yMin: 0,
+                                        yMax: 1,
+                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                        borderColor: 'rgba(16, 185, 129, 0.5)',
+                                        borderWidth: 1,
+                                        label: {
+                                            display: true,
+                                            content: 'hsCRP Target Zone',
+                                            position: 'start',
+                                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                            font: {
+                                                size: 11
+                                            },
+                                            padding: 4
+                                        }
+                                    },
+                                    glucoseTargetZone: {
+                                        type: 'box',
+                                        xMin: 5.5,
+                                        xMax: 11.5,
+                                        yMin: 70,
+                                        yMax: 99,
+                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                        borderColor: 'rgba(16, 185, 129, 0.5)',
+                                        borderWidth: 1,
+                                        label: {
+                                            display: true,
+                                            content: 'Glucose Target Zone',
+                                            position: 'start',
+                                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                            yAdjust: -10,
+                                            font: {
+                                                size: 11
+                                            },
+                                            padding: 4
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                min: 0,
+                                max: 4,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'hsCRP (mg/L)'
+                                },
+                                grid: {
+                                    borderDash: [2, 2]
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(1);
+                                    }
+                                }
+                            },
+                            y1: {
+                                min: 70,
+                                max: 120,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Glucose (mg/dL)'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Digital Twin Visualization
+            function initDigitalTwin() {
+                const ctx = document.getElementById('digital-twin-chart').getContext('2d');
+                
+                // Check if chart already exists
+                if (window.digitalTwinChart) {
+                    window.digitalTwinChart.destroy();
+                }
+                
+                const categories = ['Glucose Homeostasis', 'Inflammatory Status', 'Oxidative Stress', 'Mitochondrial Function', 'Autophagy Efficiency', 'Telomere Integrity'];
+                const currentValues = [60, 45, 55, 40, 35, 65];
+                const targetValues = [80, 75, 80, 70, 65, 75];
+                
+                window.digitalTwinChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: categories,
+                        datasets: [
+                            {
+                                label: 'Current Status',
+                                data: currentValues,
+                                backgroundColor: 'rgba(93, 92, 222, 0.2)',
+                                borderColor: 'rgba(93, 92, 222, 0.8)',
+                                pointBackgroundColor: 'rgba(93, 92, 222, 1)',
+                                pointRadius: 4
+                            },
+                            {
+                                label: 'Target Status',
+                                data: targetValues,
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: 'rgba(16, 185, 129, 0.8)',
+                                pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                                pointRadius: 4,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 20,
+                                    showLabelBackdrop: false,
+                                    font: {
+                                        size: 10
+                                    },
+                                    color: '#6B7280'
+                                },
+                                pointLabels: {
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    },
+                                    color: '#4B5563'
+                                },
+                                grid: {
+                                    color: 'rgba(107, 114, 128, 0.2)'
+                                },
+                                angleLines: {
+                                    color: 'rgba(107, 114, 128, 0.2)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 10,
+                                    boxHeight: 10,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#1F2937',
+                                bodyColor: '#1F2937',
+                                borderColor: '#E5E7EB',
+                                borderWidth: 1,
+                                padding: 10,
+                                boxPadding: 5,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        label += ': ' + context.raw + '%';
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Setup digital twin simulation button
+                document.getElementById('run-simulation').addEventListener('click', function() {
+                    openSimulationModal('comprehensive');
+                });
+            }
+            
+            // Pathway Analysis Visualization
+            function initPathwayAnalysis() {
+                // Metabolic Pathway Chart
+                const metabolicCtx = document.getElementById('metabolic-pathway-chart').getContext('2d');
+                if (window.metabolicPathwayChart) {
+                    window.metabolicPathwayChart.destroy();
+                }
+                
+                window.metabolicPathwayChart = new Chart(metabolicCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Glycolysis', 'Gluconeogenesis', 'TCA Cycle', 'Insulin Signaling', 'Glycogen Metabolism', 'Pentose Phosphate'],
+                        datasets: [
+                            {
+                                label: 'Pathway Efficiency',
+                                data: [65, 55, 60, 45, 70, 50],
+                                backgroundColor: 'rgba(245, 158, 11, 0.5)',
+                                borderColor: 'rgba(245, 158, 11, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Target Efficiency',
+                                data: [80, 70, 85, 80, 75, 65],
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Pathway Efficiency (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const index = context.dataIndex;
+                                        const recommendations = [
+                                            'Add Alpha Lipoic Acid to enhance glycolytic enzyme function',
+                                            'Optimize with timed carbohydrate intake and chromium',
+                                            'Support with B-vitamins and CoQ10 for mitochondrial function',
+                                            'Improve with Berberine and targeted exercise',
+                                            'Support with Magnesium and pre-sleep nutrition protocol',
+                                            'Enhance with antioxidant support (NAC, glutathione)'
+                                        ];
+                                        return 'Recommendation: ' + recommendations[index];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Inflammatory Pathway Chart
+                const inflammatoryCtx = document.getElementById('inflammatory-pathway-chart').getContext('2d');
+                if (window.inflammatoryPathwayChart) {
+                    window.inflammatoryPathwayChart.destroy();
+                }
+                
+                window.inflammatoryPathwayChart = new Chart(inflammatoryCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['NF-κB', 'COX-2', 'IL-6', 'TNF-α', 'Resolution Phase', 'Antioxidant Defense'],
+                        datasets: [
+                            {
+                                label: 'Pathway Activity',
+                                data: [70, 65, 60, 55, 35, 45],
+                                backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                                borderColor: 'rgba(239, 68, 68, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Target Activity',
+                                data: [30, 35, 30, 25, 80, 85],
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Pathway Activity (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const index = context.dataIndex;
+                                        const recommendations = [
+                                            'Reduce with curcumin and omega-3 fatty acids',
+                                            'Target with specialized enzymes and resveratrol',
+                                            'Reduce with targeted immune modulation therapy',
+                                            'Support with specialized polyphenols',
+                                            'Enhance with SPMs (specialized pro-resolving mediators)',
+                                            'Boost with glutathione precursors and vitamin E'
+                                        ];
+                                        return 'Recommendation: ' + recommendations[index];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Cardiovascular Pathway Chart
+                const cardiovascularCtx = document.getElementById('cardiovascular-pathway-chart').getContext('2d');
+                if (window.cardiovascularPathwayChart) {
+                    window.cardiovascularPathwayChart.destroy();
+                }
+                
+                window.cardiovascularPathwayChart = new Chart(cardiovascularCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Endothelial Function', 'Lipid Metabolism', 'Homocysteine Cycle', 'Platelet Aggregation', 'Nitric Oxide Production', 'Vascular Elasticity'],
+                        datasets: [
+                            {
+                                label: 'Pathway Function',
+                                data: [60, 65, 45, 70, 55, 50],
+                                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Target Function',
+                                data: [85, 80, 75, 40, 85, 80],
+                                backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Pathway Function (%)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const index = context.dataIndex;
+                                        const recommendations = [
+                                            'Support with arginine, citrulline and antioxidants',
+                                            'Optimize with berberine and plant sterols',
+                                            'Support with methylated B vitamins (B6, B9, B12)',
+                                            'Regulate with omega-3s and specialized enzymes',
+                                            'Enhance with beet extract and CoQ10',
+                                            'Support with vitamin K2 and specialized peptides'
+                                        ];
+                                        return 'Recommendation: ' + recommendations[index];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Simulation Modal
+            const simulationModal = document.getElementById('simulation-modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal');
+            const runSimulationBtn = document.getElementById('run-simulation-btn');
+            const resetSimulationBtn = document.getElementById('reset-simulation');
+            const intensitySlider = document.getElementById('simulation-intensity');
+            const intensityValue = document.getElementById('intensity-value');
+            const adherenceSlider = document.getElementById('simulation-adherence');
+            const adherenceValue = document.getElementById('adherence-value');
+            
+            function openSimulationModal(treatmentType) {
+                // Set the treatment type
+                const treatmentSelect = document.getElementById('simulation-treatment');
+                simulationModal.classList.add('active');
+                
+                // Find the option and set it as selected
+                for (let i = 0; i < treatmentSelect.options.length; i++) {
+                    if (treatmentSelect.options[i].value === treatmentType) {
+                        treatmentSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                // Set the modal title based on treatment
+                const simulationTitle = document.getElementById('simulation-title');
+                if (treatmentType === 'magnesio') {
+                    simulationTitle.textContent = 'Magnesio Quelado Simulation';
+                } else if (treatmentType === 'ala') {
+                    simulationTitle.textContent = 'Alpha Lipoic Acid Simulation';
+                } else if (treatmentType === 'tre') {
+                    simulationTitle.textContent = 'Time-Restricted Eating Simulation';
+                } else if (treatmentType === 'comprehensive') {
+                    simulationTitle.textContent = 'Comprehensive Protocol Simulation';
+                    // Select combination option
+                    for (let i = 0; i < treatmentSelect.options.length; i++) {
+                        if (treatmentSelect.options[i].value === 'combination') {
+                            treatmentSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            closeModalBtn.addEventListener('click', function() {
+                simulationModal.classList.remove('active');
+            });
+            
+            // Close modal if clicking outside
+            simulationModal.addEventListener('click', function(e) {
+                if (e.target === simulationModal) {
+                    simulationModal.classList.remove('active');
+                }
+            });
+            
+            // Update intensity value display
+            intensitySlider.addEventListener('input', function() {
+                intensityValue.textContent = this.value;
+            });
+            
+            // Update adherence value display
+            adherenceSlider.addEventListener('input', function() {
+                adherenceValue.textContent = this.value;
+            });
+            
+            // Reset simulation
+            resetSimulationBtn.addEventListener('click', function() {
+                intensitySlider.value = 3;
+                intensityValue.textContent = "3";
+                adherenceSlider.value = 4;
+                adherenceValue.textContent = "4";
+                
+                // Hide results if visible
+                document.getElementById('simulation-results').classList.remove('active');
+            });
+            
+            // Run simulation
+            runSimulationBtn.addEventListener('click', function() {
+                // Show loading animation
+                runSimulationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Simulating...</span>';
+                runSimulationBtn.disabled = true;
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    runSimulationBtn.innerHTML = '<i class="fas fa-play"></i><span>Run Simulation</span>';
+                    runSimulationBtn.disabled = false;
+                    
+                    // Show results
+                    const resultsContainer = document.getElementById('simulation-results');
+                    resultsContainer.classList.add('active');
+                    
+                    // Generate simulation chart
+                    generateSimulationChart();
+                    
+                    // Generate insights based on form values
+                    generateSimulationInsights();
+                    
+                    // Scroll to results
+                    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+            });
+            
+            function generateSimulationChart() {
+                const ctx = document.getElementById('simulation-chart').getContext('2d');
+                
+                // Check if chart already exists
+                if (window.simulationChart) {
+                    window.simulationChart.destroy();
+                }
+                
+                // Get form values
+                const treatment = document.getElementById('simulation-treatment').value;
+                const duration = parseInt(document.getElementById('simulation-duration').value);
+                const intensity = parseInt(document.getElementById('simulation-intensity').value);
+                const adherence = parseInt(document.getElementById('simulation-adherence').value);
+                
+                // Generate months for x-axis
+                const months = [];
+                for (let i = 0; i <= duration; i++) {
+                    months.push(`Month ${i}`);
+                }
+                
+                // Initial values
+                let glucoseInitial = 105;
+                let hba1cInitial = 5.6;
+                let hscrpInitial = 2.1;
+                let bioAgeInitial = 52.3;
+                
+                // Generate data based on treatment, intensity, and adherence
+                const generateProjection = (initial, targetReduction, duration, intensity, adherence) => {
+                    // Calculate effectiveness factor (0-1) based on intensity and adherence
+                    const effectivenessFactor = (intensity / 5) * (adherence / 5);
+                    
+                    // Calculate monthly reduction
+                    const monthlyReduction = (targetReduction * effectivenessFactor) / duration;
+                    
+                    // Generate projection
+                    const data = [initial];
+                    for (let i = 1; i <= duration; i++) {
+                        const nextValue = data[i-1] - monthlyReduction;
+                        data.push(nextValue);
+                    }
+                    
+                    return data;
+                };
+                
+                // Define target reductions for different treatments
+                let glucoseTarget, hba1cTarget, hscrpTarget, bioAgeTarget;
+                
+                switch(treatment) {
+                    case 'magnesio':
+                        glucoseTarget = 15; // 15% reduction target
+                        hba1cTarget = 5;   // 5% reduction target
+                        hscrpTarget = 10;   // 10% reduction target
+                        bioAgeTarget = 0.5;  // 0.5 year reduction
+                        break;
+                    case 'ala':
+                        glucoseTarget = 12;
+                        hba1cTarget = 7;
+                        hscrpTarget = 15;
+                        bioAgeTarget = 0.6;
+                        break;
+                    case 'tre':
+                        glucoseTarget = 18;
+                        hba1cTarget = 8;
+                        hscrpTarget = 20;
+                        bioAgeTarget = 0.8;
+                        break;
+                    case 'combination':
+                        glucoseTarget = 25;
+                        hba1cTarget = 12;
+                        hscrpTarget = 30;
+                        bioAgeTarget = 1.5;
+                        break;
+                    default:
+                        glucoseTarget = 15;
+                        hba1cTarget = 6;
+                        hscrpTarget = 15;
+                        bioAgeTarget = 0.7;
+                }
+                
+                // Generate projections
+                const glucoseData = generateProjection(glucoseInitial, glucoseTarget, duration, intensity, adherence);
+                const hba1cData = generateProjection(hba1cInitial, hba1cTarget, duration, intensity, adherence);
+                const hscrpData = generateProjection(hscrpInitial, hscrpTarget, duration, intensity, adherence);
+                const bioAgeData = generateProjection(bioAgeInitial, bioAgeTarget, duration, intensity, adherence);
+                
+                // Create simulation chart
+                window.simulationChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Fasting Glucose (mg/dL)',
+                                data: glucoseData,
+                                borderColor: '#F59E0B',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'HbA1c (%)',
+                                data: hba1cData,
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'hsCRP (mg/L)',
+                                data: hscrpData,
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                yAxisID: 'y2'
+                            },
+                            {
+                                label: 'Biological Age (years)',
+                                data: bioAgeData,
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                yAxisID: 'y3'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    boxWidth: 6,
+                                    boxHeight: 6,
+                                    padding: 20,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#1F2937',
+                                bodyColor: '#1F2937',
+                                borderColor: '#E5E7EB',
+                                borderWidth: 1,
+                                padding: 10,
+                                boxPadding: 5,
+                                usePointStyle: true
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Glucose (mg/dL)'
+                                },
+                                min: Math.min(...glucoseData) - 5,
+                                max: Math.max(...glucoseData) + 5,
+                                grid: {
+                                    borderDash: [2, 2]
+                                }
+                            },
+                            y1: {
+                                display: false,
+                                min: Math.min(...hba1cData) - 0.2,
+                                max: Math.max(...hba1cData) + 0.2
+                            },
+                            y2: {
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'hsCRP (mg/L)'
+                                },
+                                min: Math.min(...hscrpData) - 0.2,
+                                max: Math.max(...hscrpData) + 0.2,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y3: {
+                                display: false,
+                                min: Math.min(...bioAgeData) - 0.5,
+                                max: Math.max(...bioAgeData) + 0.5
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function generateSimulationInsights() {
+                // Get form values
+                const treatment = document.getElementById('simulation-treatment').value;
+                const duration = parseInt(document.getElementById('simulation-duration').value);
+                const intensity = parseInt(document.getElementById('simulation-intensity').value);
+                const adherence = parseInt(document.getElementById('simulation-adherence').value);
+                
+                const insightsContainer = document.getElementById('simulation-insights-content');
+                let insightContent = '';
+                
+                // Effectiveness factor
+                const effectivenessFactor = (intensity / 5) * (adherence / 5);
+                
+                // Generate insights based on treatment type
+                switch(treatment) {
+                    case 'magnesio':
+                        insightContent = `
+                            <p>Based on this simulation, increasing Magnesio Quelado to 400mg daily with ${adherence}/5 adherence is projected to result in:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>${Math.round(15 * effectivenessFactor)}% reduction in fasting glucose (to ~${Math.round(105 * (1 - (0.15 * effectivenessFactor)))} mg/dL) within ${duration} months</li>
+                                <li>Reduction in HbA1c to ${(5.6 * (1 - (0.05 * effectivenessFactor))).toFixed(1)}% from current 5.6%</li>
+                                <li>Modest improvement in inflammatory markers (hsCRP reduced by ${Math.round(10 * effectivenessFactor)}%)</li>
+                                <li>Estimated biological age reduction of ${(0.5 * effectivenessFactor).toFixed(1)} years based primarily on metabolic improvements</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem;">For optimal results, this simulation suggests combining Magnesio Quelado with Alpha Lipoic Acid for synergistic effects on glucose metabolism and insulin sensitivity.</p>
+                        `;
+                        break;
+                    case 'ala':
+                        insightContent = `
+                            <p>Based on this simulation, adding Alpha Lipoic Acid 600mg daily with ${adherence}/5 adherence is projected to result in:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>${Math.round(12 * effectivenessFactor)}% reduction in fasting glucose (to ~${Math.round(105 * (1 - (0.12 * effectivenessFactor)))} mg/dL) within ${duration} months</li>
+                                <li>Reduction in HbA1c to ${(5.6 * (1 - (0.07 * effectivenessFactor))).toFixed(1)}% from current 5.6%</li>
+                                <li>Significant improvement in oxidative stress markers and mitochondrial function</li>
+                                <li>Estimated biological age reduction of ${(0.6 * effectivenessFactor).toFixed(1)} years based on metabolic and oxidative stress improvements</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem;">The simulation highlights Alpha Lipoic Acid's dual role as both an antioxidant and metabolic enhancer. Consider timed dosing in the morning for optimal effectiveness.</p>
+                        `;
+                        break;
+                    case 'tre':
+                        insightContent = `
+                            <p>Based on this simulation, implementing time-restricted eating (8-hour window) with ${adherence}/5 adherence is projected to result in:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>${Math.round(18 * effectivenessFactor)}% reduction in fasting glucose (to ~${Math.round(105 * (1 - (0.18 * effectivenessFactor)))} mg/dL) within ${duration} months</li>
+                                <li>Reduction in HbA1c to ${(5.6 * (1 - (0.08 * effectivenessFactor))).toFixed(1)}% from current 5.6%</li>
+                                <li>Enhanced autophagy activation and metabolic flexibility</li>
+                                <li>Estimated biological age reduction of ${(0.8 * effectivenessFactor).toFixed(1)} years based on multiple pathway improvements</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem;">For optimal results, the simulation suggests implementing the eating window between 10:00-18:00 to align with Isabel's natural circadian rhythm and metabolic patterns.</p>
+                        `;
+                        break;
+                    case 'combination':
+                        insightContent = `
+                            <p>Based on this simulation, implementing the comprehensive protocol with ${adherence}/5 adherence is projected to result in:</p>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>${Math.round(25 * effectivenessFactor)}% reduction in fasting glucose (to ~${Math.round(105 * (1 - (0.25 * effectivenessFactor)))} mg/dL) within ${duration} months</li>
+                                <li>Reduction in HbA1c to ${(5.6 * (1 - (0.12 * effectivenessFactor))).toFixed(1)}% from current 5.6%</li>
+                                <li>Significant improvement in hsCRP (${Math.round(30 * effectivenessFactor)}% reduction) and other inflammatory markers</li>
+                                <li>Estimated biological age reduction of ${(1.5 * effectivenessFactor).toFixed(1)} years based on comprehensive pathway optimization</li>
+                            </ul>
+                            <p style="margin-top: 0.5rem;">The simulation demonstrates significant synergistic effects from this comprehensive approach, with outcomes exceeding the sum of individual interventions. For optimal results, implementation should begin with time-restricted eating, followed by gradual introduction of supplements.</p>
+                        `;
+                        break;
+                }
+                
+                insightsContainer.innerHTML = insightContent;
+            }
+            
+            // Biomarker Detail and Prediction
+            window.showBiomarkerDetail = function(biomarker) {
+                console.log(`Showing details for: ${biomarker}`);
+                // This would typically open a detailed view of the biomarker
+                // For the demo, we'll just focus on the prediction functionality
+            };
+            
+            window.predictBiomarker = function(biomarker, event) {
+                // Prevent the click from triggering the parent card click
+                event.stopPropagation();
+                
+                // Initialize or switch to biomarkers tab
+                document.querySelector('.assistant-tab[data-tab="biomarkers"]').click();
+                
+                // Initialize forecasting with focus on the selected biomarker
+                initForecasting();
+                
+                console.log(`Predicting trends for: ${biomarker}`);
+            };
+            
+            // Toggle Theme
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+                
+                // Update charts for dark mode
+                if (window.forecastingChart) {
+                    window.forecastingChart.update();
+                }
+                if (window.digitalTwinChart) {
+                    window.digitalTwinChart.update();
+                }
+                if (window.metabolicPathwayChart) {
+                    window.metabolicPathwayChart.update();
+                }
+                if (window.inflammatoryPathwayChart) {
+                    window.inflammatoryPathwayChart.update();
+                }
+                if (window.cardiovascularPathwayChart) {
+                    window.cardiovascularPathwayChart.update();
+                }
+                if (window.simulationChart) {
+                    window.simulationChart.update();
+                }
+            });
+            
+            // Initialize the first tab's functionality
+            initForecasting();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Módulo Edad Biológica</title>
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* --- Variables --- */
+        :root {
+            --primary-color: #4a90e2; /* Azul corporativo */
+            --secondary-color: #50e3c2; /* Verde azulado para acentos */
+            --background-color: #f7f9fc;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --text-light: #667;
+            --border-color: #e1e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+
+            --status-rejuvenated: #2ecc71; /* Verde */
+            --status-normal: #3498db;    /* Azul */
+            --status-aged: #e74c3c;     /* Rojo */
+
+            --status-rejuvenated-bg: rgba(46, 204, 113, 0.1);
+            --status-normal-bg: rgba(52, 152, 219, 0.1);
+            --status-aged-bg: rgba(231, 76, 60, 0.1);
+
+             /* Chart specific zone colors */
+            --chart-zone-rejuvenated: rgba(46, 204, 113, 0.15);
+            --chart-zone-aged: rgba(231, 76, 60, 0.1);
+        }
+
+        /* --- Reset & Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            overflow: hidden; /* Contain child elements */
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-weight: 600;
+            font-size: 1.8em;
+            margin: 0;
+        }
+
+        main {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+            gap: 30px;
+        }
+
+        /* --- Module Sections --- */
+        .module-section {
+            background-color: var(--card-background); /* Could be slightly off-white for contrast */
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .module-section h2 {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* --- Data Sources --- */
+        .data-sources ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .data-sources li {
+            background-color: var(--background-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+        .data-sources li i {
+            display: block;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .sync-status {
+            font-size: 0.85em;
+            color: var(--text-light);
+            margin-top: auto; /* Pushes to bottom */
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        /* --- Processing & Calculation --- */
+        .calculation-engine {
+            text-align: center;
+        }
+
+        .calculation-engine p {
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+
+        .processing-indicator {
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-style: italic;
+            color: var(--primary-color);
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--secondary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Results & Visualization --- */
+        .results-visualization {
+             grid-column: span 2; /* Make this section wider on larger screens */
+        }
+
+        .age-display {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: var(--background-color);
+            border-radius: 10px;
+        }
+
+        .age-box {
+            text-align: center;
+        }
+
+        .age-box label {
+            display: block;
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .age-box .value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .age-box .unit {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-left: 3px;
+        }
+
+         #statusDisplay {
+            margin-top: 10px; /* Space from age display */
+            margin-bottom: 25px; /* Space before chart */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.0em;
+            transition: background-color 0.4s ease, color 0.4s ease, border 0.4s ease;
+            border: 1px solid transparent;
+            text-align: center;
+        }
+        /* Status color classes (from previous example) */
+        .status-rejuvenated { background-color: var(--status-rejuvenated-bg); color: var(--status-rejuvenated); border-color: var(--status-rejuvenated); }
+        .status-normal { background-color: var(--status-normal-bg); color: var(--status-normal); border-color: var(--status-normal); }
+        .status-aged { background-color: var(--status-aged-bg); color: var(--status-aged); border-color: var(--status-aged); }
+
+        .chart-container {
+            position: relative;
+            height: 350px; /* Adjust as needed */
+            margin-bottom: 30px;
+        }
+
+        /* --- Biomarker Details --- */
+        .biomarker-details h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        .biomarker-list {
+            list-style: none;
+            padding: 0;
+            max-height: 200px; /* Allow scrolling if many biomarkers */
+            overflow-y: auto;
+        }
+        .biomarker-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95em;
+        }
+         .biomarker-list li:last-child {
+            border-bottom: none;
+        }
+        .biomarker-list .name {
+            color: var(--text-light);
+        }
+        .biomarker-list .value-status {
+            text-align: right;
+        }
+        .biomarker-list .value {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        .biomarker-list .status {
+            font-size: 0.8em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: 500;
+        }
+        .biomarker-status-high { background-color: var(--status-aged); }
+        .biomarker-status-normal { background-color: var(--status-rejuvenated); } /* Using green for normal/optimal */
+        .biomarker-status-low { background-color: #f39c12; } /* Orange for low (adjust if needed) */
+
+
+        /* --- Recommendations --- */
+        .recommendations p {
+             margin-bottom: 15px;
+             color: var(--text-light);
+             font-size: 0.95em;
+        }
+         .recommendations ul {
+             list-style: none; /* Or use disc/circle */
+             padding-left: 0; /* Remove default padding */
+             margin-top: 10px;
+         }
+         .recommendations li {
+             background-color: var(--background-color);
+             border-left: 4px solid var(--secondary-color);
+             padding: 12px 15px;
+             margin-bottom: 10px;
+             border-radius: 0 8px 8px 0; /* Rounded corners */
+             font-size: 0.9em;
+         }
+
+        /* --- Buttons --- */
+        .button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px; /* Pill shape */
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+        }
+
+        .button:active {
+             transform: translateY(0px);
+             box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+             main {
+                 grid-template-columns: 1fr; /* Stack sections on smaller screens */
+             }
+            .results-visualization {
+                 grid-column: span 1; /* Reset span */
+            }
+             .age-display {
+                 flex-direction: column;
+                 gap: 15px;
+             }
+             header h1 {
+                 font-size: 1.5em;
+             }
+             .module-section h2 {
+                font-size: 1.2em;
+             }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Módulo de Estimación de Edad Biológica</h1>
+        </header>
+
+        <main>
+            <!-- 1. Módulo de Recolección de Datos -->
+            <section class="module-section data-sources">
+                <h2><i class="fas fa-database"></i> Fuentes de Datos</h2>
+                <ul>
+                    <li><i class="fas fa-vial"></i> Laboratorio</li>
+                    <li><i class="fas fa-heart-pulse"></i> Wearables</li>
+                    <li><i class="fas fa-dna"></i> Genómica</li>
+                    <li><i class="fas fa-person-walking"></i> Estilo de Vida</li>
+                    <li><i class="fas fa-file-medical"></i> EHR</li>
+                </ul>
+                <button class="button" id="syncDataBtn"><i class="fas fa-sync-alt"></i> Sincronizar Datos</button>
+                <div class="sync-status" id="syncStatus">Última sincronización: Nunca</div>
+            </section>
+
+            <!-- 2. Módulo de Procesamiento y Cálculo -->
+            <section class="module-section calculation-engine">
+                <h2><i class="fas fa-cogs"></i> Motor de Cálculo</h2>
+                <p>Ingrese los datos o sincronice para iniciar la estimación basada en biomarcadores y algoritmos de IA.</p>
+
+                <!-- Placeholder for Chronological Age Input/Display -->
+                 <div class="input-group" style="margin-bottom: 20px; text-align: center; justify-content: center; display: flex; align-items: center; gap: 10px;">
+                    <label for="chronoAgeInput" style="margin-bottom: 0;">Edad Cronológica (Referencia):</label>
+                    <input type="number" id="chronoAgeInput" value="50" min="0" max="120" step="1" style="width: 80px;">
+                 </div>
+
+
+                <div class="processing-indicator" id="processingIndicator">
+                    <div class="spinner"></div>
+                    <span>Procesando datos y aplicando modelo predictivo...</span>
+                </div>
+                <button class="button" id="calculateBtn"><i class="fas fa-calculator"></i> Calcular Edad Biológica</button>
+            </section>
+
+            <!-- 3. Interfaz de Resultados y Visualización -->
+            <section class="module-section results-visualization">
+                <h2><i class="fas fa-chart-line"></i> Resultados y Visualización</h2>
+
+                <div class="age-display">
+                    <div class="age-box">
+                        <label>Edad Cronológica</label>
+                        <div id="chronoAgeOutput" class="value">--<span class="unit">años</span></div>
+                    </div>
+                     <div class="age-box">
+                        <label>Edad Biológica Estimada</label>
+                        <div id="bioAgeOutput" class="value">--<span class="unit">años</span></div>
+                    </div>
+                </div>
+
+                <div id="statusDisplay" class="status-indicator">
+                    <!-- Status will be updated here -->
+                    Estado: Pendiente de cálculo
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="bioAgeChart"></canvas>
+                </div>
+
+                <!-- Biomarker Contribution Simulation -->
+                <div class="biomarker-details">
+                    <h3>Factores Clave Influyentes (Simulado)</h3>
+                    <ul id="biomarkerList" class="biomarker-list">
+                       <!-- Biomarkers will be populated here -->
+                       <li>Esperando cálculo...</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- 4. Recomendaciones Simuladas -->
+            <section class="module-section recommendations">
+                 <h2><i class="fas fa-lightbulb"></i> Recomendaciones (Simulado)</h2>
+                 <p>Basado en la estimación y los factores clave:</p>
+                 <ul id="recommendationList">
+                     <li>Realizar cálculo para ver recomendaciones...</li>
+                 </ul>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Get DOM Elements ---
+            const syncDataBtn = document.getElementById('syncDataBtn');
+            const syncStatus = document.getElementById('syncStatus');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const processingIndicator = document.getElementById('processingIndicator');
+            const chronoAgeInput = document.getElementById('chronoAgeInput'); // Input for reference chrono age
+            const chronoAgeOutput = document.getElementById('chronoAgeOutput');
+            const bioAgeOutput = document.getElementById('bioAgeOutput');
+            const statusDisplay = document.getElementById('statusDisplay');
+            const biomarkerList = document.getElementById('biomarkerList');
+            const recommendationList = document.getElementById('recommendationList');
+            const chartCanvas = document.getElementById('bioAgeChart');
+
+            // --- Chart.js Setup ---
+            const MAX_AGE = 120;
+            const AXIS_INTERVAL = 10;
+
+             // Get colors from CSS variables
+            const rootStyle = getComputedStyle(document.documentElement);
+            const COLOR_REJUVENATED = rootStyle.getPropertyValue('--status-rejuvenated').trim();
+            const COLOR_NORMAL = rootStyle.getPropertyValue('--status-normal').trim();
+            const COLOR_AGED = rootStyle.getPropertyValue('--status-aged').trim();
+            const BG_REJUVENATED_ZONE = rootStyle.getPropertyValue('--chart-zone-rejuvenated').trim();
+            const BG_AGED_ZONE = rootStyle.getPropertyValue('--chart-zone-aged').trim();
+
+             function generateLineData(offset = 0, maxAge = MAX_AGE) {
+                const data = [];
+                for (let x = 0; x <= maxAge; x += AXIS_INTERVAL / 2) {
+                    let y = x + offset;
+                    if (y < 0) y = 0; if (y > maxAge) y = maxAge;
+                    if (x >= 0 && x <= maxAge) data.push({ x: x, y: y });
+                }
+                 let lastY = maxAge + offset; if (lastY < 0) lastY = 0; if (lastY > maxAge) lastY = maxAge;
+                 if (!data.find(p => p.x === maxAge)) data.push({x: maxAge, y: lastY});
+                return data;
+            }
+
+            const chartContext = chartCanvas.getContext('2d');
+            const bioAgeChart = new Chart(chartContext, {
+                type: 'scatter',
+                 data: {
+                    datasets: [
+                        // 0: Patient Data Point (initially empty)
+                        { label: 'Tu Edad', data: [], backgroundColor: COLOR_NORMAL, borderColor: '#fff', borderWidth: 2, pointRadius: 7, pointHoverRadius: 9, order: 5 },
+                        // 1: Normal Aging Line (Y=X)
+                        { label: 'Envejecimiento Normal', data: generateLineData(0), type: 'line', borderColor: 'rgba(50, 50, 50, 0.6)', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, order: 1 },
+                        // 2: Rejuvenated Zone Boundary (Y = X - 7)
+                        { label: 'Zona Rejuvenecida', data: generateLineData(-7), type: 'line', borderColor: 'transparent', pointRadius: 0, fill: { target: 'origin', above: BG_REJUVENATED_ZONE }, order: 2 },
+                        // 3: Aged Zone Boundary (Y = X + 7)
+                        { label: 'Zona Envejecida', data: generateLineData(7), type: 'line', borderColor: 'transparent', pointRadius: 0, fill: { target: 'end', above: BG_AGED_ZONE }, order: 3 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, // Allow container height to control aspect
+                    scales: {
+                        x: { type: 'linear', position: 'bottom', min: 0, max: MAX_AGE, title: { display: true, text: 'Edad Cronológica', font: { weight: 'bold' } }, ticks: { stepSize: AXIS_INTERVAL } },
+                        y: { type: 'linear', min: 0, max: MAX_AGE, title: { display: true, text: 'Edad Biológica', font: { weight: 'bold' } }, ticks: { stepSize: AXIS_INTERVAL } }
+                    },
+                    plugins: {
+                        tooltip: { enabled: true, callbacks: { label: (ctx) => ctx.datasetIndex === 0 ? ` Cronológica: ${ctx.parsed.x}, Biológica: ${ctx.parsed.y}` : null } },
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // --- Simulation Logic ---
+
+            // Simulate syncing data
+            syncDataBtn.addEventListener('click', () => {
+                syncStatus.textContent = 'Sincronizando...';
+                syncDataBtn.disabled = true;
+                setTimeout(() => {
+                    const now = new Date();
+                    syncStatus.textContent = `Última sincronización: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+                    syncDataBtn.disabled = false;
+                    // In a real app, you'd fetch data here
+                }, 1500);
+            });
+
+            // Simulate calculation
+            calculateBtn.addEventListener('click', () => {
+                const chronoAge = parseFloat(chronoAgeInput.value);
+                if (isNaN(chronoAge) || chronoAge < 0 || chronoAge > MAX_AGE) {
+                    alert("Por favor, ingrese una Edad Cronológica válida (0-120).");
+                    return;
+                }
+
+                processingIndicator.style.display = 'flex';
+                calculateBtn.disabled = true;
+                // Clear previous results
+                chronoAgeOutput.textContent = '--';
+                bioAgeOutput.textContent = '--';
+                statusDisplay.textContent = 'Calculando...';
+                statusDisplay.className = 'status-indicator';
+                biomarkerList.innerHTML = '<li>Calculando...</li>';
+                recommendationList.innerHTML = '<li>Calculando...</li>';
+                bioAgeChart.data.datasets[0].data = []; // Clear point
+                bioAgeChart.update();
+
+
+                // Simulate backend processing delay
+                setTimeout(() => {
+                    // --- Generate FAKE results ---
+                    const randomFactor = (Math.random() - 0.5) * 20; // Simulate deviation +/- 10 years
+                    let simulatedBioAge = chronoAge + randomFactor;
+                    simulatedBioAge = Math.max(0, Math.min(MAX_AGE, Math.round(simulatedBioAge))); // Clamp and round
+
+                    const { statusText, statusClass, color } = getAgeStatus(simulatedBioAge, chronoAge);
+                    const fakeBiomarkers = generateFakeBiomarkers(simulatedBioAge, chronoAge);
+                    const fakeRecommendations = generateFakeRecommendations(statusClass.replace('status-', ''));
+
+                    // --- Update UI ---
+                    chronoAgeOutput.innerHTML = `${chronoAge}<span class="unit">años</span>`;
+                    bioAgeOutput.innerHTML = `${simulatedBioAge}<span class="unit">años</span>`;
+                    statusDisplay.textContent = `Estado: ${statusText}`;
+                    statusDisplay.className = `status-indicator ${statusClass}`;
+
+                    // Update Chart
+                    bioAgeChart.data.datasets[0].data = [{ x: chronoAge, y: simulatedBioAge }];
+                    bioAgeChart.data.datasets[0].backgroundColor = color;
+                    bioAgeChart.update();
+
+                    // Update Biomarkers List
+                    biomarkerList.innerHTML = fakeBiomarkers.map(b => `
+                        <li>
+                            <span class="name">${b.name}</span>
+                            <span class="value-status">
+                                <span class="value">${b.value} ${b.unit}</span>
+                                <span class="status biomarker-status-${b.status.toLowerCase()}">${b.status}</span>
+                            </span>
+                        </li>
+                    `).join('');
+
+                     // Update Recommendations List
+                     recommendationList.innerHTML = fakeRecommendations.map(r => `<li>${r}</li>`).join('');
+
+                    processingIndicator.style.display = 'none';
+                    calculateBtn.disabled = false;
+
+                }, 2500); // Simulate 2.5 second calculation
+            });
+
+            // --- Helper: Get Status based on Ages ---
+            function getAgeStatus(biological, chronological) {
+                const difference = biological - chronological;
+                let status = 'normal';
+                let color = COLOR_NORMAL;
+                let statusText = 'Normal';
+                let statusClass = 'status-normal';
+
+                if (difference <= -7) {
+                    status = 'rejuvenated';
+                    color = COLOR_REJUVENATED;
+                    statusText = 'Rejuvenecido'; // Shorter text for display
+                    statusClass = 'status-rejuvenated';
+                } else if (difference >= 7) {
+                    status = 'aged';
+                    color = COLOR_AGED;
+                    statusText = 'Envejecido'; // Shorter text for display
+                    statusClass = 'status-aged';
+                }
+                return { status, color, statusText, statusClass };
+            }
+
+             // --- Helper: Generate Fake Biomarker Data ---
+             function generateFakeBiomarkers(bioAge, chronoAge) {
+                const diff = bioAge - chronoAge;
+                const markers = [
+                    { name: "HbA1c", unit: "%", normalMin: 4.5, normalMax: 5.6, factor: 0.1 },
+                    { name: "PCR Ultra S.", unit: "mg/L", normalMin: 0, normalMax: 1.0, factor: 0.3 },
+                    { name: "Homocisteína", unit: "µmol/L", normalMin: 5, normalMax: 12, factor: 0.2 },
+                    { name: "Vitamina D", unit: "ng/mL", normalMin: 30, normalMax: 60, factor: -0.15 },
+                    { name: "Glicación (AGEs)", unit: "AU", normalMin: 1.5, normalMax: 2.0, factor: 0.25 },
+                     { name: "Longitud Telómeros", unit: "kbp", normalMin: 6.0, normalMax: 8.0, factor: -0.2 }
+                ];
+
+                return markers.map(m => {
+                    const baseValue = (m.normalMax + m.normalMin) / 2;
+                    // Simulate deviation based on age difference, scaled by factor
+                    let value = baseValue + (diff * m.factor) + (Math.random() - 0.5) * (baseValue * 0.1); // Add some noise
+                    value = Math.max(baseValue * 0.5, Math.min(baseValue * 1.5, value)); // Clamp value somewhat
+
+                    let status = "Normal";
+                    if (value > m.normalMax) status = "High";
+                    if (value < m.normalMin) status = "Low";
+                     // Adjust status text based on whether high/low is bad
+                    if ((m.name === "Vitamina D" || m.name === "Longitud Telómeros") && status === "Low") status = "Low"; // Low is bad here
+                    else if (status === "Low") status = "Normal"; // Low is often okay/good for others
+                     if ((m.name === "Vitamina D" || m.name === "Longitud Telómeros") && status === "High") status = "Normal"; // High is good here
+
+                    return {
+                        name: m.name,
+                        value: value.toFixed(1),
+                        unit: m.unit,
+                        status: status
+                    };
+                });
+             }
+
+            // --- Helper: Generate Fake Recommendations ---
+             function generateFakeRecommendations(status) {
+                 const baseRecs = [
+                     "Mantener una dieta balanceada rica en antioxidantes.",
+                     "Realizar actividad física moderada regularmente (150 min/semana).",
+                     "Asegurar 7-8 horas de sueño reparador por noche.",
+                     "Gestionar el estrés mediante técnicas de relajación (meditación, yoga).",
+                     "Considerar chequeo médico anual completo."
+                 ];
+                 const agedRecs = [
+                     "Optimizar niveles de Vitamina D y Omega-3 (consultar médico).",
+                     "Intensificar control de marcadores inflamatorios (PCR-hs).",
+                     "Evaluar función mitocondrial y considerar coenzima Q10.",
+                     "Revisar y reducir exposición a productos finales de glicación avanzada (AGEs)."
+                 ];
+                  const rejuvenatedRecs = [
+                     "¡Excelente! Continuar con hábitos saludables.",
+                     "Explorar ayuno intermitente supervisado si es apropiado.",
+                     "Mantener monitoreo de biomarcadores clave para sostener el estado óptimo."
+                 ];
+
+                 if (status === 'aged') {
+                     return [...agedRecs, ...baseRecs.slice(0, 2)]; // Mix specific and base
+                 } else if (status === 'rejuvenated') {
+                     return [...rejuvenatedRecs, baseRecs[0]];
+                 } else {
+                     return baseRecs.slice(0,4); // Normal recommendations
+                 }
+             }
+
+        });
+    </script>
+
+</body>
+</html>

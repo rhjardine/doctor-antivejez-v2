@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración - Dashboard Médico Antienvejecimiento</title>
+
+  <!-- CSS Centralizado para Layout y Contenido -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- FontAwesome (versión recomendada 6+) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo">
+    </div>
+    <div class="header-search">
+      <input type="text" id="main-search-input" placeholder="Buscar paciente o historia...">
+    </div>
+    <div class="header-actions">
+      <i class="fas fa-bell" onclick="alert('Notificaciones')"></i>
+      <i class="fas fa-moon" id="theme-toggle"></i>
+      <i class="fas fa-user"></i>
+    </div>
+  </header>
+
+  <!-- Sidebar lateral -->
+  <nav class="sidebar">
+    <div class="menu-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='historias_tabs_bio.html'">
+      <i class="fas fa-book-medical"></i> <span>Historias</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='profesionales.html'">
+      <i class="fas fa-user-md"></i> <span>Profesionales</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='analitica.html'">
+      <i class="fas fa-chart-pie"></i> <span>Analítica</span>
+    </div>
+    <div class="menu-item reports-item" id="reportes-item" tabindex="0" onclick="toggleSubmenu()">
+      <i class="fas fa-file-alt"></i> <span>Reportes</span>
+      <ul class="popup-submenu" id="reportes-submenu">
+        <li><a href="#" class="submenu-item"><i class="fas fa-users"></i> Resumen de Pacientes</a></li>
+        <li><a href="#" class="submenu-item"><i class="fas fa-user"></i> Reportes Individuales</a></li>
+        <li><a href="#" class="submenu-item"><i class="fas fa-chart-line"></i> Análisis Biomarcadores</a></li>
+        <li><a href="#" class="submenu-item"><i class="fas fa-history"></i> Consulta de Historial</a></li>
+      </ul>
+    </div>
+    <div class="menu-item active" onclick="window.location.href='configuracion.html'">
+      <i class="fas fa-cog"></i> <span>Configuración</span>
+    </div>
+    <div class="menu-item" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> <span>Salir</span>
+    </div>
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <h2>Editar Configuración del Sistema</h2>
+    <form id="settings-form">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" required>
+      </div>
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" required>
+      </div>
+      <div class="form-group">
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" required>
+      </div>
+      <div class="form-group">
+        <label for="confirmar-contrasena">Confirmar Contraseña</label>
+        <input type="password" id="confirmar-contrasena" required>
+      </div>
+      <button type="submit">Guardar Cambios</button>
+    </form>
+  </div> <!-- Fin .main-content -->
+
+  <!-- Scripts -->
+  <script>
+    function toggleSubmenu() {
+      const submenu = document.getElementById('reportes-submenu');
+      submenu.classList.toggle('open'); // Alternar la clase para mostrar/ocultar
+    }
+
+    function logout() {
+      // Implementar lógica de cierre de sesión
+      alert('Cierre de sesión exitoso');
+      window.location.href = 'login.html'; // Redirigir a la página de inicio de sesión
+    }
+
+    document.getElementById('settings-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      // Implementar lógica para guardar cambios
+      alert('Cambios guardados exitosamente');
+    });
+  </script>
+</body>
+</html>

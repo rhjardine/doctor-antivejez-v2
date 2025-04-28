@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edad Biológica vs. Cronológica</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Optional: Chart.js plugin for background colors (if needed for complex zones) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script> -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --color-rejuvenated: rgba(75, 192, 100, 0.9); /* Green - Slightly less transparent for text/border */
+            --color-normal: rgba(100, 120, 200, 0.9);     /* Blue - Slightly less transparent */
+            --color-aged: rgba(255, 99, 132, 0.9);      /* Red - Slightly less transparent */
+
+            --color-rejuvenated-bg: rgba(75, 192, 100, 0.15);
+            --color-normal-bg: rgba(100, 120, 200, 0.1);
+            --color-aged-bg: rgba(255, 99, 132, 0.1);
+
+            /* Colors for zones in the chart */
+            --chart-zone-rejuvenated: rgba(75, 192, 100, 0.15);
+            --chart-zone-aged: rgba(255, 99, 132, 0.10);
+
+            --color-dark-blue: #293b64;
+            --color-light-gray: #f0f4f8;
+            --color-text-dark: #333;
+            --color-text-light: #666;
+            --color-border: #dde4eb;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--color-light-gray);
+            color: var(--color-text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the top */
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: var(--color-dark-blue);
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1.6em;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: center;
+            gap: 25px; /* Increased gap */
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column; /* Labels above inputs */
+            align-items: center; /* Center items horizontally */
+            gap: 5px; /* Space between label and input */
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: var(--color-text-light);
+            font-size: 0.95em;
+            margin-bottom: 3px;
+        }
+
+        .input-group input[type="number"] {
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100px; /* Fixed width for number inputs */
+            text-align: center;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: var(--color-normal);
+            box-shadow: 0 0 0 3px rgba(100, 120, 200, 0.15);
+        }
+
+        /* Remove spinner buttons for number inputs (optional) */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type=number] {
+          -moz-appearance: textfield; /* Firefox */
+        }
+
+
+        .chart-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+            /* Chart.js will handle responsiveness via canvas width/height */
+        }
+
+        /* --- Status Indicator Styling --- */
+        .status-indicator {
+            margin-top: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: background-color 0.4s ease, color 0.4s ease, border 0.4s ease;
+            border: 1px solid transparent;
+        }
+
+        .status-rejuvenated {
+            background-color: var(--color-rejuvenated-bg);
+            color: var(--color-rejuvenated);
+            border-color: var(--color-rejuvenated);
+        }
+
+        .status-normal {
+            background-color: var(--color-normal-bg);
+            color: var(--color-normal);
+            border-color: var(--color-normal);
+        }
+
+        .status-aged {
+            background-color: var(--color-aged-bg);
+            color: var(--color-aged);
+            border-color: var(--color-aged);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>Edad Biológica vs. Cronológica</h1>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="chronoAgeInput">Edad Cronológica:</label>
+                <input type="number" id="chronoAgeInput" value="50" min="0" max="120" step="1">
+            </div>
+            <div class="input-group">
+                <label for="bioAgeInput">Edad Biológica:</label>
+                <input type="number" id="bioAgeInput" value="55" min="0" max="120" step="1">
+            </div>
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="bioAgeChart"></canvas>
+        </div>
+
+        <div id="statusDisplay" class="status-indicator">
+            <!-- Status will be updated here by JS -->
+            Estado: Calculando...
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('bioAgeChart').getContext('2d');
+            const chronoAgeInput = document.getElementById('chronoAgeInput');
+            const bioAgeInput = document.getElementById('bioAgeInput');
+            const statusDisplay = document.getElementById('statusDisplay');
+
+            // --- Configuration ---
+            const MAX_AGE = 120;
+            const AXIS_INTERVAL = 10; // Intervals for axis ticks
+
+            // Get colors from CSS variables (ensure consistency)
+            const rootStyle = getComputedStyle(document.documentElement);
+            const COLOR_REJUVENATED = rootStyle.getPropertyValue('--color-rejuvenated').trim();
+            const COLOR_NORMAL = rootStyle.getPropertyValue('--color-normal').trim();
+            const COLOR_AGED = rootStyle.getPropertyValue('--color-aged').trim();
+
+            const BG_REJUVENATED_ZONE = rootStyle.getPropertyValue('--chart-zone-rejuvenated').trim();
+            const BG_AGED_ZONE = rootStyle.getPropertyValue('--chart-zone-aged').trim();
+
+            const POINT_RADIUS = 7;
+            const POINT_HOVER_RADIUS = 9;
+
+            // --- Helper Functions ---
+
+            // Generates data points for a line (e.g., y = x + offset)
+            function generateLineData(offset = 0, maxAge = MAX_AGE) {
+                const data = [];
+                for (let x = 0; x <= maxAge; x += AXIS_INTERVAL / 2) { // finer steps for smooth lines
+                    let y = x + offset;
+                    if (y < 0) y = 0; // Biological age can't be negative
+                    if (y > maxAge) y = maxAge; // Cap at max age
+                    if (x >= 0 && x <= maxAge) {
+                        data.push({ x: x, y: y });
+                    }
+                }
+                let lastY = maxAge + offset;
+                if (lastY < 0) lastY = 0;
+                if (lastY > maxAge) lastY = maxAge;
+                if (!data.find(p => p.x === maxAge)) {
+                     data.push({x: maxAge, y: lastY});
+                 }
+                return data;
+            }
+
+            // Determines status and associated color based on ages
+            function getAgeStatus(biological, chronological) {
+                const difference = biological - chronological;
+                let status = 'normal';
+                let color = COLOR_NORMAL;
+                let statusText = 'Normal';
+                let statusClass = 'status-normal';
+
+                if (difference <= -7) {
+                    status = 'rejuvenated';
+                    color = COLOR_REJUVENATED;
+                    statusText = 'Rejuvenecido (Zona Salud Óptima)';
+                    statusClass = 'status-rejuvenated';
+                } else if (difference >= 7) {
+                    status = 'aged';
+                    color = COLOR_AGED;
+                    statusText = 'Envejecido (Zona de Riesgo/Enfermedad)';
+                    statusClass = 'status-aged';
+                }
+                // The range between -7 and +7 (exclusive of +7) is considered 'Normal'
+
+                return { status, color, statusText, statusClass };
+            }
+
+            // Updates the status display element
+            function updateStatusDisplay(biological, chronological) {
+                const { statusText, statusClass } = getAgeStatus(biological, chronological);
+                statusDisplay.textContent = `Estado: ${statusText}`;
+                statusDisplay.className = `status-indicator ${statusClass}`; // Reset classes and apply new one
+            }
+
+            // --- Chart Initialization ---
+            const chart = new Chart(ctx, {
+                type: 'scatter', // Use scatter type to easily plot single points and lines
+                data: {
+                    datasets: [
+                        // 0: Patient Data Point
+                        {
+                            label: 'Tu Edad',
+                            data: [], // Start empty, will be updated
+                            backgroundColor: COLOR_NORMAL, // Default color
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            pointRadius: POINT_RADIUS,
+                            pointHoverRadius: POINT_HOVER_RADIUS,
+                            order: 5 // Render this point on top
+                        },
+                        // 1: Normal Aging Line (Y=X)
+                        {
+                            label: 'Envejecimiento Normal (Edad Bio = Edad Crono)',
+                            data: generateLineData(0),
+                            type: 'line', // Render as a line
+                            borderColor: 'rgba(50, 50, 50, 0.6)', // Dark Gray
+                            borderWidth: 2,
+                            borderDash: [5, 5], // Make it dashed
+                            pointRadius: 0, // No points on the line itself
+                            fill: false, // Don't fill below this line
+                            order: 1
+                        },
+                        // 2: Rejuvenated Zone Boundary (Y = X - 7) - Used for filling below
+                         {
+                            label: 'Zona Rejuvenecida', // Will be hidden in legend
+                            data: generateLineData(-7),
+                            type: 'line',
+                            borderColor: 'transparent', // Hide the line itself
+                            pointRadius: 0,
+                            fill: {
+                               target: 'origin', // Fill from this line down to the bottom (y=0)
+                               above: BG_REJUVENATED_ZONE // Color of the filled area
+                            },
+                            order: 2 // Render below normal line but above background
+                        },
+                         // 3: Aged Zone Boundary (Y = X + 7) - Used for filling above
+                         {
+                            label: 'Zona Envejecida', // Will be hidden in legend
+                            data: generateLineData(7),
+                            type: 'line',
+                            borderColor: 'transparent', // Hide the line itself
+                            pointRadius: 0,
+                            fill: {
+                               target: 'end', // Fill from this line up to the top (y=max)
+                               above: BG_AGED_ZONE // Color of the filled area
+                            },
+                            order: 3 // Render below normal line
+                        },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            min: 0,
+                            max: MAX_AGE,
+                            title: {
+                                display: true,
+                                text: 'Edad Cronológica',
+                                font: { weight: 'bold', size: 14 },
+                                color: 'var(--color-text-light)' // Use CSS var
+                            },
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.2)' // Lighter grid lines
+                            },
+                            ticks: {
+                                stepSize: AXIS_INTERVAL,
+                                color: 'var(--color-text-light)' // Use CSS var
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            min: 0,
+                            max: MAX_AGE,
+                            title: {
+                                display: true,
+                                text: 'Edad Biológica',
+                                font: { weight: 'bold', size: 14 },
+                                color: 'var(--color-text-light)' // Use CSS var
+                            },
+                             grid: {
+                                color: 'rgba(200, 200, 200, 0.2)'
+                            },
+                            ticks: {
+                                stepSize: AXIS_INTERVAL,
+                                color: 'var(--color-text-light)' // Use CSS var
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) { // Only for the patient point
+                                        return ` Cronológica: ${context.parsed.x}, Biológica: ${context.parsed.y}`;
+                                    }
+                                    return null; // Hide tooltips for lines/zones
+                                }
+                            }
+                        },
+                        legend: {
+                           display: false // Hide the legend as requested (status below is clearer)
+                        }
+                    }
+                }
+            });
+
+            // --- Update Function ---
+            function updateChart() {
+                const chronoAge = parseFloat(chronoAgeInput.value);
+                const bioAge = parseFloat(bioAgeInput.value);
+
+                // Basic validation
+                if (isNaN(chronoAge) || isNaN(bioAge) || chronoAge < 0 || bioAge < 0 || chronoAge > MAX_AGE || bioAge > MAX_AGE ) {
+                     chart.data.datasets[0].data = [];
+                     statusDisplay.textContent = 'Estado: Ingrese valores válidos (0-120)';
+                     statusDisplay.className = 'status-indicator'; // Reset class
+                     chart.update();
+                    return;
+                }
+
+                // Update Status Display
+                updateStatusDisplay(bioAge, chronoAge);
+
+                // Update Chart Data Point
+                const { color } = getAgeStatus(bioAge, chronoAge);
+                chart.data.datasets[0].data = [{ x: chronoAge, y: bioAge }];
+                chart.data.datasets[0].backgroundColor = color;
+                chart.data.datasets[0].borderColor = '#fff'; // Keep white border
+
+                chart.update(); // Redraw the chart
+            }
+
+            // --- Event Listeners ---
+            chronoAgeInput.addEventListener('input', updateChart);
+            bioAgeInput.addEventListener('input', updateChart);
+
+            // --- Initial Chart Render ---
+            updateChart(); // Draw the chart with initial values
+        });
+    </script>
+</body>
+</html>

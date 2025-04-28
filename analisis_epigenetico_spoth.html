@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edad Biofísica - Cálculo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- Variables CSS --- */
+        :root {
+            --primary-color: #293b64; /* R:41 G:59 B:100 */
+            --secondary-color: #23bcef; /* R:35 G:188 B:239 */
+            --background-light: #eef2f7; /* Base gris claro para neumorfismo */
+            --background-gradient: linear-gradient(145deg, #f8faff, #dde3ea);
+            --text-color-light: #333;
+            --text-color-dark: #e0e0e0;
+            --card-bg-light: #eef2f7;
+            --shadow-light: #ffffff;
+            --shadow-dark: #babecc;
+            /* Sombras Neumórficas Moderadas */
+            --neumorphic-shadow-outset: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+            --neumorphic-shadow-inset: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+            --neumorphic-shadow-outset-hover: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light); /* Sombra más pronunciada en hover */
+            --neumorphic-shadow-inset-active: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); /* Sombra más sutil en active/pressed */
+
+            /* Colores Modo Oscuro */
+            --dm-primary-color: #5a7dbd;
+            --dm-secondary-color: #4fc3f7;
+            --dm-background: #2c3e50;
+            --dm-card-bg: #34495e;
+            --dm-text-color: #ecf0f1;
+            --dm-shadow-light: #48607c;
+            --dm-shadow-dark: #1a2533;
+            /* Sombras Neumórficas Moderadas (Modo Oscuro) */
+            --dm-neumorphic-shadow-outset: 4px 4px 10px var(--dm-shadow-dark), -4px -4px 10px var(--dm-shadow-light);
+            --dm-neumorphic-shadow-inset: inset 3px 3px 7px var(--dm-shadow-dark), inset -3px -3px 7px var(--dm-shadow-light);
+            --dm-neumorphic-shadow-outset-hover: 6px 6px 12px var(--dm-shadow-dark), -6px -6px 12px var(--dm-shadow-light);
+            --dm-neumorphic-shadow-inset-active: inset 2px 2px 5px var(--dm-shadow-dark), inset -2px -2px 5px var(--dm-shadow-light);
+        }
+
+        /* --- Estilos Generales --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--background-gradient);
+            color: var(--text-color-light);
+            display: flex;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Clase para indicar sidebar colapsado */
+        body.sidebar-collapsed .main-content {
+            margin-left: 70px; /* Ancho colapsado */
+        }
+        body.sidebar-collapsed .sidebar {
+            width: 70px; /* Ancho colapsado */
+        }
+         body.sidebar-collapsed .sidebar .menu-item span {
+             opacity: 0;
+             transition-delay: 0s; /* Ocultar inmediatamente */
+         }
+
+
+        /* --- Header --- */
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            height: 60px;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 5px 10px; /* Área de clic */
+        }
+
+        .header-logo span { /* Estilo para el texto del logo */
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .header-search input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            min-width: 250px;
+            background-color: var(--background-light); /* Fondo sutil */
+            box-shadow: var(--neumorphic-shadow-inset);
+            transition: box-shadow 0.3s ease;
+        }
+         .header-search input:focus {
+             outline: none;
+             box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light), 0 0 0 1px var(--secondary-color);
+         }
+
+
+        .header-actions i {
+            font-size: 1.3rem;
+            margin-left: 20px;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.2s ease;
+        }
+        .header-actions i:hover {
+            color: var(--primary-color);
+        }
+
+
+        /* --- Sidebar (Expandido por defecto) --- */
+        .sidebar {
+            width: 250px; /* Ancho inicial expandido */
+            background-color: var(--primary-color);
+            color: #fff;
+            padding-top: 80px; /* Espacio para el header fijo */
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1000;
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Estilos para el estado colapsado se definen en body.sidebar-collapsed .sidebar */
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item i {
+            font-size: 1.3rem;
+            margin-right: 20px;
+            min-width: 30px;
+            text-align: center;
+            transition: margin-right 0.3s ease; /* Transición suave del icono */
+        }
+
+        .menu-item span {
+            opacity: 1; /* Visible por defecto */
+            transition: opacity 0.2s ease;
+            transition-delay: 0.1s; /* Pequeño retraso al aparecer */
+            font-weight: 500;
+        }
+
+        /* Estilos para el estado colapsado se definen en body.sidebar-collapsed .sidebar .menu-item span */
+
+        .popup-submenu {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+
+        /* --- Contenido Principal --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 90px 40px 40px 40px;
+            margin-left: 250px; /* Espacio inicial para el sidebar expandido */
+            transition: margin-left 0.3s ease;
+            display: flex;
+            gap: 40px; /* Espacio entre sección de cards y área gráfica */
+            align-items: flex-start; /* Alinear items al inicio del eje transversal */
+        }
+
+        /* Estilos para el estado colapsado se definen en body.sidebar-collapsed .main-content */
+
+        /* --- Sección Biofísica (Formulario) --- */
+        .bio-section {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            flex: 1 1 60%; /* Ocupa más espacio base */
+            max-width: 700px; /* Puede ser un poco más ancho si se desea */
+            min-width: 400px;
+        }
+
+        /* --- Grid de Métricas (Vertical) --- */
+        .metrics-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Espacio entre cards */
+            margin-top: 20px;
+            align-items: stretch; /* Estirar items para ocupar ancho */
+        }
+
+        /* --- Tarjeta de Métrica (Neumórfica Moderada) --- */
+        .metric-card {
+            background: var(--card-bg-light);
+            padding: 25px;
+            border-radius: 12px; /* Bordes ligeramente menos redondeados */
+            border: none;
+            display: flex;
+            flex-direction: column;
+            gap: 18px; /* Espacio interno ajustado */
+            width: 100%;
+            box-shadow: var(--neumorphic-shadow-outset); /* Sombra moderada */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px; /* Borde más delgado */
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 12px 0 0 12px;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px); /* Elevación sutil */
+            box-shadow: var(--neumorphic-shadow-outset-hover); /* Sombra hover */
+        }
+
+        .metric-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.25rem; /* Tamaño ajustado */
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: none;
+            padding-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+         .metric-card h3 i {
+             color: var(--secondary-color);
+             font-size: 1.4rem; /* Icono ajustado */
+         }
+
+        /* --- Formularios dentro de las Cards --- */
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            font-size: 0.85rem; /* Ligeramente más pequeño */
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+            display: block;
+        }
+
+        .form-group input {
+            font-size: 0.95rem; /* Tamaño ajustado */
+            padding: 10px 12px; /* Padding ajustado */
+            width: 100%;
+            border: none;
+            border-radius: 6px; /* Bordes menos redondeados */
+            background-color: var(--background-light);
+            box-shadow: var(--neumorphic-shadow-inset); /* Sombra inset moderada */
+            color: var(--text-color-light);
+            transition: box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light), 0 0 0 1px var(--secondary-color); /* Resaltar foco sutil */
+        }
+
+        .form-group input[readonly] {
+            background-color: #e8ebee; /* Fondo readonly sutilmente diferente */
+            box-shadow: var(--neumorphic-shadow-inset);
+            cursor: not-allowed;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-group small {
+            font-size: 0.75rem;
+            color: #6c757d;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* --- Sección de Resultados --- */
+        .result-section {
+            margin-top: 30px;
+            padding: 20px 25px; /* Padding ajustado */
+            border: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Columnas más pequeñas */
+            gap: 20px; /* Gap ajustado */
+            background: var(--card-bg-light);
+            border-radius: 12px;
+            box-shadow: var(--neumorphic-shadow-outset);
+        }
+
+        .result-section h3 {
+            grid-column: 1 / -1;
+            margin-bottom: 8px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .result-section .form-group input {
+            font-weight: 700;
+            font-size: 1.1rem; /* Tamaño ajustado */
+            text-align: center;
+            color: var(--secondary-color);
+            background-color: var(--background-light);
+            box-shadow: var(--neumorphic-shadow-inset);
+        }
+
+        /* --- Botones de Acción (Neumórficos Moderados) --- */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Espacio ajustado */
+            align-items: center;
+            margin-top: 35px;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 320px; /* Ancho ajustado */
+            padding: 12px 20px; /* Padding ajustado */
+            font-size: 1rem; /* Tamaño ajustado */
+            font-weight: 600;
+            border-radius: 8px; /* Bordes ajustados */
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--neumorphic-shadow-outset);
+            background: var(--card-bg-light);
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px); /* Elevación sutil */
+             box-shadow: var(--neumorphic-shadow-outset-hover);
+             color: var(--secondary-color);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: var(--neumorphic-shadow-inset-active); /* Efecto presionado moderado */
+            color: var(--secondary-color);
+        }
+
+        .btn-primary { } /* Estilo base */
+
+        .btn-success {
+             color: #28a745;
+        }
+         .btn-success:hover {
+             color: #218838;
+         }
+         .btn-success:active {
+             color: #218838;
+         }
+
+        /* --- Botón Flotante (Back) --- */
+        .back-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--neumorphic-shadow-outset); /* Sombra neumórfica */
+            cursor: pointer;
+            z-index: 100;
+            font-size: 1.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05); /* Efecto zoom sutil */
+             box-shadow: var(--neumorphic-shadow-outset-hover);
+        }
+         .back-button:active {
+             transform: scale(0.98);
+             box-shadow: var(--neumorphic-shadow-inset-active);
+         }
+
+        /* --- Área para Gráficos (Ajustada) --- */
+        .graphics-area {
+            flex: 0 1 340px; /* No crece, base de 340px, puede encogerse */
+            min-width: 280px; /* Ancho mínimo */
+            background: var(--card-bg-light);
+            border-radius: 12px;
+            box-shadow: var(--neumorphic-shadow-inset); /* Sombra inset para diferenciar */
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem; /* Tamaño ajustado */
+            color: #777;
+            align-self: stretch; /* Ocupar altura completa del flex container */
+            text-align: center;
+        }
+
+
+        /* --- Estilos Modo Oscuro (Ajustados) --- */
+        body.dark-mode {
+            background: var(--dm-background);
+            color: var(--dm-text-color);
+        }
+        body.dark-mode header {
+             background-color: #34495e;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+         body.dark-mode .header-search input {
+             background-color: #566f88;
+             border-color: #777;
+             color: var(--dm-text-color);
+             box-shadow: var(--dm-neumorphic-shadow-inset);
+         }
+         body.dark-mode .header-search input:focus {
+              box-shadow: inset 2px 2px 4px var(--dm-shadow-dark), inset -2px -2px 4px var(--dm-shadow-light), 0 0 0 1px var(--dm-secondary-color);
+         }
+         body.dark-mode .header-actions i {
+             color: #bdc3c7;
+         }
+         body.dark-mode .header-actions i:hover {
+             color: var(--dm-secondary-color);
+         }
+         /* El color del sidebar oscuro puede mantenerse o ajustarse */
+         body.dark-mode .sidebar {
+              background-color: var(--primary-color); /* O usar --dm-card-bg si se prefiere */
+         }
+          body.dark-mode .menu-item:hover, body.dark-mode .menu-item.active {
+             background-color: rgba(0, 0, 0, 0.2);
+         }
+
+        body.dark-mode .metric-card {
+            background: var(--dm-card-bg);
+            box-shadow: var(--dm-neumorphic-shadow-outset);
+        }
+         body.dark-mode .metric-card::before {
+             background-color: var(--dm-secondary-color);
+         }
+        body.dark-mode .metric-card:hover {
+             box-shadow: var(--dm-neumorphic-shadow-outset-hover);
+         }
+
+        body.dark-mode .metric-card h3 {
+            color: var(--dm-secondary-color);
+        }
+         body.dark-mode .metric-card h3 i {
+             color: var(--dm-secondary-color);
+         }
+
+        body.dark-mode .form-group label {
+            color: #bdc3c7;
+        }
+
+        body.dark-mode .form-group input {
+            background-color: #3a5066;
+            box-shadow: var(--dm-neumorphic-shadow-inset);
+            color: var(--dm-text-color);
+        }
+        body.dark-mode .form-group input::placeholder {
+            color: #7f8c8d;
+        }
+         body.dark-mode .form-group input:focus {
+             box-shadow: inset 2px 2px 5px var(--dm-shadow-dark), inset -2px -2px 5px var(--dm-shadow-light), 0 0 0 1px var(--dm-secondary-color);
+         }
+
+        body.dark-mode .form-group input[readonly] {
+            background-color: #415a72;
+            box-shadow: var(--dm-neumorphic-shadow-inset);
+            color: var(--dm-secondary-color);
+        }
+
+        body.dark-mode .form-group small {
+            color: #95a5a6;
+        }
+
+        body.dark-mode .result-section {
+            background: var(--dm-card-bg);
+            box-shadow: var(--dm-neumorphic-shadow-outset);
+        }
+
+        body.dark-mode .result-section h3 {
+            color: var(--dm-secondary-color);
+        }
+         body.dark-mode .result-section .form-group input {
+             background-color: #3a5066;
+             box-shadow: var(--dm-neumorphic-shadow-inset);
+             color: var(--dm-secondary-color);
+         }
+
+         body.dark-mode .btn {
+             background: var(--dm-card-bg);
+             box-shadow: var(--dm-neumorphic-shadow-outset);
+             color: var(--dm-primary-color);
+         }
+         body.dark-mode .btn:hover {
+             box-shadow: var(--dm-neumorphic-shadow-outset-hover);
+             color: var(--dm-secondary-color);
+         }
+         body.dark-mode .btn:active {
+             box-shadow: var(--dm-neumorphic-shadow-inset-active);
+             color: var(--dm-secondary-color);
+         }
+         body.dark-mode .btn-success {
+             color: #66bb6a;
+         }
+         body.dark-mode .btn-success:hover, body.dark-mode .btn-success:active {
+             color: #81c784;
+         }
+
+
+        body.dark-mode .back-button {
+            background: var(--dm-primary-color);
+            box-shadow: var(--dm-neumorphic-shadow-outset);
+        }
+
+        body.dark-mode .back-button:hover {
+            background: var(--dm-secondary-color);
+            box-shadow: var(--dm-neumorphic-shadow-outset-hover);
+        }
+        body.dark-mode .back-button:active {
+             box-shadow: var(--dm-neumorphic-shadow-inset-active);
+         }
+
+         body.dark-mode .graphics-area {
+             background: var(--dm-card-bg);
+             box-shadow: var(--dm-neumorphic-shadow-inset);
+             color: #95a5a6;
+         }
+
+    </style>
+</head>
+
+<body> <header>
+        <button class="sidebar-toggle" aria-label="Toggle sidebar"><i class="fas fa-bars"></i></button>
+        <div class="header-logo">
+            <span >Doctor Antivejez</span>
+        </div>
+        <div class="header-search">
+            <input type="text" id="main-search-input" placeholder="Buscar paciente o historia...">
+        </div>
+        <div class="header-actions">
+            <i class="fas fa-bell" onclick="showNotification('No hay notificaciones nuevas.')" aria-label="Notifications"></i>
+            <i class="fas fa-moon" id="theme-toggle" aria-label="Toggle theme"></i>
+            <i class="fas fa-user" onclick="showNotification('Perfil de Usuario (Próximamente)')" aria-label="User profile"></i>
+        </div>
+    </header>
+    <nav class="sidebar"> <div class="menu-item" onclick="window.location.href='index.html'">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="menu-item active">
+            <i class="fas fa-book-medical"></i>
+            <span>Historias</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='profesionales.html'">
+            <i class="fas fa-user-md"></i>
+            <span>Profesionales</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='analitica.html'">
+            <i class="fas fa-chart-pie"></i>
+            <span>Analítica</span>
+        </div>
+        <div class="menu-item reports-item" id="reportes-item" tabindex="0" onclick="toggleSubmenu()">
+            <i class="fas fa-file-alt"></i>
+            <span>Reportes</span>
+            <ul class="popup-submenu" id="reportes-submenu">
+                <li><a>...</a></li>
+            </ul>
+        </div>
+        <div class="menu-item" onclick="window.location.href='configuracion.html'">
+            <i class="fas fa-cog"></i>
+            <span>Configuración</span>
+        </div>
+    </nav>
+
+    <div class="main-content"> <div class="bio-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="color: var(--primary-color); font-weight: 700; margin: 0;"><i class="fas fa-procedures" style="margin-right: 10px;"></i> Edad Biofísica</h2>
+                <p style="font-size: 0.9rem; margin: 0;">Paciente ID: <strong id="patient-id-display" style="color: var(--secondary-color); font-weight: 600;">Cargando...</strong></p>
+            </div>
+
+            <p style="margin-bottom: 25px; line-height: 1.6; color: #555;">La edad biofísica se determina mediante la evaluación de parámetros físicos y funcionales. Proporciona información sobre el estado funcional de los distintos sistemas corporales.</p>
+
+            <div class="form-group" style="max-width: 250px; margin-bottom: 30px;">
+                <label for="edad-cronologica-input">Edad Cronológica Actual</label>
+                <input type="number" id="edad-cronologica-input" placeholder="e.g. 50" required min="1" step="1">
+                <small>Necesaria para calcular la diferencia.</small>
+            </div>
+
+            <form id="biofisica-metrics-form">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3><i class="fas fa-weight"></i> Composición Corporal</h3>
+                        <div class="form-group"> <label for="peso">Peso (kg)</label> <input type="number" id="peso" step="0.1" required placeholder="e.g. 70.5"> </div>
+                        <div class="form-group"> <label for="altura">Altura (cm)</label> <input type="number" id="altura" required placeholder="e.g. 175" step="1"> </div>
+                        <div class="form-group"> <label for="imc">IMC (kg/m²)</label> <input type="number" id="imc" readonly> </div>
+                    </div>
+                    <div class="metric-card">
+                        <h3><i class="fas fa-ruler-combined"></i> Mediciones Corporales</h3>
+                        <div class="form-group"> <label for="cintura">Circ. cintura (cm)</label> <input type="number" id="cintura" step="0.1" required placeholder="e.g. 85.5"> </div>
+                        <div class="form-group"> <label for="cadera">Circ. cadera (cm)</label> <input type="number" id="cadera" step="0.1" required placeholder="e.g. 100.0"> </div>
+                        <div class="form-group"> <label for="icc">Índice Cintura-Cadera</label> <input type="number" id="icc" readonly> </div>
+                    </div>
+                    <div class="metric-card">
+                        <h3><i class="fas fa-percentage"></i> Composición Grasa</h3>
+                        <div class="form-group"> <label for="grasa-corporal">% Grasa Corporal</label> <input type="number" id="grasa-corporal" step="0.1" required placeholder="e.g. 23.5"> </div>
+                        <div class="form-group"> <label for="grasa-visceral">Nivel Grasa Visceral</label> <input type="number" id="grasa-visceral" min="1" required placeholder="e.g. 5" step="1"> </div>
+                    </div>
+                     <div class="metric-card">
+                         <h3><i class="fas fa-dumbbell"></i> Masa Muscular y Ósea</h3>
+                         <div class="form-group"> <label for="masa-muscular">Masa Muscular (kg)</label> <input type="number" id="masa-muscular" step="0.1" required placeholder="e.g. 55.2"> </div>
+                         <div class="form-group"> <label for="masa-osea">Masa Ósea (kg)</label> <input type="number" id="masa-osea" step="0.1" required placeholder="e.g. 2.8"> </div>
+                     </div>
+                    <div class="metric-card">
+                        <h3><i class="fas fa-heartbeat"></i> Signos Vitales</h3>
+                        <div class="form-group">
+                            <label for="presion-sistolica">Presión Arterial (Sist/Diast)</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="number" id="presion-sistolica" placeholder="e.g. 120" style="flex: 1;" required step="1">
+                                <span style="font-size: 1.2rem; color: #888;">/</span>
+                                <input type="number" id="presion-diastolica" placeholder="e.g. 80" style="flex: 1;" required step="1">
+                            </div>
+                        </div>
+                        <div class="form-group"> <label for="frecuencia-cardiaca">Frecuencia Cardíaca (lpm)</label> <input type="number" id="frecuencia-cardiaca" required placeholder="e.g. 65" step="1"> </div>
+                        <div class="form-group"> <label for="saturacion">Saturación O<sub>2</sub> (%)</label> <input type="number" id="saturacion" step="0.1" required placeholder="e.g. 98.5" min="0" max="100"> </div>
+                    </div>
+                    <div class="metric-card">
+                        <h3><i class="fas fa-running"></i> Capacidad Funcional</h3>
+                        <div class="form-group"> <label for="fuerza-agarre">Fuerza Agarre (kg)</label> <input type="number" id="fuerza-agarre" step="0.1" required placeholder="e.g. 42.5"> </div>
+                        <div class="form-group"> <label for="flexibilidad">Flexibilidad (cm)</label> <input type="number" id="flexibilidad" step="0.1" required placeholder="e.g. 20.0"> </div>
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <h3>Resultado Estimado</h3>
+                    <div class="form-group">
+                        <label for="resultado-biofisico">Edad Biofísica (años)</label>
+                        <input type="text" id="resultado-biofisico" value="--" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="diferencia-biofisica">Diferencia vs Cronológica</label>
+                        <input type="text" id="diferencia-biofisica" value="--" readonly>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-primary" onclick="calcularEdadBiofisica()">
+                        <i class="fas fa-calculator" style="margin-right: 8px;"></i>Calcular Edad Biofísica
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="guardarResultados()">
+                        <i class="fas fa-save" style="margin-right: 8px;"></i>Guardar Resultados
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="graphics-area">
+            <span>Área para gráficos interactivos<br>(Próximamente)</span>
+        </div>
+
+    </div> <div class="back-button"
+         onclick="window.location.href='historias_tabs_bio.html?patientId=' + (currentPatientId || '')"
+         aria-label="Volver">
+        <i class="fas fa-arrow-left"></i>
+    </div>
+
+    <div id="message-box" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #333; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1002; font-size: 1rem; opacity: 0; transition: opacity 0.5s ease;">
+      <span id="message-box-text"></span>
+      <button onclick="hideNotification()" style="background: none; border: none; color: white; font-size: 1.2rem; margin-left: 15px; cursor: pointer; float: right; line-height: 1;" aria-label="Cerrar notificación">&times;</button>
+    </div>
+
+
+    <script>
+        let currentPatientId = null;
+
+        // --- Funciones de Notificación ---
+        let messageTimeout;
+        function showNotification(message) {
+            const box = document.getElementById('message-box');
+            const text = document.getElementById('message-box-text');
+            if (!box || !text) return;
+
+            clearTimeout(messageTimeout); // Limpiar timeout anterior
+            text.textContent = message;
+            box.style.display = 'block';
+            void box.offsetWidth; // Forzar reflow
+            box.style.opacity = '1';
+
+            messageTimeout = setTimeout(hideNotification, 5000); // Ocultar tras 5 seg
+        }
+
+        function hideNotification() {
+             const box = document.getElementById('message-box');
+             if (!box) return;
+             clearTimeout(messageTimeout);
+             box.style.opacity = '0';
+             setTimeout(() => { box.style.display = 'none'; }, 500); // Ocultar tras transición
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            currentPatientId = params.get('patientId');
+            const displayElement = document.getElementById('patient-id-display');
+            if (displayElement) { displayElement.textContent = currentPatientId || "No especificado"; }
+
+            // --- Cálculos Automáticos (IMC, ICC) ---
+            const pesoInput = document.getElementById('peso');
+            const alturaInput = document.getElementById('altura');
+            const imcInput = document.getElementById('imc');
+            if (pesoInput && alturaInput && imcInput) {
+                const calcularIMC = () => {
+                    const peso = parseFloat(pesoInput.value);
+                    const alturaCm = parseFloat(alturaInput.value);
+                    if (peso > 0 && alturaCm > 0) {
+                        const alturaM = alturaCm / 100;
+                        const imc = peso / (alturaM * alturaM);
+                        imcInput.value = imc.toFixed(2);
+                    } else {
+                        imcInput.value = '';
+                    }
+                };
+                pesoInput.addEventListener('input', calcularIMC);
+                alturaInput.addEventListener('input', calcularIMC);
+            }
+
+            const cinturaInput = document.getElementById('cintura');
+            const caderaInput = document.getElementById('cadera');
+            const iccInput = document.getElementById('icc');
+            if (cinturaInput && caderaInput && iccInput) {
+                const calcularICC = () => {
+                    const cintura = parseFloat(cinturaInput.value);
+                    const cadera = parseFloat(caderaInput.value);
+                    if (cintura > 0 && cadera > 0) {
+                        const icc = cintura / cadera;
+                        iccInput.value = icc.toFixed(2);
+                    } else {
+                        iccInput.value = '';
+                    }
+                };
+                cinturaInput.addEventListener('input', calcularICC);
+                caderaInput.addEventListener('input', calcularICC);
+            }
+
+            // --- Sidebar Toggle ---
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const body = document.body;
+
+            if (toggleBtn && sidebar && body) {
+                toggleBtn.addEventListener('click', function () {
+                    // Añade o quita la clase 'sidebar-collapsed' al body
+                    // El CSS se encarga de cambiar el ancho del sidebar y el margen del main-content
+                    body.classList.toggle('sidebar-collapsed');
+                });
+            }
+
+            // --- Theme Toggle ---
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeToggle.classList.replace('fa-moon', 'fa-sun');
+                }
+
+                themeToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    if (document.body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark');
+                        themeToggle.classList.replace('fa-moon', 'fa-sun');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                        themeToggle.classList.replace('fa-sun', 'fa-moon');
+                    }
+                });
+            }
+        });
+
+        // --- Función Calcular Edad Biofísica (Placeholder - AJUSTAR FÓRMULA) ---
+        function calcularEdadBiofisica() {
+            console.log("Calculando Edad Biofísica (Fórmula Placeholder)...");
+            const edadCronoInput = document.getElementById('edad-cronologica-input');
+            if (!edadCronoInput || !edadCronoInput.value) {
+                showNotification("Por favor, ingrese la Edad Cronológica actual.");
+                edadCronoInput?.focus(); return;
+            }
+            const edadCronologica = parseFloat(edadCronoInput.value);
+            if (isNaN(edadCronologica) || edadCronologica <= 0) {
+                showNotification("Edad Cronológica inválida.");
+                edadCronoInput.focus(); return;
+            }
+
+            const inputs = [ // Ajustar ideales, factores y pesos según criterio médico
+                { id: 'imc', ideal: 22, factor: 0.5, inverse: false, weight: 1.0 },
+                { id: 'icc', ideal: 0.85, factor: 15, inverse: false, weight: 1.2 },
+                { id: 'grasa-corporal', ideal: 20, factor: 0.4, inverse: false, weight: 1.1 },
+                { id: 'frecuencia-cardiaca', ideal: 65, factor: 0.15, inverse: false, weight: 0.8 },
+                { id: 'presion-sistolica', ideal: 115, factor: 0.2, inverse: false, weight: 1.0 },
+                { id: 'fuerza-agarre', ideal: 40, factor: 0.25, inverse: true, weight: 0.9 }, // Más fuerza = más joven
+                { id: 'flexibilidad', ideal: 25, factor: 0.15, inverse: true, weight: 0.7 }, // Más flexibilidad = más joven
+                { id: 'grasa-visceral', ideal: 5, factor: 1.0, inverse: false, weight: 1.3 },
+                // Añadir más si es necesario: masa-muscular, masa-osea, saturacion...
+                 { id: 'masa-muscular', ideal: 55, factor: 0.2, inverse: true, weight: 0.8 }, // Más músculo = más joven
+                 { id: 'masa-osea', ideal: 2.8, factor: 0.1, inverse: true, weight: 0.5 }, // Más hueso = más joven
+                 { id: 'saturacion', ideal: 98, factor: 0.5, inverse: true, weight: 0.6 } // Más saturación = más joven
+            ];
+
+            let edadBioCalculada = edadCronologica;
+            let validInputsCount = 0;
+            let totalWeightUsed = 0; // Para posible normalización o información
+
+            for (const inputConf of inputs) {
+                const inputElem = document.getElementById(inputConf.id);
+                const valor = parseFloat(inputElem?.value);
+
+                if (!inputElem || isNaN(valor)) {
+                    console.warn(`Valor inválido o faltante para ${inputElem?.labels?.[0]?.textContent || inputConf.id}.`);
+                    continue;
+                }
+
+                validInputsCount++;
+                totalWeightUsed += inputConf.weight;
+                let desviacion = valor - inputConf.ideal;
+                if (inputConf.inverse) {
+                    desviacion = inputConf.ideal - valor; // Invertir si aplica
+                }
+
+                // Sumar a la edad si el valor es peor que el ideal
+                if (desviacion > 0) {
+                     edadBioCalculada += (desviacion * inputConf.factor * inputConf.weight);
+                }
+                // Opcional: Restar edad si es mejor que el ideal (con precaución)
+                // else if (desviacion < 0) {
+                //     edadBioCalculada += (desviacion * inputConf.factor * inputConf.weight * 0.5); // Menor impacto por ser mejor
+                // }
+            }
+
+            if (validInputsCount < inputs.length * 0.5) { // Exigir al menos 50% de datos
+                showNotification("Muy pocos datos válidos para una estimación fiable.");
+                document.getElementById('resultado-biofisico').value = "--";
+                document.getElementById('diferencia-biofisica').value = "--";
+                return;
+            }
+
+            edadBioCalculada = Math.max(18, Math.round(edadBioCalculada)); // Limitar edad mínima
+
+            const diferencia = edadBioCalculada - edadCronologica;
+            let textoDiferencia = "";
+            if (diferencia === 0) textoDiferencia = "Igual";
+            else if (diferencia > 0) textoDiferencia = `+${diferencia} ${diferencia === 1 ? 'año' : 'años'}`;
+            else textoDiferencia = `${diferencia} ${Math.abs(diferencia) === 1 ? 'año' : 'años'}`;
+
+            document.getElementById('resultado-biofisico').value = edadBioCalculada;
+            document.getElementById('diferencia-biofisica').value = textoDiferencia;
+
+            showNotification(`Edad Biofísica calculada: ${edadBioCalculada} años.`);
+            console.log("Edad Biofísica Estimada (Placeholder):", edadBioCalculada);
+        }
+
+        // --- Función Guardar Resultados (con simulación) ---
+        function guardarResultados() {
+            if (!currentPatientId) {
+                showNotification("No se ha identificado al paciente."); return;
+            }
+            const edadBioResultadoInput = document.getElementById('resultado-biofisico');
+            const edadDifResultadoInput = document.getElementById('diferencia-biofisica');
+
+            if (!edadBioResultadoInput || !edadDifResultadoInput || edadBioResultadoInput.value === '--' || edadDifResultadoInput.value === '--') {
+                showNotification("Por favor, calcule la Edad Biofísica antes de guardar."); return;
+            }
+
+            const formData = new FormData();
+            formData.append('patientId', currentPatientId);
+            formData.append('edadCronologica', document.getElementById('edad-cronologica-input')?.value || '');
+            // Añadir todos los campos del formulario
+            const formInputs = document.querySelectorAll('#biofisica-metrics-form input[id]');
+             formInputs.forEach(input => {
+                 if(input.id && !input.readOnly) { // Guardar inputs editables
+                    formData.append(input.id, input.value || '');
+                 }
+             });
+             // Añadir los calculados readonly si son necesarios en backend
+             formData.append('imcCalculado', document.getElementById('imc')?.value || '');
+             formData.append('iccCalculado', document.getElementById('icc')?.value || '');
+
+            formData.append('edadBiofisicaCalculada', edadBioResultadoInput.value);
+            formData.append('edadDiferencialCalculada', edadDifResultadoInput.value);
+
+            console.log("Enviando datos (simulación):", Object.fromEntries(formData));
+
+            const saveButton = document.querySelector('button[onclick="guardarResultados()"]');
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>Guardando...';
+            }
+
+            // Simulación de guardado
+            setTimeout(() => {
+                console.log('Simulación: Datos guardados para paciente:', currentPatientId);
+                showNotification('Resultados guardados exitosamente (Simulación).');
+
+                 if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '<i class="fas fa-save" style="margin-right: 8px;"></i>Guardar Resultados';
+                }
+            }, 1500);
+
+            /* // --- Fetch Real (DESCOMENTAR para usar) ---
+            fetch('guardar_biofisica.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) { throw new Error(`Error HTTP: ${response.status}`); }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta servidor:', data);
+                if (data.status === 'success') { showNotification('Resultados guardados exitosamente.'); }
+                else { showNotification(`Error al guardar: ${data.message || 'Desconocido'}`); }
+            })
+            .catch(error => {
+                console.error('Error fetch:', error);
+                showNotification(`Error de conexión: ${error.message}`);
+            })
+            .finally(() => {
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.innerHTML = '<i class="fas fa-save" style="margin-right: 8px;"></i>Guardar Resultados';
+                }
+            });
+            */
+        }
+
+        // --- Submenu Sidebar (Placeholder) ---
+        function toggleSubmenu() {
+            const submenu = document.getElementById('reportes-submenu');
+            if (submenu) {
+                 console.log("Toggle submenu. Implementar lógica.");
+                 showNotification("Submenú de Reportes (Próximamente)");
+            }
+        }
+    </script>
+</body>
+
+</html>

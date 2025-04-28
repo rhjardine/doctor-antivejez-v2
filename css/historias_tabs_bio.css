@@ -1,0 +1,275 @@
+/* RESET Y TIPOGRAFÍA */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* ENCABEZADO */
+header {
+  background-color: #23BCEF; /* color primario */
+  padding: 1rem;
+  display: flex;             /* Para alinear logo y texto en la misma fila */
+  align-items: center;
+  color: #fff;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+}
+.header-logo img.logo {
+  height: 50px;              /* Ajusta el tamaño de tu logo aquí */
+  margin-right: 1rem;        /* Espacio entre logo y título */
+}
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* CONTENEDOR PRINCIPAL DE TABS */
+.tabs-container {
+  max-width: 1200px;
+  margin: 1rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 1rem;
+}
+
+/* BARRA DE PESTAÑAS */
+.tabs {
+  list-style: none;
+  display: flex;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 1rem;
+}
+.tab {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  background: #f5f5f5;
+  color: #293B64; /* azul oscuro */
+  font-weight: bold;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tab i {
+  font-size: 1.2rem;
+}
+.tab:not(:last-child) {
+  border-right: 1px solid #ddd;
+}
+.tab:hover {
+  background: #e2e2e2;
+}
+.tab.active {
+  background: #23BCEF; /* color primario */
+  color: #fff;
+  border-bottom: 2px solid #23BCEF;
+}
+
+/* CONTENIDO DE PESTAÑAS */
+.tabs-content {
+  min-height: 400px;
+}
+.tab-content {
+  display: none; /* Oculto por defecto */
+}
+.tab-content.active {
+  display: block;
+}
+
+/* GRILLA DE FORMULARIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  color: #293B64; /* azul oscuro */
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f6f5; /* blanco perlado */
+  transition: border-color 0.3s ease;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #23BCEF;
+  outline: none;
+}
+.form-group.full-width {
+  grid-column: 1 / -1; /* ocupar ambas columnas */
+}
+
+/* SECCIÓN DE EDADES BIOLÓGICAS */
+.bio-ages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.bio-age-card {
+  background: #23BCEF;      /* Ajustado: fondo azul */
+  border: 2px solid #23BCEF;
+  border-radius: 8px;
+  text-align: center;
+  padding: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;              /* Texto en blanco */
+}
+.bio-age-card i {
+  font-size: 2rem;
+  color: #fff;              /* Iconos en blanco */
+}
+.bio-age-card:hover {
+  background: #1aa8d4;      /* un tono más oscuro */
+  transform: translateY(-3px);
+}
+.bio-age-card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+.bio-age-card .bio-age-value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* SECCIÓN COMPARACIÓN DE EDADES */
+.comparison-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.comparison-card {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+.comparison-card h4 {
+  color: #293B64;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+.comparison-card p {
+  font-size: 1.2rem;
+  color: #23BCEF;
+  font-weight: bold;
+}
+
+/* SECCIÓN GRÁFICO DE BIOMARCADORES */
+.chart-container {
+  width: 100%;
+  margin: 1rem 0;
+  overflow-x: auto; /* Por si se ve en pantallas muy pequeñas */
+}
+
+/* BOTONES DE ACCIÓN */
+.form-buttons {
+  text-align: center;
+  margin: 1rem 0;
+}
+.form-buttons button {
+  padding: 0.75rem 1.5rem;
+  margin: 0 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background: #293B64; /* azul oscuro */
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.form-buttons button:hover {
+  background: #1f2a44;
+}
+.form-buttons.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+
+  /* Ajuste del encabezado para que el logo y el título no ocupen todo el centro */
+  header {
+    flex-direction: column;
+    align-items: flex-start;  /* Logo a la izquierda */
+  }
+  header .header-logo {
+    margin-bottom: 0.5rem;
+  }
+  header .header-logo img.logo {
+    height: 40px; /* Ajusta el tamaño del logo en pantallas pequeñas */
+  }
+  header h1 {
+    font-size: 1.2rem;
+    text-align: left;
+    margin-left: 0.5rem;
+  }
+
+  /* Ajuste de la grilla de formulario a una sola columna */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajuste de las pestañas */
+  .tab {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Ajuste de las tarjetas comparativas */
+  .comparison-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Si la pantalla es aún más pequeña, una sola columna para comparison-cards */
+  @media (max-width: 480px) {
+    .comparison-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Ajuste de las tarjetas de edades */
+  .bio-ages-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Ajuste del chart-container */
+  .chart-container {
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+}

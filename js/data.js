@@ -1,0 +1,10 @@
+// Mock Database
+const mockDatabase = {
+    patients: [
+        { id: 1, name: "John Doe", chronoAge: 50, gender: "Male", clinicalHistory: ["Hypertension", "Obesity"], geneticMarkers: { telomere_length: "short", APOE: "ε4" }, epigeneticData: { methylation_level: 0.7 }, lastVisit: "2023-01-15", biologicalAgeHistory: [{ date: "2020-01-01", age: 52 }, { date: "2021-01-01", age: 53 }, { date: "2022-01-01", age: 54 }] },
+        { id: 2, name: "Jane Smith", chronoAge: 45, gender: "Female", clinicalHistory: [], geneticMarkers: { telomere_length: "long", APOE: "ε3" }, epigeneticData: { methylation_level: 0.5 }, lastVisit: "2023-02-20", biologicalAgeHistory: [{ date: "2020-01-01", age: 40 }, { date: "2021-01-01", age: 41 }, { date: "2022-01-01", age: 42 }] },
+        { id: 3, name: "Alice Johnson", chronoAge: 60, gender: "Female", clinicalHistory: ["Type 2 Diabetes"], geneticMarkers: { telomere_length: "medium", APOE: "ε3" }, epigeneticData: { methylation_level: 0.6 }, lastVisit: "2023-03-10", biologicalAgeHistory: [{ date: "2020-01-01", age: 58 }, { date: "2021-01-01", age: 59 }, { date: "2022-01-01", age: 60 }] },
+        { id: 4, name: "Bob Brown", chronoAge: 55, gender: "Male", clinicalHistory: ["Obesity"], geneticMarkers: { telomere_length: "short", APOE: "ε4" }, epigeneticData: { methylation_level: 0.65 }, lastVisit: "2023-04-05", biologicalAgeHistory: [{ date: "2020-01-01", age: 57 }, { date: "2021-01-01", age: 58 }, { date: "2022-01-01", age: 59 }] },
+        { id: 5, name: "Charlie Davis", chronoAge: 40, gender: "Male", clinicalHistory: [], geneticMarkers: { telomere_length: "long", APOE: "ε3" }, epigeneticData: { methylation_level: 0.55 }, lastVisit: "2023-05-01", biologicalAgeHistory: [{ date: "2020-01-01", age: 38 }, { date: "2021-01-01", age: 39 }, { date: "2022-01-01", age: 40 }] }
+    ]
+};

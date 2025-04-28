@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediLongevity AI Assistant</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+  :root {
+    --primary-color: #5D5CDE;
+    --primary-dark: #4B4AB3;
+    --primary-light: #7C7BE5;
+    --secondary-color: #10B981;
+    --secondary-dark: #059669;
+    --text-dark: #1F2937;
+    --text-medium: #4B5563; 
+    --text-light: #9CA3AF;
+    --bg-light: #F9FAFB;
+    --bg-white: #FFFFFF;
+    --bg-card: #F3F4F6;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --success: #10B981;
+    --info: #3B82F6;
+    --border-color: #E5E7EB;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+
+    --transition: all 0.3s ease;
+  }
+
+  /* Dark Mode Colors */
+  .dark-mode {
+    --primary-color: #7C7BE5;
+    --primary-dark: #6A69D4;
+    --primary-light: #8E8DEB;
+    --text-dark: #F9FAFB;
+    --text-medium: #D1D5DB; 
+    --text-light: #9CA3AF;
+    --bg-light: #111827;
+    --bg-white: #1F2937;
+    --bg-card: #374151;
+    --border-color: #4B5563;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+    line-height: 1.5;
+    transition: var(--transition);
+  }
+
+  .app-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    width: 220px; 
+    background-color: var(--bg-white);
+    border-right: 1px solid var(--border-color);
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+  }
+
+  .sidebar-header {
+    padding: 0 1.5rem 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-menu {
+    flex: 1;
+    list-style-type: none;
+  }
+  
+  .nav-item {
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-medium);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover {
+    color: var(--primary-color);
+    background-color: rgba(93, 92, 222, 0.05);
+  }
+
+  .nav-item.active {
+    color: var(--primary-color);
+    background-color: rgba(93, 92, 222, 0.1);
+    border-left-color: var(--primary-color);
+  }
+
+  .nav-item i {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    text-align: center;
+  }
+  
+  .user-profile {
+    padding: 1rem 1.5rem;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .user-info {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .user-name { 
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-role {
+    color: var(--text-light);
+    font-size: 0.813rem;
+  }
+
+  /* Main Content Area */
+  .main-content {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+
+  .patient-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background-color: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+  }
+  
+  .patient-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #E5E7EB;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-medium);
+    font-size: 1.5rem;
+  }
+
+  .patient-info {
+    flex: 1;
+  }
+
+  .patient-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+  }
+
+  .patient-details {
+    color: var(--text-medium);
+    font-size: 0.875rem;
+  }
+  
+  .health-metrics {
+    display: flex;
+    gap: 1.25rem;
+    margin-left: auto;
+  }
+
+  .metric {
+    text-align: center;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+    color: var(--text-medium);
+    margin-bottom: 0.25rem;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  .metric-value .trend {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--success);
+  }
+
+  /* AI Assistant Section */ 
+  .section-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .assistant-container {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .assistant-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .assistant-tab {
+    padding: 1rem 1.25rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: var(--transition); 
+    font-size: 0.875rem;
+  }
+
+  .assistant-tab.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+  }
+
+  .assistant-tab:hover:not(.active) {
+    color: var(--text-dark);
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .assistant-content {
+    padding: 1.5rem;
+    min-height: 500px;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .chat-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+
+  .chat-message {
+    margin-bottom: 1.25rem;
+    display: flex; 
+    flex-direction: column;
+  }
+
+  .chat-message.ai {
+    align-items: flex-start;
+  }
+
+  .chat-message.user {
+    align-items: flex-end;
+  }
+
+  .message-bubble {
+    max-width: 75%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    position: relative;
+  }
+
+  .chat-message.ai .message-bubble {
+    background-color: var(--bg-card);
+    border-bottom-left-radius: 0;
+  }
+
+  .chat-message.user .message-bubble {
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 0;
+  }
+  
+  .chat-input-container {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .chat-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+  }
+
+  .chat-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2);
+  }
+
+  .send-button {
+    padding: 0.75rem 1.25rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none; 
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .send-button:hover {
+    background-color: var(--primary-dark);
+  }
+
+  /* AI Insights Tab */
+  .insights-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .insight-card {
+    background-color: var(--bg-light);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .insight-header {
+    display: flex; 
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .insight-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    color: white;
+  }
+
+  .insight-icon.health {
+    background-color: var(--info);
+  }
+
+  .insight-icon.biomarker {
+    background-color: var(--primary-color);
+  }
+
+  .insight-icon.recommendation {
+    background-color: var(--success);
+  }
+
+  .insight-icon.alert {
+    background-color: var(--warning); 
+  }
+
+  .insight-title {
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+
+  .insight-content {
+    color: var(--text-medium);
+    font-size: 0.938rem;
+  }
+
+  /* Biomarker Analysis Tab */
+  .biomarker-analysis {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center; 
+    gap: 0.75rem;
+  }
+
+  .filter-group label {
+    font-weight: 500;
+    color: var(--text-medium);
+  }
+
+  .filter-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    background-color: var(--bg-white);
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+
+  .biomarker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .biomarker-card {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .biomarker-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+  }
+
+  .biomarker-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .biomarker-value.normal {
+    color: var(--success);
+  }
+
+  .biomarker-value.warning { 
+    color: var(--warning);
+  }
+
+  .biomarker-value.danger {
+    color: var(--danger);
+  }
+
+  .biomarker-range {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .biomarker-trend {
+    font-size: 0.813rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .biomarker-trend.up {
+    color: var(--success);
+  }
+
+  .biomarker-trend.down {
+    color: var(--danger);
+  }
+  
+  .chart-container {
+    margin-top: 1.5rem;
+    height: 300px;
+    width: 100%;
+  }
+
+  /* Toggle Theme Button */
+  .theme-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    transition: var(--transition);
+  }
+
+  .theme-toggle:hover {
+    transform: scale(1.05);
+    background-color: var(--primary-dark);
+  }
+  
+  /* Loading Spinner */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-lg);
+    width: fit-content;
+    margin-bottom: 1rem;
+  }
+
+  .typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-light);
+    animation: typingAnimation 1.4s infinite ease-in-out both;
+  }
+
+  .typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  .typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+  
+  @keyframes typingAnimation {
+    0%, 80%, 100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
+  }
+
+  /* Treatment Recommendations Tab */
+  .treatments-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .treatment-card {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    padding: 1.25rem;
+  }
+
+  .treatment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .treatment-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .treatment-icon {
+    color: var(--primary-color);
+  }
+
+  .treatment-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-light);
+  }
+
+  .treatment-status.active {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .treatment-status.scheduled {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--info); 
+  }
+
+  .treatment-status.completed {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: var(--text-medium);
+  }
+
+  .treatment-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .treatment-detail {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+  }
+
+  .detail-value {
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+  
+  .treatment-description {
+    color: var(--text-medium);
+    font-size: 0.938rem;
+    margin-bottom: 1rem;
+  }
+
+  .treatment-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .treatment-button {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    color: var(--text-medium);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .treatment-button:hover {
+    background-color: var(--bg-card); 
+  }
+
+  .treatment-button.primary {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .treatment-button.primary:hover {
+    background-color: var(--primary-dark);
+  }
+
+  /* Genomic Analysis Styles */
+  .genome-analysis-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .genome-section {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .genome-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+  }
+
+  .genome-section-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .genome-section-icon {
+    color: var(--primary-color);
+  }
+
+  .genome-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .variant-card {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-light);
+  }
+
+  .variant-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .variant-details {
+    font-size: 0.813rem;
+    color: var(--text-medium);
+  }
+
+  .variant-impact {
+    margin-top: 0.5rem;
+    font-size: 0.813rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    width: fit-content;
+  }
+
+  .impact-high {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+
+  .impact-medium {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  .impact-low {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .pathway-container {
+    overflow-x: auto;
+  }
+
+  .pathway-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .pathway-table th,
+  .pathway-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .pathway-table th {
+    font-weight: 600;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+  }
+
+  .pathway-table tbody tr:hover {
+    background-color: var(--bg-light);
+  }
+
+  /* Knowledge Base Tab */
+  .knowledge-base-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .search-container {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2);
+  }
+
+  .search-button {
+    padding: 0.75rem 1.25rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .search-button:hover {
+    background-color: var(--primary-dark);
+  }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .source-card {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .source-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .source-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .source-name {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+  }
+
+  .source-description {
+    font-size: 0.813rem;
+    color: var(--text-medium);
+  }
+
+  .literature-list {
+    list-style: none;
+  }
+
+  .literature-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.75rem;
+  }
+
+  .literature-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .literature-authors {
+    font-size: 0.875rem;
+    color: var(--text-medium);
+    margin-bottom: 0.25rem;
+  }
+
+  .literature-journal {
+    font-size: 0.813rem;
+    font-style: italic;
+    color: var(--text-medium);
+    margin-bottom: 0.5rem;
+  }
+
+  .literature-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  .literature-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(93, 92, 222, 0.1);
+    color: var(--primary-color);
+    border-radius: var(--radius-sm);
+  }
+
+  /* XAI Explanation Styles */
+  .xai-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .explanation-card {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .explanation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .explanation-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .explanation-confidence {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .confidence-high {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .confidence-medium {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+  }
+
+  .confidence-low {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  .explanation-content {
+    color: var(--text-medium);
+    font-size: 0.938rem;
+    margin-bottom: 1rem;
+  }
+
+  .factors-list {
+    margin-top: 1rem;
+  }
+
+  .factor-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .factor-weight {
+    width: 30%;
+    height: 8px;
+    background-color: var(--bg-light);
+    border-radius: 4px;
+    margin-right: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .factor-weight-bar {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 4px;
+  }
+
+  .factor-text {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--text-medium);
+  }
+
+  /* Recommendation Levels */
+  .recommendation-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .level-card {
+    background-color: var(--bg-white);
+    border-radius: var(--radius-md);
+    border-left: 4px solid;
+    padding: 1.25rem;
+  }
+
+  .level-1 {
+    border-left-color: var(--info);
+  }
+
+  .level-2 {
+    border-left-color: var(--success);
+  }
+
+  .level-3 {
+    border-left-color: var(--warning);
+  }
+
+  .level-4 {
+    border-left-color: var(--primary-color);
+  }
+
+  .level-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .level-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .level-content {
+    color: var(--text-medium);
+    font-size: 0.938rem;
+    margin-bottom: 1rem;
+  }
+
+  .level-items {
+    margin-top: 0.5rem;
+  }
+
+  .level-item {
+    display: flex;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .level-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .level-item-icon {
+    margin-right: 0.75rem;
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    padding-top: 0.125rem;
+  }
+
+  .level-item-content {
+    flex: 1;
+  }
+
+  .level-item-title {
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .level-item-description {
+    font-size: 0.875rem;
+    color: var(--text-medium);
+  }
+
+  .evidence-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: rgba(93, 92, 222, 0.1);
+    color: var(--primary-color);
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+
+  /* DB Version Badge */
+  .db-version {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-light);
+    color: var(--text-medium);
+    margin-left: auto;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 1024px) {
+    .sidebar {
+      width: 64px;
+    }
+
+    .logo span, .nav-item span, .user-info {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 0.75rem;
+    }
+
+    .user-profile {
+      justify-content: center; 
+      padding: 1rem;
+    }
+
+    .main-content {
+      padding: 1rem;
+    }
+    
+    .assistant-tab {
+      padding: 0.75rem 1rem;
+      font-size: 0.813rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .patient-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .patient-avatar {
+      margin-bottom: 1rem;
+    }
+
+    .health-metrics {
+      margin-left: 0;
+      margin-top: 1rem;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .insights-container, 
+    .sources-grid,
+    .genome-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .biomarker-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    
+    .treatment-details {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .app-container {
+      flex-direction: column;
+    }
+
+    .sidebar {
+      width: 100%;
+      height: auto;
+      padding: 1rem 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-header {
+      padding: 0 1rem 1rem;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-item { 
+      padding: 0.5rem;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .nav-item span {
+      display: block;
+      font-size: 0.75rem;
+    }
+
+    .user-profile {
+      display: none;
+    }
+
+    .main-content {
+      padding: 0.75rem;
+    }
+
+    .assistant-tabs {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .assistant-tab {
+      white-space: nowrap;
+      padding: 0.75rem 0.875rem;
+      font-size: 0.75rem;
+    }
+
+    .assistant-content {
+      padding: 1rem;
+    }
+
+    .health-metrics { 
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .metric {
+      flex: 1;
+      min-width: 45%;
+    }
+    
+    .treatment-actions,
+    .filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .filter-group {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .treatment-button,
+    .filter-select {
+      width: 100%;
+    }
+    
+    .search-container {
+      flex-direction: column;
+    }
+  }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fas fa-heartbeat"></i>
+          <span>MediLongevity</span>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <i class="fas fa-chart-line"></i>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-flask"></i> 
+          <span>Biomarkers</span>
+        </li>
+        <li class="nav-item active">
+          <i class="fas fa-robot"></i>
+          <span>AI Assistant</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-dna"></i>
+          <span>Genomic Data</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Treatment Protocols</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-file-medical-alt"></i>
+          <span>Reports</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Patients</span>
+        </li>
+        <li class="nav-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </li>
+      </ul>
+
+      <div class="user-profile">
+        <div class="user-avatar">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="user-info"> 
+          <div class="user-name">Dr. María García</div>
+          <div class="user-role">Longevity Specialist</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Patient Info Header -->
+      <div class="patient-header">
+        <div class="patient-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="patient-info">
+          <h2 class="patient-name">Isabel Romero</h2>
+          <div class="patient-details">58 years • Female • ID: 458912</div>
+        </div>
+        <div class="health-metrics">
+          <div class="metric">
+            <div class="metric-label">Biological Age</div>
+            <div class="metric-value">52.3 <span class="trend">(-5.7)</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Health Score</div>
+            <div class="metric-value">84/100</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Last Checkup</div>
+            <div class="metric-value">12/04/2023</div> 
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Assistant Section -->
+      <div class="section-header">
+        <h2 class="section-title">AI Longevity Assistant</h2>
+      </div>
+
+      <div class="assistant-container">
+        <div class="assistant-tabs">
+          <div class="assistant-tab active" data-tab="chat">Conversational Assistant</div>
+          <div class="assistant-tab" data-tab="insights">AI Insights</div>
+          <div class="assistant-tab" data-tab="biomarkers">Biomarker Analysis</div>
+          <div class="assistant-tab" data-tab="genomics">Genomic Analysis</div>
+          <div class="assistant-tab" data-tab="recommendations">Recommendations</div>
+          <div class="assistant-tab" data-tab="xai">Explainable AI</div>
+          <div class="assistant-tab" data-tab="knowledge">Knowledge Base</div>
+        </div>
+
+        <div class="assistant-content">
+          <!-- Chat Interface Tab -->
+          <div class="tab-content" id="chat-tab">
+            <div class="chat-container">
+              <div class="chat-message ai">
+                <div class="message-bubble">
+                  <p>Hello Dr. García. I've analyzed Isabel's latest biomarkers and genomic data. Her inflammatory markers show significant improvement since starting the Immune Modulator therapy. I've also identified key genetic variants that may influence her response to therapies. What specific aspect of her health would you like to discuss today?</p>
+                </div>
+              </div>
+
+              <div class="chat-message user"> 
+                <div class="message-bubble">
+                  <p>Can you analyze her metabolic health trends and suggest optimizations to her current protocol based on her genomic profile?</p>
+                </div>
+              </div>
+
+              <div class="chat-message ai">
+                <div class="message-bubble">
+                  <p>Isabel's metabolic markers are showing gradual improvement, but her genomic profile indicates opportunities for personalization:</p>
+                  <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Fasting glucose reduced from 118 to 105 mg/dL (still above optimal range)</li>
+                    <li>HbA1c improved from 5.9% to 5.6% (now within normal range)</li>
+                    <li>Insulin sensitivity increased by 18%</li>
+                    <li>Genomic analysis shows variants in PPARG and TCF7L2 genes associated with altered glucose metabolism</li>
+                  </ul>
+
+                  <p style="margin-top: 0.75rem;">Recommendations to optimize her protocol based on genomic profile:</p>
+                  <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Increase Magnesio Quelado to 400mg daily (TCF7L2 variant carriers often require higher magnesium)</li>
+                    <li>Add Alpha Lipoic Acid 600mg daily to improve insulin sensitivity (particularly effective with her PPARG variant)</li>
+                    <li>Consider time-restricted eating (8-hour window) to improve metabolic flexibility (studies show enhanced efficacy for her genetic profile)</li>
+                    <li>Add Berberine 500mg twice daily (shown to significantly improve glucose metabolism in carriers of her specific TCF7L2 variant)</li>
+                    <li>Continue current VIT C/Zinc supplementation which supports these pathways</li>
+                  </ol>
+
+                  <p style="margin-top: 0.75rem;">Evidence strength: High (3 meta-analyses and 5 clinical trials support these recommendations for patients with her specific genetic variants).</p>
+                  
+                  <p style="margin-top: 0.75rem;">Would you like me to generate a detailed protocol update with supporting research from our knowledge base?</p>
+                </div>
+              </div> 
+            </div>
+
+            <div class="chat-input-container">
+              <input type="text" class="chat-input" placeholder="Ask a question about Isabel's health..." id="chat-input">
+              <button class="send-button" id="send-button">
+                <i class="fas fa-paper-plane"></i>
+                <span>Send</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Insights Tab -->
+          <div class="tab-content" id="insights-tab" style="display: none;">
+            <div class="insights-container">
+              <div class="insight-card">
+                <div class="insight-header">
+                  <div class="insight-icon health">
+                    <i class="fas fa-lightbulb"></i>
+                  </div>
+                  <h3 class="insight-title">Key Health Insights</h3>
+                </div>
+                <div class="insight-content">
+                  <p>Isabel's inflammatory markers show consistent improvement following implementation of the Immune Modulator therapy. The combination with Ginkgo biloba appears to have synergistic effects on both inflammation and circulation. Genomic data reveals she carries an IL6R variant that positively influences her response to this therapy.</p>
+                </div>
+              </div>
+
+              <div class="insight-card"> 
+                <div class="insight-header">
+                  <div class="insight-icon biomarker">
+                    <i class="fas fa-chart-line"></i>
+                  </div>
+                  <h3 class="insight-title">Biomarker Pattern Detection</h3>
+                </div>
+                <div class="insight-content">
+                  <p>A correlation analysis reveals that Isabel's inflammatory markers improve significantly 3-4 days after each Hidroterapia Ionizante session, suggesting this therapy is particularly effective for her specific inflammatory profile. Her epigenetic methylation patterns show reduced aging markers in response to this therapy.</p>
+                </div>
+              </div>
+
+              <div class="insight-card">
+                <div class="insight-header">
+                  <div class="insight-icon recommendation">
+                    <i class="fas fa-search-plus"></i>
+                  </div>
+                  <h3 class="insight-title">Research-Based Recommendations</h3>
+                </div>
+                <div class="insight-content">
+                  <p>Recent studies in individuals with similar metabolic and genomic profiles to Isabel show significant benefits from adding Berberine (500mg 2x daily) alongside magnesium supplementation. This combination improved insulin sensitivity by 24% in a 12-week trial for carriers of the TCF7L2 variant (rs7903146) that Isabel possesses.</p>
+                </div>
+              </div>
+
+              <div class="insight-card">
+                <div class="insight-header">
+                  <div class="insight-icon alert"> 
+                    <i class="fas fa-exclamation-triangle"></i>
+                  </div>
+                  <h3 class="insight-title">Potential Interaction Alert</h3>
+                </div>
+                <div class="insight-content">
+                  <p>The current dosage of Ginkgo biloba may interact with VIT C/Zinc when taken simultaneously due to Isabel's CYP3A4 variant. Recommend separating these supplements by at least 2 hours for optimal absorption and effectiveness. Pharmacogenomic analysis indicates moderate risk of interaction.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Biomarker Analysis Tab -->
+          <div class="tab-content" id="biomarkers-tab" style="display: none;">
+            <div class="biomarker-analysis">
+              <div class="filter-bar">
+                <div class="filter-group">
+                  <label for="biomarker-category">Category:</label>
+                  <select id="biomarker-category" class="filter-select">
+                    <option value="all">All Biomarkers</option>
+                    <option value="metabolic">Metabolic</option>
+                    <option value="inflammatory">Inflammatory</option>
+                    <option value="cardiovascular">Cardiovascular</option>
+                    <option value="hormonal">Hormonal</option>
+                    <option value="epigenetic">Epigenetic</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label for="time-period">Period:</label> 
+                  <select id="time-period" class="filter-select">
+                    <option value="3m">Last 3 Months</option>
+                    <option value="6m" selected>Last 6 Months</option>
+                    <option value="1y">Last Year</option>
+                  </select>
+                </div>
+                
+                <div class="filter-group">
+                  <label for="genetic-filter">Genetic Risk Filter:</label> 
+                  <select id="genetic-filter" class="filter-select">
+                    <option value="none">No Filtering</option>
+                    <option value="high">High Genetic Risk</option>
+                    <option value="moderate">Moderate Genetic Risk</option>
+                    <option value="low">Low Genetic Risk</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="biomarker-grid">
+                <div class="biomarker-card">
+                  <div class="biomarker-name">Glucose</div>
+                  <div class="biomarker-value warning">105</div>
+                  <div class="biomarker-range">Range: 70-99 mg/dL</div>
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -11%
+                  </div>
+                </div>
+
+                <div class="biomarker-card">
+                  <div class="biomarker-name">HbA1c</div>
+                  <div class="biomarker-value normal">5.6%</div>
+                  <div class="biomarker-range">Range: &lt;5.7%</div>
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -5%
+                  </div>
+                </div>
+
+                <div class="biomarker-card">
+                  <div class="biomarker-name">hsCRP</div> 
+                  <div class="biomarker-value warning">2.1</div>
+                  <div class="biomarker-range">Range: &lt;1.0 mg/L</div>
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -45%
+                  </div>
+                </div>
+
+                <div class="biomarker-card">
+                  <div class="biomarker-name">IL-6</div>
+                  <div class="biomarker-value danger">2.8</div>
+                  <div class="biomarker-range">Range: &lt;1.8 pg/mL</div>
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -33%
+                  </div>
+                </div>
+
+                <div class="biomarker-card">
+                  <div class="biomarker-name">Vitamin D</div>
+                  <div class="biomarker-value normal">32</div>
+                  <div class="biomarker-range">Range: 30-50 ng/mL</div>
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-up"></i> +33%
+                  </div>
+                </div>
+
+                <div class="biomarker-card">
+                  <div class="biomarker-name">Homocysteine</div>
+                  <div class="biomarker-value warning">12.4</div>
+                  <div class="biomarker-range">Range: &lt;10 μmol/L</div> 
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -12%
+                  </div>
+                </div>
+                
+                <div class="biomarker-card">
+                  <div class="biomarker-name">DNA Methylation Age</div>
+                  <div class="biomarker-value normal">53.2</div>
+                  <div class="biomarker-range">Chronological: 58 yrs</div> 
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-down"></i> -1.8 yrs
+                  </div>
+                </div>
+                
+                <div class="biomarker-card">
+                  <div class="biomarker-name">Telomere Length</div>
+                  <div class="biomarker-value normal">6.3 kb</div>
+                  <div class="biomarker-range">Range: 5.2-8.6 kb</div> 
+                  <div class="biomarker-trend up">
+                    <i class="fas fa-arrow-up"></i> +3%
+                  </div>
+                </div>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="biomarker-chart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Genomic Analysis Tab -->
+          <div class="tab-content" id="genomics-tab" style="display: none;">
+            <div class="genome-analysis-container">
+              <div class="genome-section">
+                <div class="genome-section-header">
+                  <div class="genome-section-title">
+                    <i class="fas fa-dna genome-section-icon"></i>
+                    <span>Key Genetic Variants</span>
+                  </div>
+                  <div class="db-version">Database: ClinVar 2023.03 | dbSNP v155</div>
+                </div>
+                
+                <div class="genome-grid">
+                  <div class="variant-card">
+                    <div class="variant-name">MTHFR (rs1801133)</div>
+                    <div class="variant-details">C677T | Genotype: CT (Heterozygous)</div>
+                    <div class="variant-impact impact-medium">Moderate Impact</div>
+                  </div>
+                  
+                  <div class="variant-card">
+                    <div class="variant-name">APOE (rs429358, rs7412)</div>
+                    <div class="variant-details">Genotype: ε3/ε3</div>
+                    <div class="variant-impact impact-low">Low Impact</div>
+                  </div>
+                  
+                  <div class="variant-card">
+                    <div class="variant-name">TCF7L2 (rs7903146)</div>
+                    <div class="variant-details">Genotype: TT (Homozygous)</div>
+                    <div class="variant-impact impact-high">High Impact</div>
+                  </div>
+                  
+                  <div class="variant-card">
+                    <div class="variant-name">PPARG (rs1801282)</div>
+                    <div class="variant-details">Pro12Ala | Genotype: CG (Heterozygous)</div>
+                    <div class="variant-impact impact-medium">Moderate Impact</div>
+                  </div>
+                  
+                  <div class="variant-card">
+                    <div class="variant-name">CYP3A4 (rs2740574)</div>
+                    <div class="variant-details">Genotype: AG (Heterozygous)</div>
+                    <div class="variant-impact impact-medium">Moderate Impact</div>
+                  </div>
+                  
+                  <div class="variant-card">
+                    <div class="variant-name">IL6R (rs2228145)</div>
+                    <div class="variant-details">Asp358Ala | Genotype: AC (Heterozygous)</div>
+                    <div class="variant-impact impact-medium">Moderate Impact</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="genome-section">
+                <div class="genome-section-header">
+                  <div class="genome-section-title">
+                    <i class="fas fa-project-diagram genome-section-icon"></i>
+                    <span>Affected Biological Pathways</span>
+                  </div>
+                  <div class="db-version">Database: KEGG 2023 | Reactome v83</div>
+                </div>
+                
+                <div class="pathway-container">
+                  <table class="pathway-table">
+                    <thead>
+                      <tr>
+                        <th>Pathway</th>
+                        <th>Impact</th>
+                        <th>Associated Variants</th>
+                        <th>Intervention Potential</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Insulin Signaling</td>
+                        <td>Strong Negative</td>
+                        <td>TCF7L2, PPARG</td>
+                        <td>High</td>
+                      </tr>
+                      <tr>
+                        <td>Folate Metabolism</td>
+                        <td>Moderate Negative</td>
+                        <td>MTHFR</td>
+                        <td>High</td>
+                      </tr>
+                      <tr>
+                        <td>Inflammatory Response</td>
+                        <td>Moderate Positive</td>
+                        <td>IL6R</td>
+                        <td>Moderate</td>
+                      </tr>
+                      <tr>
+                        <td>Xenobiotic Metabolism</td>
+                        <td>Moderate Negative</td>
+                        <td>CYP3A4</td>
+                        <td>Moderate</td>
+                      </tr>
+                      <tr>
+                        <td>Lipid Metabolism</td>
+                        <td>Neutral</td>
+                        <td>APOE</td>
+                        <td>Low</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <div class="genome-section">
+                <div class="genome-section-header">
+                  <div class="genome-section-title">
+                    <i class="fas fa-pills genome-section-icon"></i>
+                    <span>Pharmacogenomic Analysis</span>
+                  </div>
+                </div>
+                
+                <div class="pathway-container">
+                  <table class="pathway-table">
+                    <thead>
+                      <tr>
+                        <th>Compound</th>
+                        <th>Predicted Response</th>
+                        <th>Key Variants</th>
+                        <th>Evidence Level</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Metformin</td>
+                        <td>Reduced Efficacy</td>
+                        <td>TCF7L2 (rs7903146)</td>
+                        <td>Level A (Strong)</td>
+                      </tr>
+                      <tr>
+                        <td>Berberine</td>
+                        <td>Enhanced Efficacy</td>
+                        <td>TCF7L2 (rs7903146)</td>
+                        <td>Level B (Moderate)</td>
+                      </tr>
+                      <tr>
+                        <td>Magnesium</td>
+                        <td>Enhanced Efficacy</td>
+                        <td>TRPM6 (rs11144134)</td>
+                        <td>Level B (Moderate)</td>
+                      </tr>
+                      <tr>
+                        <td>Ginkgo biloba</td>
+                        <td>Normal Response</td>
+                        <td>CYP3A4 (rs2740574)</td>
+                        <td>Level C (Limited)</td>
+                      </tr>
+                      <tr>
+                        <td>Methylfolate</td>
+                        <td>Enhanced Efficacy</td>
+                        <td>MTHFR (rs1801133)</td>
+                        <td>Level A (Strong)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recommendations Tab -->
+          <div class="tab-content" id="recommendations-tab" style="display: none;">
+            <div class="recommendation-levels">
+              <div class="level-card level-1">
+                <div class="level-header">
+                  <div class="level-title">
+                    <i class="fas fa-walking"></i>
+                    <span>Level 1: Lifestyle Recommendations</span>
+                  </div>
+                  <div class="evidence-tag">Evidence: Strong</div>
+                </div>
+                
+                <div class="level-content">
+                  <p>Personalized lifestyle recommendations based on Isabel's genomic profile, biomarkers, and health objectives.</p>
+                  
+                  <div class="level-items">
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-utensils"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Time-Restricted Eating (TRE)</div>
+                        <div class="level-item-description">Implement 8-hour eating window (10:00-18:00) based on TCF7L2 genotype showing enhanced glucose response to TRE. Studies show 20-30% improvement in insulin sensitivity for TT genotype carriers.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-dumbbell"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Personalized Exercise Protocol</div>
+                        <div class="level-item-description">Increase Zone 2 cardio to 4x weekly (40 min sessions) with PPARG genotype showing enhanced fat utilization and insulin sensitization with this specific protocol. Add 2 sessions of resistance training focusing on major muscle groups.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-moon"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Sleep Optimization</div>
+                        <div class="level-item-description">Implement strict sleep schedule (22:30-6:30) with morning light exposure. Genetic variants in CLOCK gene suggest enhanced metabolic benefit from consistent sleep timing and morning light.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-spa"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Stress Management</div>
+                        <div class="level-item-description">Daily mindfulness practice (15 min) and weekly nature exposure. Genetic analysis shows heightened stress response and inflammation with variants in FKBP5 and IL6R genes. These practices show significant benefit in carriers.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="level-card level-2">
+                <div class="level-header">
+                  <div class="level-title">
+                    <i class="fas fa-tablets"></i>
+                    <span>Level 2: Supplementation Recommendations</span>
+                  </div>
+                  <div class="evidence-tag">Evidence: Moderate-Strong</div>
+                </div>
+                
+                <div class="level-content">
+                  <p>Nutraceuticals and supplements with dosages personalized to Isabel's genomic profile and current biomarkers.</p>
+                  
+                  <div class="level-items">
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-capsules"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Magnesio Quelado</div>
+                        <div class="level-item-description">Increase to 400mg daily (1-0-1-0). TCF7L2 TT genotype shows increased magnesium requirements for optimal glucose metabolism and insulin sensitivity. Bioavailable chelated form recommended due to TRPM6 variant.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-capsules"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Alpha Lipoic Acid</div>
+                        <div class="level-item-description">Add 600mg daily (1-0-0-0). Particularly effective for PPARG CG carriers to enhance mitochondrial function and insulin signaling. Meta-analysis shows 18-26% improvement in insulin sensitivity in carriers.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-capsules"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Berberine</div>
+                        <div class="level-item-description">Add 500mg twice daily (1-0-1-0). Clinical trials show significant benefits for TCF7L2 TT carriers, particularly for glucose metabolism. Take 30 minutes before meals for optimal effect.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-capsules"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Methylfolate & Methylcobalamin</div>
+                        <div class="level-item-description">Add 1000mcg methylfolate and 1000mcg methylcobalamin daily (1-0-0-0). MTHFR C677T variant requires bioactive B vitamins. Will address elevated homocysteine (currently 12.4 μmol/L).</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-capsules"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">VIT C/Zinc & Ginkgo biloba Timing</div>
+                        <div class="level-item-description">Continue current doses but separate by 2+ hours due to CYP3A4 variant causing potential interaction. VIT C/Zinc in morning, Ginkgo biloba in evening for optimal absorption and effectiveness.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="level-card level-3">
+                <div class="level-header">
+                  <div class="level-title">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                    <span>Level 3: Pharmacological Considerations</span>
+                  </div>
+                  <div class="evidence-tag">Evidence: Moderate</div>
+                </div>
+                
+                <div class="level-content">
+                  <p>Potential pharmacological interventions for consideration. Note: These are suggestions for physician evaluation, not direct prescriptions.</p>
+                  
+                  <div class="level-items">
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-prescription"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Metformin Consideration</div>
+                        <div class="level-item-description">Low-dose metformin (500mg daily) could be considered if fasting glucose remains >100mg/dL after 8 weeks of current interventions. Note: TCF7L2 genotype suggests slightly reduced efficacy, may require dose adjustment. Consider baseline B12 testing before initiating.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-prescription"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Potential GLP-1 Modulator</div>
+                        <div class="level-item-description">If metabolic markers fail to normalize with natural interventions, consider low-dose GLP-1 modulation. TCF7L2 genotype suggests enhanced response to GLP-1 based therapies. Could offset genetic predisposition to impaired incretin response.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-prescription"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Temporary Low-Dose Statin Consideration</div>
+                        <div class="level-item-description">Despite APOE ε3/ε3 status (neutral lipid risk), consider short-term, low-dose rosuvastatin for pleiotropic anti-inflammatory effects if hsCRP remains >2.0 mg/L after 12 weeks. Genetic profile suggests good tolerance and minimal myalgia risk.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="level-card level-4">
+                <div class="level-header">
+                  <div class="level-title">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Level 4: Monitoring & Additional Testing</span>
+                  </div>
+                  <div class="evidence-tag">Evidence: Strong</div>
+                </div>
+                
+                <div class="level-content">
+                  <p>Recommended monitoring schedule and additional tests to optimize Isabel's longevity protocol.</p>
+                  
+                  <div class="level-items">
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-vial"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Continuous Glucose Monitoring (CGM)</div>
+                        <div class="level-item-description">Recommend 14-day CGM to assess glucose variability and personalize nutritional approach. TCF7L2 genotype carriers show significant heterogeneity in food responses not captured by standard glucose testing.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-calendar-check"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Biomarker Monitoring Schedule</div>
+                        <div class="level-item-description">Fasting glucose & insulin: biweekly for first month, then monthly<br>
+                        Comprehensive metabolic panel & inflammatory markers: 4 weeks after protocol implementation<br>
+                        Homocysteine: 8 weeks after methylfolate initiation<br>
+                        Epigenetic age assessment: 6-month follow-up</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-heartbeat"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Advanced Cardiovascular Assessment</div>
+                        <div class="level-item-description">Recommend coronary calcium scan and advanced lipoprotein profile (NMR) to better assess cardiovascular risk beyond standard lipid panel. PPARG and TCF7L2 variants can influence particle size and number not captured in standard testing.</div>
+                      </div>
+                    </div>
+                    
+                    <div class="level-item">
+                      <div class="level-item-icon">
+                        <i class="fas fa-microscope"></i>
+                      </div>
+                      <div class="level-item-content">
+                        <div class="level-item-title">Gut Microbiome Analysis</div>
+                        <div class="level-item-description">Recommend comprehensive gut microbiome analysis with metabolomic profiling. Recent research shows specific microbiome patterns in TCF7L2 variant carriers that can be targeted for metabolic improvement.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Explainable AI Tab -->
+          <div class="tab-content" id="xai-tab" style="display: none;">
+            <div class="xai-container">
+              <div class="explanation-card">
+                <div class="explanation-header">
+                  <div class="explanation-title">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Reasoning Process: Metabolic Protocol Recommendations</span>
+                  </div>
+                  <div class="explanation-confidence confidence-high">Confidence: High (87%)</div>
+                </div>
+                
+                <div class="explanation-content">
+                  <p>The AI system used a multi-layer analysis approach to generate personalized recommendations for Isabel's metabolic health optimization. Here's how the system arrived at these specific conclusions:</p>
+                  
+                  <div class="factors-list">
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 90%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>TCF7L2 Gene Variant (rs7903146, TT):</strong> This homozygous variant is strongly associated with impaired incretin response and reduced insulin secretion. Clinical studies show carriers respond particularly well to berberine, magnesium supplementation, and time-restricted eating patterns.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 75%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>PPARG Gene Variant (rs1801282, CG):</strong> This heterozygous variant affects insulin sensitivity and fat metabolism. Research indicates enhanced response to alpha lipoic acid supplementation and zone 2 cardio exercise compared to non-carriers.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 65%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Current Biomarker Trends:</strong> The gradual improvement in fasting glucose (118→105 mg/dL) and HbA1c (5.9%→5.6%) indicates positive response to current protocol but suggests opportunity for further optimization.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 55%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Meta-Analysis Results:</strong> Three meta-analyses of nutritional interventions in TCF7L2 variant carriers show statistically significant benefits for the specific recommendations provided, particularly berberine and time-restricted eating.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 45%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Drug-Nutrient Interaction Analysis:</strong> CYP3A4 variant (rs2740574, AG) indicates potential interaction between Ginkgo biloba and VIT C/Zinc when taken simultaneously, leading to recommendation for separated timing.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 30%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Patient-Specific Factors:</strong> Age (58), gender (female), biological age assessment (52.3), and current health status influence dosing recommendations and implementation timeline.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="explanation-card">
+                <div class="explanation-header">
+                  <div class="explanation-title">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Evidence Sources & Evaluation</span>
+                  </div>
+                  <div class="explanation-confidence confidence-medium">Evidence Quality: Moderate-High</div>
+                </div>
+                
+                <div class="explanation-content">
+                  <p>The recommendations are based on the following evidence sources, weighted by quality, relevance, and recency:</p>
+                  
+                  <div class="factors-list">
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 95%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Randomized Clinical Trials:</strong> 5 RCTs specifically studying TCF7L2 carriers and metabolic interventions (total n=1,243). Most recent: Zhang et al. (2022) showing 24% improved insulin sensitivity with berberine in TT carriers.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 80%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Meta-Analyses:</strong> 3 meta-analyses on nutritional interventions for diabetes risk variants, including specific analysis of TCF7L2 and PPARG polymorphisms (cumulative n=3,872).
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 65%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Observational Studies:</strong> 8 cohort studies examining natural history and intervention outcomes in TCF7L2 variant carriers (cumulative n=12,450).
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 50%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Mechanistic Studies:</strong> 14 in vitro and animal studies elucidating biological mechanisms of TCF7L2 and PPARG variants and intervention effects.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 40%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Clinical Guidelines:</strong> 3 expert consensus guidelines on management of prediabetes in patients with genetic risk variants.
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 25%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Case Series:</strong> 2 published case series of patients with similar genetic profiles to Isabel showing positive outcomes with similar protocols.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="explanation-card">
+                <div class="explanation-header">
+                  <div class="explanation-title">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Intervention Risk/Benefit Analysis</span>
+                  </div>
+                </div>
+                
+                <div class="explanation-content">
+                  <p>The AI system performed a comprehensive risk/benefit analysis for each recommended intervention:</p>
+                  
+                  <div class="factors-list">
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 95%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Time-Restricted Eating:</strong> Very high benefit potential (improved insulin sensitivity, reduced glucose AUC) with minimal risk (minor adjustment period) given TCF7L2 genotype. Benefit/risk ratio: 9.5/10
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 85%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Magnesium Supplementation:</strong> High benefit potential with minimal risk at recommended dosage. Specific benefit for TCF7L2 carriers. Benefit/risk ratio: 8.7/10
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 75%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Berberine:</strong> Substantial benefit potential with moderate risk (potential GI discomfort, rare liver enzyme elevation). High efficacy for TCF7L2 carriers outweighs risks. Benefit/risk ratio: 7.8/10
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 70%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Alpha Lipoic Acid:</strong> Good benefit potential with low risk profile. Particularly effective for PPARG variants. Benefit/risk ratio: 7.6/10
+                      </div>
+                    </div>
+                    
+                    <div class="factor-item">
+                      <div class="factor-weight">
+                        <div class="factor-weight-bar" style="width: 55%"></div>
+                      </div>
+                      <div class="factor-text">
+                        <strong>Methylfolate & B12:</strong> Moderate benefit for homocysteine reduction with very low risk given MTHFR variant. Benefit/risk ratio: 7.2/10
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Knowledge Base Tab -->
+          <div class="tab-content" id="knowledge-tab" style="display: none;">
+            <div class="knowledge-base-container">
+              <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search research, pathways, genes, or interventions..." id="knowledge-search">
+                <button class="search-button" id="search-button">
+                  <i class="fas fa-search"></i>
+                  <span>Search</span>
+                </button>
+              </div>
+              
+              <div class="sources-grid">
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-dna"></i>
+                  </div>
+                  <div class="source-name">ClinVar</div>
+                  <div class="source-description">Clinical variants database with interpretations</div>
+                </div>
+                
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-dna"></i>
+                  </div>
+                  <div class="source-name">dbSNP</div>
+                  <div class="source-description">Single nucleotide polymorphism database</div>
+                </div>
+                
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-book-medical"></i>
+                  </div>
+                  <div class="source-name">PubMed</div>
+                  <div class="source-description">Biomedical literature database</div>
+                </div>
+                
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-project-diagram"></i>
+                  </div>
+                  <div class="source-name">KEGG</div>
+                  <div class="source-description">Biological pathways database</div>
+                </div>
+                
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-project-diagram"></i>
+                  </div>
+                  <div class="source-name">Reactome</div>
+                  <div class="source-description">Biological pathways database</div>
+                </div>
+                
+                <div class="source-card">
+                  <div class="source-icon">
+                    <i class="fas fa-file-medical"></i>
+                  </div>
+                  <div class="source-name">SNOMED CT</div>
+                  <div class="source-description">Clinical terminology ontology</div>
+                </div>
+              </div>
+              
+              <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Relevant Literature for Current Recommendations</h3>
+              
+              <ul class="literature-list">
+                <li class="literature-item">
+                  <div class="literature-title">Berberine improves insulin sensitivity by inhibiting fat store and adjusting adipokines profile in human preadipocytes and metabolic syndrome patients</div>
+                  <div class="literature-authors">Zhang Q, Xiao X, Feng K, et al.</div>
+                  <div class="literature-journal">Evidence-Based Complementary and Alternative Medicine, 2022 Jan;2022:1-10</div>
+                  <p>Randomized trial showing 24% improvement in insulin sensitivity for TCF7L2 variant carriers treated with berberine, compared to 8% in non-carriers. Mechanistic evidence of incretin response modulation.</p>
+                  <div class="literature-tags">
+                    <span class="literature-tag">TCF7L2</span>
+                    <span class="literature-tag">Berberine</span>
+                    <span class="literature-tag">Insulin Sensitivity</span>
+                    <span class="literature-tag">RCT</span>
+                  </div>
+                </li>
+                
+                <li class="literature-item">
+                  <div class="literature-title">Time-restricted eating effects on glycemic control in individuals with genetic susceptibility to type 2 diabetes: A randomized clinical trial</div>
+                  <div class="literature-authors">Martinez-Lopez N, Tapia G, Garcia-Milian R, et al.</div>
+                  <div class="literature-journal">Cell Metabolism, 2021 Aug;33(8):1592-1609</div>
+                  <p>RCT demonstrating significantly greater metabolic improvements with time-restricted eating in TCF7L2 risk allele carriers compared to non-carriers. 8-hour feeding window showed optimal results for TT genotype.</p>
+                  <div class="literature-tags">
+                    <span class="literature-tag">Time-Restricted Eating</span>
+                    <span class="literature-tag">TCF7L2</span>
+                    <span class="literature-tag">Glycemic Control</span>
+                    <span class="literature-tag">RCT</span>
+                  </div>
+                </li>
+                
+                <li class="literature-item">
+                  <div class="literature-title">PPARG Pro12Ala polymorphism and response to exercise training and alpha lipoic acid supplementation: A randomized controlled trial</div>
+                  <div class="literature-authors">Cohen DE, Serrano-Wu MH, Gómez-Pérez SL, et al.</div>
+                  <div class="literature-journal">Diabetes, Obesity and Metabolism, 2020 Feb;22(2):270-282</div>
+                  <p>Controlled trial showing differential response to alpha lipoic acid supplementation based on PPARG genotype. CG carriers showed 18-26% improvement in insulin sensitivity compared to 7% in non-carriers.</p>
+                  <div class="literature-tags">
+                    <span class="literature-tag">PPARG</span>
+                    <span class="literature-tag">Alpha Lipoic Acid</span>
+                    <span class="literature-tag">Exercise</span>
+                    <span class="literature-tag">RCT</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button --> 
+  <div class="theme-toggle" id="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check for dark mode preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+        const icon = document.querySelector('#theme-toggle i');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
+      
+      // Listen for changes to color scheme preference
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        if (event.matches) {
+          document.body.classList.add('dark-mode');
+          const icon = document.querySelector('#theme-toggle i');
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          document.body.classList.remove('dark-mode');
+          const icon = document.querySelector('#theme-toggle i');
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+        
+        // Update chart if it exists
+        if (window.biomarkerChart) {
+          updateChartColors();
+          window.biomarkerChart.update();
+        }
+      });
+    
+      // Tab Switching
+      const tabs = document.querySelectorAll('.assistant-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+
+          // Add active class to clicked tab
+          tab.classList.add('active');
+
+          // Hide all content
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.style.display = 'none';
+          });
+
+          // Show content for active tab
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(tabId + '-tab').style.display = 'block';
+
+          // Initialize charts if on biomarkers tab
+          if (tabId === 'biomarkers') {
+            initBiomarkerChart();
+          }
+        });
+      });
+
+      // Chat Functionality
+      const chatInput = document.getElementById('chat-input');
+      const sendButton = document.getElementById('send-button');
+      const chatContainer = document.querySelector('.chat-container');
+
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, 'user');
+        chatInput.value = '';
+
+        // Show typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = `
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        `;
+        chatContainer.appendChild(typingIndicator);
+
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // Simulate AI response after delay
+        setTimeout(() => {
+          // Remove typing indicator
+          typingIndicator.remove();
+
+          // Generate AI response based on user message
+          let aiResponse = generateAIResponse(message);
+
+          // Add AI response
+          addMessage(aiResponse, 'ai');
+
+          // Scroll to bottom
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1500);
+      }
+
+      function addMessage(content, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+
+        // Check if content has HTML formatting
+        if (content.includes('<') && content.includes('>')) {
+          bubble.innerHTML = content;
+        } else {
+          bubble.textContent = content;
+        }
+
+        messageDiv.appendChild(bubble);
+        chatContainer.appendChild(messageDiv);
+      }
+
+      function generateAIResponse(userMessage) {
+        // Simple keyword-based response generation
+        const userMessageLower = userMessage.toLowerCase();
+
+        if (userMessageLower.includes('yes') && userMessageLower.includes('protocol')) {
+          return `
+            <p><strong>Updated Protocol for Isabel Romero</strong></p>
+            <p style="margin-top: 0.5rem;">Based on comprehensive genomic analysis, biomarker data, and clinical evidence, I recommend the following precision protocol:</p>
+
+            <p style="margin-top: 0.75rem;"><strong>Supplementation:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li><strong>Magnesio Quelado:</strong> Increase to 400mg daily (1-0-1-0) - Targets TCF7L2 variant</li>
+              <li><strong>Alpha Lipoic Acid:</strong> Add 600mg daily (1-0-0-0) - Enhanced efficacy with PPARG variant</li>
+              <li><strong>Berberine:</strong> Add 500mg twice daily (1-0-1-0) - Strong evidence for TCF7L2 TT carriers</li>
+              <li><strong>Methylfolate & B12:</strong> Add 1000mcg of each daily (1-0-0-0) - Addresses MTHFR variant</li>
+              <li><strong>VIT C/Zinc:</strong> Continue current dosage (1000mg/15mg daily, 1-0-0-0)</li>
+              <li><strong>Ginkgo biloba:</strong> Continue 120mg daily, but separate from VIT C/Zinc by at least 2 hours due to CYP3A4 variant</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;"><strong>Lifestyle Modifications:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>Implement time-restricted eating with an 8-hour window (10:00-18:00) - Research shows enhanced efficacy for TCF7L2 TT genotype</li>
+              <li>Increase Zone 2 cardio to 4x weekly (40 min sessions) - Optimal for PPARG CG carriers</li>
+              <li>Add 2 resistance training sessions focusing on major muscle groups</li>
+              <li>Implement strict sleep schedule (22:30-6:30) with morning light exposure</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;"><strong>Monitoring:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>Recommend 14-day CGM to assess glucose variability and personalize nutritional approach</li>
+              <li>Fasting glucose & insulin: biweekly for first month, then monthly</li>
+              <li>Comprehensive metabolic panel & inflammatory markers: 4 weeks after protocol implementation</li>
+              <li>Homocysteine: 8 weeks after methylfolate initiation</li>
+              <li>Epigenetic age assessment: 6-month follow-up</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;">All recommendations are evidence-based with specific relevance to Isabel's genomic profile. Three meta-analyses and five clinical trials support these recommendations for patients with her specific genetic variants.</p>
+            
+            <p style="margin-top: 0.75rem;">Would you like me to generate patient education materials or provide the detailed scientific rationale behind any specific recommendation?</p>
+          `;
+        } else if (userMessageLower.includes('genetic') || userMessageLower.includes('genomic') || userMessageLower.includes('dna')) {
+          return `
+            <p>Isabel's genetic analysis reveals several key variants influencing her health:</p>
+            
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+              <li><strong>TCF7L2 (rs7903146) - TT genotype:</strong> This homozygous variant is associated with impaired incretin response, reduced insulin secretion, and increased diabetes risk. It affects how her body regulates blood glucose after meals.</li>
+              <li><strong>PPARG (rs1801282) - CG genotype:</strong> This heterozygous variant affects insulin sensitivity and fat metabolism, with moderate impact on her metabolic health.</li>
+              <li><strong>MTHFR (rs1801133) - CT genotype:</strong> This variant moderately impairs folate metabolism, contributing to her elevated homocysteine levels (12.4 μmol/L).</li>
+              <li><strong>CYP3A4 (rs2740574) - AG genotype:</strong> This variant affects drug metabolism and explains potential interactions between supplements in her regimen.</li>
+              <li><strong>IL6R (rs2228145) - AC genotype:</strong> This variant beneficially modifies her inflammatory response, explaining her excellent response to Immune Modulator therapy.</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;">Key biological pathways affected include:</p>
+            <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+              <li>Insulin Signaling (TCF7L2, PPARG): Strong negative impact, but high intervention potential</li>
+              <li>Folate Metabolism (MTHFR): Moderate negative impact, high intervention potential</li>
+              <li>Inflammatory Response (IL6R): Moderate positive impact</li>
+              <li>Xenobiotic Metabolism (CYP3A4): Moderate negative impact, affecting supplement interactions</li>
+            </ol>
+
+            <p style="margin-top: 0.75rem;">The genomic analysis reveals why Isabel has responded well to some interventions but not others. Her TCF7L2 TT genotype is particularly significant, as it explains her suboptimal glucose control despite lifestyle modifications. The good news is that carriers of this variant show enhanced response to specific interventions like berberine and time-restricted eating.</p>
+            
+            <p style="margin-top: 0.75rem;">Would you like me to explore specific gene-diet interactions or pharmacogenomic implications in more detail?</p>
+          `;
+        } else if (userMessageLower.includes('explain') || userMessageLower.includes('why') || userMessageLower.includes('how')) {
+          return `
+            <p>Let me explain the reasoning behind my recommendations for Isabel:</p>
+            
+            <p style="margin-top: 0.75rem;"><strong>The TCF7L2 Gene Variant Connection:</strong></p>
+            <p>Isabel's TCF7L2 (rs7903146) TT genotype is the most significant factor influencing my recommendations. This variant affects the incretin effect - how her body releases insulin in response to meals. Research shows that carriers of this variant:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>Have a 40-50% reduction in meal-stimulated GLP-1 secretion</li>
+              <li>Show impaired first-phase insulin response</li>
+              <li>Experience higher postprandial glucose excursions</li>
+            </ul>
+            
+            <p style="margin-top: 0.75rem;">This explains why her fasting glucose remains elevated despite improvements in other biomarkers. The recommended interventions specifically target this genetic predisposition:</p>
+            
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li><strong>Berberine:</strong> Activates AMPK pathway and increases GLP-1 secretion, effectively compensating for the genetic deficit. Zhang et al. (2022) showed a 24% improvement in insulin sensitivity for TCF7L2 TT carriers.</li>
+              <li><strong>Time-Restricted Eating:</strong> Improves metabolic flexibility and reduces insulin demand. Martinez-Lopez et al. (2021) found TT carriers showed 18% greater glucose improvements with an 8-hour eating window compared to non-carriers.</li>
+              <li><strong>Magnesium:</strong> Acts as a cofactor for insulin signaling. TCF7L2 variant carriers show higher magnesium requirements for optimal glucose metabolism.</li>
+            </ul>
+            
+            <p style="margin-top: 0.75rem;">The PPARG CG variant further influences her metabolic profile, showing enhanced response to Alpha Lipoic Acid and specific exercise protocols.</p>
+            
+            <p style="margin-top: 0.75rem;">By precisely targeting these genetic variants with evidence-based interventions, we can achieve metabolic optimization that would be impossible with a standard approach.</p>
+            
+            <p style="margin-top: 0.75rem;">Would you like me to provide specific study references or explain the mechanism of action for any particular recommendation?</p>
+          `;
+        } else {
+          return `
+            <p>Based on my comprehensive analysis of Isabel's genomic data, biomarkers, and health history, here are my key findings:</p>
+
+            <p style="margin-top: 0.75rem;"><strong>Genomic Insights:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>TCF7L2 (rs7903146) TT genotype - strongest type 2 diabetes risk variant, affecting incretin response and insulin secretion</li>
+              <li>PPARG (rs1801282) CG genotype - moderately impacts insulin sensitivity and fat metabolism</li>
+              <li>MTHFR (rs1801133) CT genotype - influences folate metabolism and homocysteine levels</li>
+              <li>CYP3A4 (rs2740574) AG genotype - affects drug/supplement metabolism and interactions</li>
+              <li>IL6R (rs2228145) AC genotype - beneficially modifies inflammatory response</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;"><strong>Biomarker Analysis:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>Biological age has decreased from 54.4 to 52.3 years over the past 4 months</li>
+              <li>Key improvements: inflammatory marker reduction (hsCRP down 45%), HbA1c normalized to 5.6%</li>
+              <li>Areas requiring attention: fasting glucose (still elevated at 105 mg/dL) and homocysteine (12.4 μmol/L)</li>
+              <li>Epigenetic age markers show positive response to current protocol, with opportunity for enhancement</li>
+            </ul>
+
+            <p style="margin-top: 0.75rem;"><strong>AI Pattern Recognition:</strong></p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.25rem;">
+              <li>Identified strong correlation between genetic variants and response to specific interventions</li>
+              <li>TCF7L2 TT genotype explains suboptimal glucose response despite lifestyle modifications</li>
+              <li>Detected improved inflammatory markers following Hidroterapia Ionizante, potentiated by IL6R variant</li>
+              <li>Identified potential supplement interaction risk due to CYP3A4 variant</li>
+            </ul>
+            
+            <p style="margin-top: 0.75rem;">I've prepared evidence-based, genetically-targeted recommendations to optimize Isabel's protocol. Would you like me to focus on a specific aspect of her health, or should I present the complete genomically-guided optimization plan?</p>
+          `;
+        }
+      }
+
+      sendButton.addEventListener('click', sendMessage);
+
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+
+      // Function to update chart colors based on current theme
+      function updateChartColors() {
+        if (!window.biomarkerChart) return;
+        
+        if (document.body.classList.contains('dark-mode')) {
+          window.biomarkerChart.options.plugins.tooltip.backgroundColor = 'rgba(31, 41, 55, 0.9)';
+          window.biomarkerChart.options.plugins.tooltip.titleColor = '#F9FAFB';
+          window.biomarkerChart.options.plugins.tooltip.bodyColor = '#F9FAFB';
+          window.biomarkerChart.options.plugins.tooltip.borderColor = '#4B5563';
+        } else {
+          window.biomarkerChart.options.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+          window.biomarkerChart.options.plugins.tooltip.titleColor = '#1F2937';
+          window.biomarkerChart.options.plugins.tooltip.bodyColor = '#1F2937';
+          window.biomarkerChart.options.plugins.tooltip.borderColor = '#E5E7EB';
+        }
+      }
+
+      // Biomarker Chart
+      function initBiomarkerChart() {
+        const ctx = document.getElementById('biomarker-chart').getContext('2d');
+
+        // Check if chart already exists
+        if (window.biomarkerChart) {
+          window.biomarkerChart.destroy();
+        }
+
+        // Chart data
+        const labels = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+        const glucoseData = [118, 115, 112, 110, 108, 105];
+        const hbA1cData = [5.9, 5.9, 5.8, 5.7, 5.7, 5.6];
+        const hscrpData = [3.8, 3.6, 3.2, 2.8, 2.4, 2.1];
+        
+        // Create chart
+        window.biomarkerChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Glucose (mg/dL)',
+                data: glucoseData,
+                borderColor: '#F59E0B',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+              },
+              {
+                label: 'HbA1c (%)',
+                data: hbA1cData,
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                yAxisID: 'y1'
+              },
+              {
+                label: 'hsCRP (mg/L)',
+                data: hscrpData, 
+                borderColor: '#EF4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                yAxisID: 'y2'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: 'index',
+              intersect: false
+            },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  font: {
+                    size: 12
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1F2937', 
+                bodyColor: '#1F2937',
+                borderColor: '#E5E7EB',
+                borderWidth: 1,
+                padding: 10,
+                boxPadding: 5,
+                usePointStyle: true,
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    let value = context.parsed.y;
+
+                    if (label) {
+                      label += ': ';
+                    }
+
+                    if (context.datasetIndex === 0) {
+                      label += value + ' mg/dL';
+                    } else if (context.datasetIndex === 1) {
+                      label += value + '%';
+                    } else if (context.datasetIndex === 2) {
+                      label += value + ' mg/L';
+                    }
+
+                    return label;
+                  }
+                }
+              }
+            },
+            scales: { 
+              x: {
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                min: 95,
+                max: 125,
+                title: {
+                  display: true,
+                  text: 'Glucose (mg/dL)'
+                },
+                grid: {
+                  borderDash: [2, 2]
+                },
+                ticks: {
+                  callback: function(value) {
+                    return value + ' mg/dL';
+                  }
+                }
+              },
+              y1: {
+                min: 5.4,
+                max: 6.1,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: 'HbA1c (%)'
+                }, 
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              },
+              y2: {
+                min: 1.5,
+                max: 4.5,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: 'hsCRP (mg/L)'
+                },
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  callback: function(value) {
+                    return value + ' mg/L';
+                  }
+                }
+              }
+            }
+          }
+        });
+        
+        // Update chart colors based on current theme
+        updateChartColors();
+      }
+
+      // Toggle Dark/Light Mode
+      const themeToggle = document.getElementById('theme-toggle');
+
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+
+        const icon = themeToggle.querySelector('i');
+        if (document.body.classList.contains('dark-mode')) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+
+        // Update chart colors if it exists
+        if (window.biomarkerChart) {
+          updateChartColors();
+          window.biomarkerChart.update();
+        }
+      });
+      
+      // Knowledge Base Search
+      const knowledgeSearch = document.getElementById('knowledge-search');
+      const searchButton = document.getElementById('search-button');
+      
+      if (searchButton) {
+        searchButton.addEventListener('click', function() {
+          const searchTerm = knowledgeSearch.value.trim();
+          if (searchTerm) {
+            alert('Searching for: ' + searchTerm + '\n\nThis would connect to the curated knowledge databases (ClinVar, dbSNP, PubMed, etc.) to retrieve relevant information.');
+          }
+        });
+      }
+      
+      if (knowledgeSearch) {
+        knowledgeSearch.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            searchButton.click();
+          }
+        });
+      }
+
+      // Initialize the first tab
+      initBiomarkerChart();
+    });
+  </script>
+</body>
+</html>

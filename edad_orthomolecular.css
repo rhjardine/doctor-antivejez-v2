@@ -1,0 +1,136 @@
+/* edad_orthomolecular.css */
+
+/* Reset y tipografía */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+  }
+  
+  /* Encabezado */
+  header {
+    background-color: #23BCEF;
+    padding: 1rem;
+    text-align: center;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  
+  /* Contenedor principal */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+  }
+  
+  /* Títulos */
+  h1, h2 {
+    color: #293B64;
+  }
+  
+  /* Grilla de formulario */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-group label {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+    color: #293B64;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.5rem;
+    border: 1px solid #293B64;
+    border-radius: 4px;
+    background: #f5f6f5;
+    transition: border-color 0.3s ease;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: #23BCEF;
+    outline: none;
+  }
+  .form-group.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  /* Sección de Resultados */
+  .result-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .result-field {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+  .result-field label {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+    color: #293B64;
+  }
+  .result-field input {
+    padding: 0.5rem;
+    border: 1px solid #293B64;
+    border-radius: 4px;
+    background: #e9ecef;
+    text-align: center;
+  }
+  
+  /* Botones de acción */
+  .form-buttons {
+    text-align: center;
+    margin: 1rem 0;
+  }
+  .form-buttons button {
+    padding: 0.75rem 1.5rem;
+    margin: 0 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background: #293B64;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  .form-buttons button:hover {
+    background: #1f2a44;
+  }
+  .form-buttons.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .result-fields {
+      flex-direction: column;
+    }
+    .container {
+      padding: 1rem;
+    }
+  }

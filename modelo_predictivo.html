@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Predicción de Salud con TensorFlow.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        #result { margin-top: 20px; padding: 15px; background: #f0f0f0; }
+        #loading { display: none; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Análisis Predictivo de Salud</h1>
+        
+        <div id="loading">Cargando modelo... <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2UggSguEfi6UGMNfc33oJaQ0yLAEqUwDLZVJyOTi4QnGuDMLsmEJyMA4LdSE1wwFmrC0yzYnH4zTKprxyT03U3081T2904uLuLWd6vP2uA0GAFu3gXIAQA7" width="24" height="24"></div>
+        
+        <!-- Todos los campos de entrada -->
+        <div class="input-group">
+            <label>Edad:</label>
+            <input type="number" id="age" placeholder="Edad en años" required>
+        </div>
+        <div class="input-group">
+            <label>Género (0=Femenino, 1=Masculino):</label>
+            <input type="number" id="gender" placeholder="0 o 1" required>
+        </div>
+        <div class="input-group">
+            <label>IMC (Índice de Masa Corporal):</label>
+            <input type="number" step="0.1" id="bmi" placeholder="Ej: 24.5" required>
+        </div>
+        <div class="input-group">
+            <label>Presión Arterial (mmHg):</label>
+            <input type="number" id="bloodPressure" placeholder="Ej: 120" required>
+        </div>
+        <div class="input-group">
+            <label>Colesterol Total (mg/dL):</label>
+            <input type="number" id="cholesterol" placeholder="Ej: 180" required>
+        </div>
+        <div class="input-group">
+            <label>Glucosa en Sangre (mg/dL):</label>
+            <input type="number" id="glucose" placeholder="Ej: 90" required>
+        </div>
+        <div class="input-group">
+            <label>Marcadores Genéticos (0-10):</label>
+            <input type="number" id="geneticMarkers" placeholder="Ej: 3" required>
+        </div>
+        <div class="input-group">
+            <label>Edad Epigenética:</label>
+            <input type="number" id="epigeneticAge" placeholder="Edad en años" required>
+        </div>
+        <div class="input-group">
+            <label>Longitud de Telómeros (kb):</label>
+            <input type="number" step="0.1" id="telomereLength" placeholder="Ej: 5.6" required>
+        </div>
+        <div class="input-group">
+            <label>Marcadores Inflamatorios (0-10):</label>
+            <input type="number" id="inflammatoryMarkers" placeholder="Ej: 2" required>
+        </div>
+        <div class="input-group">
+            <label>Estrés Oxidativo (0-10):</label>
+            <input type="number" id="oxidativeStress" placeholder="Ej: 4" required>
+        </div>
+        
+        <button id="predictButton" disabled>Predecir Salud</button>
+        <div id="result"></div>
+        <div id="validationMetrics"></div>
+    </div>
+
+    <script>
+        let model;
+        let mean;
+        let std;
+        let isReady = false;
+
+        async function init() {
+            try {
+                showLoading();
+                
+                const [data, labels] = generateClinicalData(2000);
+                
+                const split = 0.8;
+                const trainSize = Math.floor(data.shape[0] * split);
+                
+                const xTrain = data.slice([0,0], [trainSize, 11]);
+                const yTrain = labels.slice([0,0], [trainSize, 1]);
+                
+                const xVal = data.slice([trainSize,0], [data.shape[0]-trainSize, 11]);
+                const yVal = labels.slice([trainSize,0], [data.shape[0]-trainSize, 1]);
+
+                mean = xTrain.mean(0);
+                std = xTrain.std(0);
+                
+                const xNormTrain = xTrain.sub(mean).div(std);
+                const xNormVal = xVal.sub(mean).div(std);
+                
+                model = await createModel();
+                await trainModel(model, xNormTrain, yTrain, xNormVal, yVal);
+                
+                const eval = await model.evaluate(xNormVal, yVal);
+                document.getElementById('validationMetrics').innerHTML = `
+                    <h3>Métricas de Validación:</h3>
+                    <p>Precisión: ${eval[1].toFixed(2)}</p>
+                    <p>AUC: ${eval[2].toFixed(2)}</p>
+                `;
+                
+                hideLoading();
+                document.getElementById('predictButton').disabled = false;
+                isReady = true;
+                
+            } catch (error) {
+                console.error("Error crítico:", error);
+                alert("Hubo un error al inicializar el sistema. Verifique la consola de desarrollador.");
+            }
+        }
+
+        async function createModel() {
+            const model = tf.sequential();
+            model.add(tf.layers.dense({inputShape: [11], units: 128, activation: 'relu'}));
+            model.add(tf.layers.batchNormalization());
+            model.add(tf.layers.dropout({rate: 0.3}));
+            model.add(tf.layers.dense({units: 64, activation: 'relu'}));
+            model.add(tf.layers.dense({units: 1, activation: 'sigmoid'}));
+            model.compile({
+                optimizer: tf.train.adam(0.001),
+                loss: 'binaryCrossentropy',
+                metrics: ['accuracy', tf.metrics.auc()]
+            });
+            return model;
+        }
+
+        async function trainModel(model, xTrain, yTrain, xVal, yVal) {
+            return model.fit(xTrain, yTrain, {
+                validationData: [xVal, yVal],
+                epochs: 50,
+                batchSize: 32,
+                shuffle: true,
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => {
+                        if (epoch % 10 === 0) {
+                            console.log(Epoch ${epoch}: Loss ${logs.loss});
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateClinicalData(samples=2000) {
+            const data = [];
+            const labels = [];
+            for (let i = 0; i < samples; i++) {
+                const age = Math.random() * 60 + 20;
+                const gender = Math.round(Math.random());
+                const bmi = Math.random() * 15 + 18;
+                const bloodPressure = Math.random() * 40 + 100;
+                const cholesterol = Math.random() * 150 + 150;
+                const glucose = Math.random() * 100 + 50;
+                const geneticRisk = Math.random() * 10;
+                const epigeneticAge = age + Math.random() * 10;
+                const telomereLength = Math.random() * 5 + 5;
+                const inflammatory = Math.random() * 10;
+                const oxidative = Math.random() * 10;
+                
+                const riskScore = 
+                    (age > 65 ? 0.4 : 0) + 
+                    (bmi > 30 ? 0.3 : 0) + 
+                    (bloodPressure > 130 ? 0.25 : 0) + 
+                    (cholesterol > 200 ? 0.2 : 0) + 
+                    (glucose > 126 ? 0.2 : 0) + 
+                    (geneticRisk > 7 ? 0.3 : 0);
+                
+                data.push([
+                    age, gender, bmi, bloodPressure, cholesterol, 
+                    glucose, geneticRisk, epigeneticAge, telomereLength, 
+                    inflammatory, oxidative
+                ]);
+                labels.push(riskScore > 1.5 ? 1 : 0);
+            }
+            return [tf.tensor2d(data), tf.tensor2d(labels, [samples, 1])];
+        }
+
+        async function predictHealth() {
+            if (!isReady) return alert("El sistema aún no está listo");
+            
+            const inputs = [
+                document.getElementById('age').valueAsNumber,
+                document.getElementById('gender').valueAsNumber,
+                document.getElementById('bmi').valueAsNumber,
+                document.getElementById('bloodPressure').valueAsNumber,
+                document.getElementById('cholesterol').valueAsNumber,
+                document.getElementById('glucose').valueAsNumber,
+                document.getElementById('geneticMarkers').valueAsNumber,
+                document.getElementById('epigeneticAge').valueAsNumber,
+                document.getElementById('telomereLength').valueAsNumber,
+                document.getElementById('inflammatoryMarkers').valueAsNumber,
+                document.getElementById('oxidativeStress').valueAsNumber
+            ];
+
+            if (inputs.some(isNaN)) {
+                return alert("Por favor complete todos los campos con valores numéricos");
+            }
+
+            const inputTensor = tf.tensor2d([inputs]);
+            const normInput = inputTensor.sub(mean).div(std);
+            const prediction = model.predict(normInput);
+            const score = await prediction.data();
+            
+            document.getElementById('result').innerHTML = `
+                <h3>Resultado de la Predicción:</h3>
+                <p>Riesgo de comorbilidades: ${score[0] > 0.5 ? 'ALTO' : 'BAJO'}</p>
+                <p>Confianza: ${(score[0] * 100).toFixed(1)}%</p>
+            `;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        window.onload = async () => {
+            await init();
+        };
+    </script>
+</body>
+</html>

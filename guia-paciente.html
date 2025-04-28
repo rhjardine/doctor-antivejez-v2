@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Paciente - Doctor Antivejez</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+        .preview-section {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <!-- Encabezado -->
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <img src="logo.png" alt="Doctor Antivejez" class="h-12 mr-4">
+                <h1 class="text-2xl font-bold text-blue-900">Guía del Paciente</h1>
+            </div>
+            <div>
+                <input type="text" id="patient-name" placeholder="Nombre del Paciente" class="border p-2 rounded mr-2">
+                <input type="date" id="patient-date" class="border p-2 rounded">
+            </div>
+        </header>
+
+        <!-- Barra de Navegación (Pestañas) -->
+        <nav class="flex space-x-4 mb-6">
+            <button class="tab-btn px-4 py-2 bg-cyan-500 text-white rounded" data-tab="fases">Fases</button>
+            <button class="tab-btn px-4 py-2 bg-white text-blue-900 rounded" data-tab="nutraceuticos">Nutracéuticos</button>
+            <button class="tab-btn px-4 py-2 bg-white text-blue-900 rounded" data-tab="formulas">Fórmulas Naturales</button>
+        </nav>
+
+        <!-- Contenido Principal (Dos Columnas) -->
+        <div class="flex space-x-4">
+            <!-- Columna Izquierda: Formulario -->
+            <div class="w-1/2">
+                <!-- Pestaña: Fases -->
+                <div id="fases" class="tab-content active bg-white p-4 rounded shadow mb-4">
+                    <h2 class="text-lg font-bold text-blue-900 mb-2">Fase de Remoción</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Cucharadas al acostarse</label>
+                        <input type="checkbox" id="cucharadas" checked> 1 sola vez
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Detoxificación Alcalina</label>
+                        <select id="detox" class="border p-2 rounded w-full">
+                            <option value="1 semana">1 semana</option>
+                            <option value="2 semanas">2 semanas</option>
+                            <option value="3 semanas">3 semanas</option>
+                        </select>
+                        <div class="mt-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" id="nino" class="form-checkbox"> <span class="ml-2">Niño</span>
+                            </label>
+                            <label class="inline-flex items-center ml-4">
+                                <input type="checkbox" id="adulto" class="form-checkbox"> <span class="ml-2">Adulto</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pestaña: Nutracéuticos -->
+                <div id="nutraceuticos" class="tab-content bg-white p-4 rounded shadow mb-4">
+                    <h2 class="text-lg font-bold text-blue-900 mb-2">Nutracéuticos</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Producto</label>
+                        <input type="text" id="producto" class="border p-2 rounded w-full" placeholder="Ej. Vitamina C">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Dosis Diaria</label>
+                        <input type="text" id="dosis" class="border p-2 rounded w-full" placeholder="Ej. 2 cápsulas">
+                    </div>
+                </div>
+
+                <!-- Pestaña: Fórmulas Naturales -->
+                <div id="formulas" class="tab-content bg-white p-4 rounded shadow mb-4">
+                    <h2 class="text-lg font-bold text-blue-900 mb-2">Fórmulas Naturales</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Fórmula</label>
+                        <input type="text" id="formula" class="border p-2 rounded w-full" placeholder="Ej. Infusión de manzanilla">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Instrucciones</label>
+                        <textarea id="instrucciones" class="border p-2 rounded w-full" placeholder="Ej. Tomar 1 taza antes de dormir"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Vista Previa -->
+            <div class="w-1/2">
+                <div class="preview-section">
+                    <h2 class="text-lg font-bold text-blue-900 mb-2">Vista Previa</h2>
+                    <p><strong>Nombre del Paciente:</strong> <span id="preview-name">[Nombre]</span></p>
+                    <p><strong>Fecha:</strong> <span id="preview-date">[Fecha]</span></p>
+                    <div class="mt-4">
+                        <h3 class="text-md font-bold text-blue-900">Fase de Remoción</h3>
+                        <ul class="list-disc ml-6">
+                            <li>Cucharadas al acostarse: <span id="preview-cucharadas">1 sola vez</span></li>
+                            <li>Detoxificación Alcalina: <span id="preview-detox">[Selección]</span></li>
+                            <li>Público: <span id="preview-publico">[Niño/Adulto]</span></li>
+                        </ul>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-md font-bold text-blue-900">Nutracéuticos</h3>
+                        <ul class="list-disc ml-6">
+                            <li>Producto: <span id="preview-producto">[Producto]</span></li>
+                            <li>Dosis: <span id="preview-dosis">[Dosis]</span></li>
+                        </ul>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-md font-bold text-blue-900">Fórmulas Naturales</h3>
+                        <ul class="list-disc ml-6">
+                            <li>Fórmula: <span id="preview-formula">[Fórmula]</span></li>
+                            <li>Instrucciones: <span id="preview-instrucciones">[Instrucciones]</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Acciones (Sticky Footer) -->
+        <div class="sticky-footer flex justify-end space-x-4">
+            <button class="px-4 py-2 bg-gray-500 text-white rounded flex items-center">
+                <i class="fas fa-save mr-2"></i> Guardar Borrador
+            </button>
+            <button class="px-4 py-2 bg-blue-900 text-white rounded flex items-center">
+                <i class="fas fa-eye mr-2"></i> Vista Previa
+            </button>
+            <button class="px-4 py-2 bg-cyan-500 text-white rounded flex items-center">
+                <i class="fas fa-print mr-2"></i> Imprimir
+            </button>
+            <button class="px-4 py-2 bg-cyan-500 text-white rounded flex items-center">
+                <i class="fas fa-envelope mr-2"></i> Enviar
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts para interactividad -->
+    <script>
+        // Manejo de pestañas
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('bg-cyan-500', 'text-white'));
+                tabs.forEach(t => t.classList.add('bg-white', 'text-blue-900'));
+                tab.classList.remove('bg-white', 'text-blue-900');
+                tab.classList.add('bg-cyan-500', 'text-white');
+
+                contents.forEach(content => content.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Actualización de la vista previa
+        function updatePreview() {
+            document.getElementById('preview-name').textContent = document.getElementById('patient-name').value || '[Nombre]';
+            document.getElementById('preview-date').textContent = document.getElementById('patient-date').value || '[Fecha]';
+            document.getElementById('preview-cucharadas').textContent = document.getElementById('cucharadas').checked ? '1 sola vez' : 'No especificado';
+            document.getElementById('preview-detox').textContent = document.getElementById('detox').value || '[Selección]';
+            document.getElementById('preview-publico').textContent = (document.getElementById('nino').checked ? 'Niño' : '') + (document.getElementById('adulto').checked ? ' Adulto' : '') || '[Niño/Adulto]';
+            document.getElementById('preview-producto').textContent = document.getElementById('producto').value || '[Producto]';
+            document.getElementById('preview-dosis').textContent = document.getElementById('dosis').value || '[Dosis]';
+            document.getElementById('preview-formula').textContent = document.getElementById('formula').value || '[Fórmula]';
+            document.getElementById('preview-instrucciones').textContent = document.getElementById('instrucciones').value || '[Instrucciones]';
+        }
+
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', updatePreview);
+            element.addEventListener('change', updatePreview);
+        });
+
+        // Inicializar vista previa
+        updatePreview();
+    </script>
+</body>
+</html>

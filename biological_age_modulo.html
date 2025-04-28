@@ -1,0 +1,482 @@
+//<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Antivejez - Cálculo de Edad Biológica</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
+  <!-- Bootstrap Icons (opcional) -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  >
+
+  <style>
+    :root {
+      --color-dark-blue: #293B64;   /* Azul oscuro */
+      --color-light-blue: #5BA1D7;  /* Azul claro */
+      --color-perla: #f2f2f2;       /* Gris perlado */
+      --color-white: #ffffff;
+      --color-gray: #888888;
+      --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--color-perla);
+      font-family: var(--font-family-main);
+    }
+
+    /* Sidebar (panel lateral) */
+    .sidebar {
+      background-color: var(--color-dark-blue);
+      color: var(--color-white);
+      min-height: 100vh;
+    }
+    .sidebar .patient-info {
+      padding: 20px;
+    }
+    .sidebar .patient-info h5 {
+      margin-bottom: 10px;
+    }
+    .sidebar .patient-data {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Card headers en azul claro */
+    .card-header {
+      background-color: var(--color-light-blue);
+      color: var(--color-white);
+      cursor: pointer;
+    }
+    .card-header h5 {
+      margin: 0;
+    }
+    .card-header i {
+      margin-right: 8px;
+    }
+
+    /* Botón principal */
+    .btn-primary {
+      background-color: var(--color-light-blue);
+      border-color: var(--color-light-blue);
+    }
+    .btn-primary:hover {
+      background-color: #4b8fbe;
+      border-color: #4b8fbe;
+    }
+
+    /* Scroll en la columna principal si es muy larga */
+    .main-content {
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR (Panel Lateral) -->
+    <div class="col-12 col-md-3 col-lg-2 sidebar d-flex flex-column">
+      <div class="patient-info">
+        <h5>Paciente:</h5>
+        <div class="patient-data">
+          <strong>Nombre y Apellido:</strong> Juan Pérez<br>
+          <strong>Edad:</strong> 82 años<br>
+          <strong>Sexo:</strong> Masculino<br>
+          <strong>C.I.:</strong> V-12.345.678<br>
+          <strong>Altura:</strong> 1.70 m<br>
+          <strong>Peso:</strong> 70 kg
+        </div>
+      </div>
+      <hr class="bg-light">
+      <div class="mt-auto p-3">
+        <button class="btn btn-light w-100 mb-2">Editar Paciente</button>
+        <button class="btn btn-light w-100">Volver</button>
+      </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="col-12 col-md-9 col-lg-10 main-content">
+      <h1 class="text-center mb-4">Panel de Cálculo - Doctor Antivejez</h1>
+
+      <!-- CARD: EDAD BIOFÍSICA -->
+      <div class="card mb-3">
+        <div 
+          class="card-header d-flex align-items-center justify-content-between" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#collapseBiofisica"
+        >
+          <h5 class="mb-0">
+            <i class="bi bi-activity"></i>
+            Edad Biofísica
+          </h5>
+          <i class="bi bi-caret-down-fill"></i>
+        </div>
+        <div id="collapseBiofisica" class="collapse show">
+          <div class="card-body">
+            <!-- Formulario Biofísica -->
+            <div class="row g-3">
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Género</label>
+                <select class="form-select">
+                  <option>Femenino</option>
+                  <option>Masculino</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">% Grasa</label>
+                <input type="number" class="form-control" placeholder="Ej: 25.0">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Índice de masa corporal</label>
+                <input type="number" class="form-control" placeholder="Ej: 22.3">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Reflejos Digitales (cm)</label>
+                <input type="number" class="form-control" placeholder="Ej: 5.2">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Acomodación Visual (cm)</label>
+                <input type="number" class="form-control" placeholder="Ej: 10.0">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Balance Estático (seg)</label>
+                <input type="number" class="form-control" placeholder="Ej: 30">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Hidratación Cutánea (seg)</label>
+                <input type="number" class="form-control" placeholder="Ej: 15">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Sistólica</label>
+                <input type="number" class="form-control" placeholder="Ej: 120">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Diastólica</label>
+                <input type="number" class="form-control" placeholder="Ej: 80">
+              </div>
+            </div>
+          </div>
+          <!-- Resultados inferiores -->
+          <div class="card-footer">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Edad Cronológica</label>
+                <input type="number" class="form-control" value="82" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Biofísica</label>
+                <input type="number" class="form-control" value="0" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Diferencial</label>
+                <input type="text" class="form-control" value="0" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD: EDAD BIOQUÍMICA -->
+      <div class="card mb-3">
+        <div 
+          class="card-header d-flex align-items-center justify-content-between" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#collapseBioquimica"
+        >
+          <h5 class="mb-0">
+            <i class="bi bi-droplet-half"></i>
+            Edad Bioquímica
+          </h5>
+          <i class="bi bi-caret-down-fill"></i>
+        </div>
+        <div id="collapseBioquimica" class="collapse">
+          <div class="card-body">
+            <!-- Formulario Bioquímica -->
+            <div class="row g-3">
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Somatomedina C (IGF-1) (ng/ml)</label>
+                <input type="number" class="form-control" placeholder="Ej: 150">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Hb Glicosilada (%)</label>
+                <input type="number" class="form-control" placeholder="Ej: 5.8">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Insulina Basal (mui/ml)</label>
+                <input type="number" class="form-control" placeholder="Ej: 6.0">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Post Prandial (mui/ml)</label>
+                <input type="number" class="form-control" placeholder="Ej: 30">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Relación TG (mg/dl) - HDL</label>
+                <input type="text" class="form-control" placeholder="Ej: 2.5">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">DHEA-S (ug/dl)</label>
+                <input type="number" class="form-control" placeholder="Ej: 150">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Homocisteína (umol/L)</label>
+                <input type="number" class="form-control" placeholder="Ej: 10">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">PSA Total / Libre (%)</label>
+                <input type="text" class="form-control" placeholder="Ej: 2.3 / 0.8">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">FSH UI/L</label>
+                <input type="number" class="form-control" placeholder="Ej: 10.5">
+              </div>
+              <div class="col-sm-6 col-md-4">
+                <label class="form-label">Densitometría ósea (F)</label>
+                <input type="text" class="form-control" placeholder="Ej: -1.5 T-score">
+              </div>
+            </div>
+          </div>
+          <!-- Resultados inferiores -->
+          <div class="card-footer">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Edad Cronológica</label>
+                <input type="number" class="form-control" value="82" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Bioquímica</label>
+                <input type="number" class="form-control" value="0" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Diferencial</label>
+                <input type="text" class="form-control" value="0" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD: EDAD ORTOMOLECULAR -->
+      <div class="card mb-3">
+        <div 
+          class="card-header d-flex align-items-center justify-content-between" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#collapseOrtomolecular"
+        >
+          <h5 class="mb-0">
+            <i class="bi bi-flask"></i>
+            Edad Ortomolecular
+          </h5>
+          <i class="bi bi-caret-down-fill"></i>
+        </div>
+        <div id="collapseOrtomolecular" class="collapse">
+          <div class="card-body">
+            <!-- Campos Ortomoleculares -->
+            <div class="row g-3">
+              <!-- Se sugiere usar col-sm-6 col-md-4 col-lg-3 para acomodar la gran cantidad de campos -->
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Aluminio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Antimonio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Arsénico</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Bario</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Berilio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Bismuto</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Cadmio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Mercurio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Níquel</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Plata</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Platino</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Plomo</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Talio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Tinio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Titanio</label>
+                <input type="number" class="form-control">
+              </div>
+              <!-- Continúa con los demás elementos (Torio, Uranio, Calcio, Magnesio, etc.) -->
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Torio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Uranio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Calcio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Magnesio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Sodio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Potasio</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Cobre</label>
+                <input type="number" class="form-control">
+              </div>
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Zinc</label>
+                <input type="number" class="form-control">
+              </div>
+              <!-- ... y así sucesivamente para todos los elementos indicados ... -->
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Zirconio</label>
+                <input type="number" class="form-control">
+              </div>
+            </div>
+          </div>
+          <!-- Resultados inferiores -->
+          <div class="card-footer">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Edad Cronológica</label>
+                <input type="number" class="form-control" value="82" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Ortomolecular</label>
+                <input type="number" class="form-control" value="0" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Diferencial</label>
+                <input type="text" class="form-control" value="0" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD: EDAD GENÉTICA (según texto, repite campos Ortomoleculares) -->
+      <div class="card mb-3">
+        <div 
+          class="card-header d-flex align-items-center justify-content-between" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#collapseGenetica"
+        >
+          <h5 class="mb-0">
+            <i class="bi bi-bug"></i>
+            Edad Genética
+          </h5>
+          <i class="bi bi-caret-down-fill"></i>
+        </div>
+        <div id="collapseGenetica" class="collapse">
+          <div class="card-body">
+            <!-- Según el texto, se repiten los mismos elementos que Ortomolecular -->
+            <div class="row g-3">
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Aluminio</label>
+                <input type="number" class="form-control">
+              </div>
+              <!-- Continúa con la misma lista (Antimonio, Arsénico, Bario, etc.) -->
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Antimonio</label>
+                <input type="number" class="form-control">
+              </div>
+              <!-- ... Resto de campos repetidos ... -->
+              <div class="col-sm-6 col-md-4 col-lg-3">
+                <label class="form-label">Zirconio</label>
+                <input type="number" class="form-control">
+              </div>
+            </div>
+          </div>
+          <!-- Resultados inferiores -->
+          <div class="card-footer">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Edad Cronológica</label>
+                <input type="number" class="form-control" value="82" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Genética</label>
+                <input type="number" class="form-control" value="0" readonly>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Edad Diferencial</label>
+                <input type="text" class="form-control" value="0" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón final para guardar todo -->
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg" onclick="guardarDatos()">
+          Guardar Datos
+        </button>
+      </div>
+
+    </div><!-- /.main-content -->
+  </div><!-- /.row -->
+</div><!-- /.container-fluid -->
+
+<!-- Bootstrap 5 JS (incluye Popper) -->
+<script 
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js">
+</script>
+<script>
+  function guardarDatos() {
+    alert('Datos guardados correctamente.');
+  }
+</script>
+
+</body>
+</html>//

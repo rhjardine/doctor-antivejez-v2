@@ -1,0 +1,40 @@
+{
+    "pacientes": [
+        {
+            "id": 1,
+            "nombre": "Ana García",
+            "edad": 45,
+            "edadBiologica": 40,
+            "ultimaConsulta": "2024-01-15",
+            "marcadoresBiologicos": {
+                "telomeros": 8.5,
+                "estresOxidativo": "moderado",
+                "inflamacion": "baja"
+            }
+        },
+        {
+            "id": 2, 
+            "nombre": "Carlos Rodríguez",
+            "edad": 52,
+            "edadBiologica": 48,
+            "ultimaConsulta": "2024-01-10",
+            "marcadoresBiologicos": {
+                "telomeros": 7.8,
+                "estresOxidativo": "alto",
+                "inflamacion": "moderada"
+            }
+        },
+        {
+            "id": 3,
+            "nombre": "María López",
+            "edad": 38,
+            "edadBiologica": 35,
+            "ultimaConsulta": "2024-01-20",
+            "marcadoresBiologicos": {
+                "telomeros": 9.2,
+                "estresOxidativo": "bajo",
+                "inflamacion": "baja"
+            }
+        }
+    ]
+}

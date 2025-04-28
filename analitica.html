@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Longevity Platform (Simulación)</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Estilos (Asumiendo que los estilos base están en style.css) -->
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fas fa-dna"></i> <!-- Icono ADN -->
+                <h1>Aegis Longevity</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <!-- Enlaces actualizados para navegación SPA (Single Page Application) -->
+                    <li><a href="#dashboard" class="nav-link active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#data-upload" class="nav-link"><i class="fas fa-cloud-upload-alt"></i> <span>Cargar Datos</span></a></li>
+                    <li><a href="#analysis" class="nav-link"><i class="fas fa-chart-bar"></i> <span>Análisis</span></a></li>
+                    <li><a href="#recommendations" class="nav-link"><i class="fas fa-clipboard-list"></i> <span>Recomendaciones</span></a></li>
+                    <li><a href="#reports" class="nav-link"><i class="fas fa-file-pdf"></i> <span>Informes</span></a></li>
+                    <li><a href="#settings" class="nav-link"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+                </ul>
+            </nav>
+             <div class="sidebar-footer">
+                 <p>© 2024 Aegis Platform</p>
+                 <!-- Botón Tema Oscuro -->
+                 <div class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Modo Oscuro</div>
+             </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- ======================= -->
+            <!-- === DASHBOARD SECTION === -->
+            <!-- ======================= -->
+            <section id="dashboard" class="content-section active">
+                <div class="page-header">
+                    <h2>Dashboard Principal</h2>
+                    <!-- Podrías añadir un selector de paciente aquí si es multi-usuario -->
+                </div>
+                <div class="grid-layout">
+                    <!-- Tarjeta Edad Biológica -->
+                    <div class="card metric-card">
+                        <div class="card-header"><i class="fas fa-heartbeat"></i> Edad Biológica</div>
+                        <div class="value" id="db-bio-age">-- <span class="unit">años</span></div>
+                        <div class="status-indicator status-neutral" id="db-bio-age-status">Calculando...</div>
+                    </div>
+                    <!-- Tarjeta Score Longevidad -->
+                     <div class="card metric-card">
+                        <div class="card-header"><i class="fas fa-shield-alt"></i> Score Longevidad</div>
+                        <div class="value" id="db-longevity-score">-- <span class="unit">/100</span></div>
+                        <div class="status-indicator status-neutral" id="db-longevity-status">Calculando...</div>
+                    </div>
+                    <!-- Tarjeta Marcador Clave (Ej: Inflamación) -->
+                    <div class="card metric-card">
+                        <div class="card-header"><i class="fas fa-fire"></i> Inflamación (hs-CRP)</div>
+                        <div class="value" id="db-inflammation">-- <span class="unit">mg/L</span></div>
+                         <div class="status-indicator status-neutral" id="db-inflammation-status">Calculando...</div>
+                    </div>
+                    <!-- Gráfico Resumen Marcadores (Dona) -->
+                    <div class="card grid-col-span-2"> <!-- Ocupa 2 columnas si hay espacio -->
+                        <div class="card-header"><i class="fas fa-chart-pie"></i> Resumen Marcadores Longevidad</div>
+                         <div class="chart-container" style="min-height: 250px;">
+                             <canvas id="longevityMarkersChart"></canvas>
+                             <!-- Loader Opcional para el gráfico -->
+                             <div id="longevityLoader" class="loader hidden"><div class="spinner"></div></div>
+                         </div>
+                    </div>
+                    <!-- Sección Gamification/Logros (Opcional) -->
+                     <div class="card">
+                         <div class="card-header"><i class="fas fa-trophy"></i> Logros Recientes</div>
+                         <div class="achievements-list" id="achievementsList">
+                             <!-- Se llenará con JS -->
+                             <p class="report-placeholder" style="font-size:0.9em;">Completa análisis para desbloquear logros.</p>
+                         </div>
+                     </div>
+                </div>
+            </section>
+
+            <!-- ========================== -->
+            <!-- === DATA UPLOAD SECTION === -->
+            <!-- ========================== -->
+            <section id="data-upload" class="content-section">
+                <div class="page-header"><h2>Cargar y Conectar Datos</h2></div>
+                 <p class="section-description" style="color: var(--text-light); margin-bottom: 20px;">Sube tus informes o conecta tus dispositivos para un análisis completo.</p>
+                <div class="grid-layout">
+                    <!-- Carga Genómica -->
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-dna"></i> Datos Genómicos</div>
+                        <div class="upload-area" id="uploadGenomic" title="Cargar archivo VCF, BAM, FASTQ...">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Arrastra tu archivo genómico o haz clic.</p>
+                        </div>
+                         <input type="file" id="genomicFile" accept=".vcf,.bam,.fastq,.gz,.zip,.txt" style="display: none;">
+                        <div class="upload-status" id="genomicStatus">Estado: No cargado</div>
+                    </div>
+                    <!-- Carga Labs -->
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-flask"></i> Resultados Laboratorio</div>
+                         <div class="upload-area" id="uploadLabs" title="Cargar PDF o CSV de resultados">
+                            <i class="fas fa-file-pdf"></i>
+                            <p>Arrastra tu informe de laboratorio o haz clic.</p>
+                        </div>
+                        <input type="file" id="labFile" accept=".pdf,.csv,.xlsx" style="display: none;">
+                        <div class="upload-status" id="labStatus">Estado: No cargado</div>
+                    </div>
+                    <!-- Carga Epigenética (si aplica) -->
+                     <div class="card">
+                        <div class="card-header"><i class="fas fa-atom"></i> Datos Epigenéticos (Metilación)</div>
+                         <div class="upload-area" id="uploadEpigenetic" title="Cargar datos de metilación (IDAT, etc.)">
+                            <i class="fas fa-file-waveform"></i> <!-- Icono alternativo -->
+                            <p>Arrastra tu archivo de metilación o haz clic.</p>
+                        </div>
+                        <input type="file" id="epigeneticFile" accept=".idat,.csv,.txt" style="display: none;">
+                        <div class="upload-status" id="epigeneticStatus">Estado: No cargado</div>
+                    </div>
+                    <!-- Conexión Wearables -->
+                     <div class="card">
+                        <div class="card-header"><i class="fas fa-watch"></i> Conectar Wearables</div>
+                        <div style="text-align: center; margin-top:10px;">
+                            <button class="button button-outline" style="margin: 5px;"><i class="fab fa-google"></i> Google Fit</button>
+                            <button class="button button-outline" style="margin: 5px;"><i class="fab fa-apple"></i> Apple Health</button>
+                            <button class="button button-outline" style="margin: 5px;"><i class="fas fa-ring"></i> Oura Ring</button>
+                             <!-- Añadir más -->
+                        </div>
+                        <div class="upload-status" id="wearableStatus" style="margin-top: 15px; text-align: center;">Estado: No conectado</div>
+                    </div>
+                     <!-- Cuestionarios -->
+                     <div class="card">
+                        <div class="card-header"><i class="fas fa-clipboard-list"></i> Cuestionarios</div>
+                        <p style="color: var(--text-light); font-size:0.9em; margin-bottom: 15px;">Completa cuestionarios para refinar tu análisis.</p>
+                        <button class="button" style="width: 100%;"><i class="fas fa-pencil-alt"></i> Estilo de Vida y Hábitos</button>
+                         <div class="upload-status" id="questionnaireStatus" style="margin-top: 15px; text-align: center;">Estado: Pendiente</div>
+                    </div>
+                </div>
+                 <div class="card" style="margin-top: 25px; background-color: var(--status-neutral-bg);"> <!-- Security Note -->
+                     <p style="font-size: 0.9em; color: var(--text-light); text-align: center; margin:0;"><i class="fas fa-lock"></i> Tus datos se procesan de forma segura y privada. Revisa nuestros <a href="#settings" class="nav-link" style="display:inline; padding:0; color: var(--accent-color);">Ajustes de Consentimiento</a>.</p>
+                 </div>
+            </section>
+
+            <!-- ======================= -->
+            <!-- === ANALYSIS SECTION === -->
+            <!-- ======================= -->
+            <section id="analysis" class="content-section">
+                 <div class="page-header">
+                     <h2>Resultados del Análisis Multi-ómico</h2>
+                     <button class="button" id="runFullAnalysisBtn"><i class="fas fa-sync-alt"></i> Volver a Analizar</button>
+                 </div>
+
+                 <!-- Loader mientras analiza -->
+                 <div id="analysisLoader" class="loader hidden">
+                     <div class="spinner"></div>
+                     <p>Analizando datos genómicos, epigenéticos y biomarcadores... <br><small>(Esto puede tardar unos momentos)</small></p>
+                 </div>
+
+                 <!-- Contenido de Resultados (inicialmente oculto) -->
+                 <div id="analysisResultsContent" class="hidden">
+                     <div class="grid-layout">
+                        <!-- Edad Biológica Detallada -->
+                        <div class="card grid-col-span-2">
+                            <div class="card-header"><i class="fas fa-user-clock"></i> Edad Biológica vs. Cronológica</div>
+                            <div class="chart-container" style="min-height: 350px;"><canvas id="detailedBioAgeChart"></canvas></div>
+                             <div style="text-align:center; font-size:0.85em; color: var(--text-light); margin-top: 5px;">*Reloj Epigenético: <span id="analysis-bio-age-clock-detail">--</span></div>
+                        </div>
+
+                         <!-- Score Longevidad -->
+                         <div class="card metric-card">
+                            <div class="card-header"><i class="fas fa-shield-heart"></i> Score Longevidad</div>
+                            <div class="value" id="analysis-longevity-score-detail">-- <span class="unit">/100</span></div>
+                            <div class="status-indicator status-neutral" id="analysis-longevity-status-detail">Calculando...</div>
+                             <p style="font-size:0.85em; margin-top: 5px; color: var(--text-light);">Basado en múltiples factores.</p>
+                        </div>
+
+                        <!-- Top Biomarcadores -->
+                         <div class="card">
+                             <div class="card-header"><i class="fas fa-star"></i> Biomarcadores Destacados</div>
+                             <div id="topBiomarkersList">
+                                 <p class="report-placeholder">Resultados clave aparecerán aquí.</p>
+                             </div>
+                         </div>
+
+                        <!-- Insights Nutrigenómicos -->
+                         <div class="card grid-col-span-2">
+                             <div class="card-header"><i class="fas fa-apple-alt"></i> Insights Nutrigenómicos</div>
+                             <div id="nutrigenomicsSummaryDetail">
+                                 <p class="report-placeholder">Recomendaciones nutricionales basadas en tu genética.</p>
+                             </div>
+                         </div>
+
+                          <!-- Visualizaciones Avanzadas (Placeholders) -->
+                         <div class="card grid-col-span-2">
+                              <div class="card-header"><i class="fas fa-project-diagram"></i> Visualizaciones Avanzadas (Próximamente)</div>
+                              <div class="grid-layout" style="gap: 15px;">
+                                  <div class="heatmap-placeholder"><i class="fas fa-th"></i><p>Heatmap Interacciones</p></div>
+                                  <div class="pca-placeholder"><i class="fas fa-braille"></i><p>Análisis PCA</p></div>
+                              </div>
+                         </div>
+                     </div>
+                 </div>
+                 <!-- Mensaje si no hay datos para analizar -->
+                 <div id="analysisNoData" class="report-placeholder hidden">
+                     <i class="fas fa-folder-open fa-2x" style="opacity: 0.5; margin-bottom: 10px;"></i><br>
+                     No hay suficientes datos cargados para realizar un análisis completo.<br>
+                     <a href="#data-upload" class="nav-link button button-outline" style="margin-top: 15px; display: inline-block; padding: 8px 15px;">Cargar Datos Ahora</a>
+                 </div>
+            </section>
+
+            <!-- ============================= -->
+            <!-- === RECOMMENDATIONS SECTION === -->
+            <!-- ============================= -->
+            <section id="recommendations" class="content-section">
+                 <div class="page-header">
+                     <h2>Plan de Acción Personalizado <i class="fas fa-tasks" style="color: var(--secondary-color);"></i></h2>
+                     <button class="button button-outline"><i class="fas fa-sliders-h"></i> Ajustar Preferencias</button>
+                 </div>
+                 <div id="recommendationsLoader" class="loader hidden"><div class="spinner"></div><p>Generando plan de acción basado en análisis...</p></div>
+                 <div id="recommendationsContent" class="hidden">
+                     <div class="grid-layout grid-layout-recommendations"> <!-- Clases específicas opcionales -->
+                         <!-- Tarjeta Nutrición -->
+                         <div class="card recommendation-card">
+                            <div class="card-header"><i class="fas fa-utensils"></i> Nutrición</div>
+                            <div class="recommendation-list" id="nutritionRecs"><ul><li>Cargando...</li></ul></div>
+                         </div>
+                          <!-- Tarjeta Ejercicio -->
+                          <div class="card recommendation-card">
+                            <div class="card-header"><i class="fas fa-dumbbell"></i> Ejercicio</div>
+                            <div class="recommendation-list" id="exerciseRecs"><ul><li>Cargando...</li></ul></div>
+                         </div>
+                          <!-- Tarjeta Suplementación -->
+                          <div class="card recommendation-card">
+                            <div class="card-header"><i class="fas fa-pills"></i> Suplementación</div>
+                             <div class="recommendation-list" id="supplementRecs"><ul><li>Cargando...</li></ul></div>
+                         </div>
+                          <!-- Tarjeta Bienestar -->
+                          <div class="card recommendation-card">
+                            <div class="card-header"><i class="fas fa-brain"></i> Bienestar Mental y Sueño</div>
+                            <div class="recommendation-list" id="wellnessRecs"><ul><li>Cargando...</li></ul></div>
+                         </div>
+                          <!-- Tarjeta Terapias (Opcional) -->
+                           <div class="card recommendation-card">
+                            <div class="card-header"><i class="fas fa-hand-holding-medical"></i> Terapias Sugeridas</div>
+                            <div class="recommendation-list" id="therapyRecs"><ul><li>Cargando...</li></ul></div>
+                         </div>
+                     </div>
+                     <!-- AR Placeholder / Notas Adicionales -->
+                     <div class="card" style="margin-top: 25px; text-align: center; background-color: var(--background-color); border: 1px dashed var(--border-color);">
+                         <p style="color: var(--text-light); margin:0;"><i class="fas fa-info-circle"></i> Consulta siempre con tu profesional de salud antes de realizar cambios significativos.</p>
+                     </div>
+                 </div>
+                  <!-- Mensaje si no hay análisis para generar recomendaciones -->
+                 <div id="recommendationsNoData" class="report-placeholder hidden">
+                      <i class="fas fa-flask fa-2x" style="opacity: 0.5; margin-bottom: 10px;"></i><br>
+                      Completa un análisis primero para generar tu plan de acción personalizado. <br>
+                      <a href="#analysis" class="nav-link button button-outline" style="margin-top: 15px; display: inline-block; padding: 8px 15px;">Ir a Análisis</a>
+                 </div>
+            </section>
+
+            <!-- ===================== -->
+            <!-- === REPORTS SECTION === -->
+            <!-- ===================== -->
+            <section id="reports" class="content-section">
+                <div class="page-header"><h2>Descargar Informes</h2></div>
+                <div class="card">
+                    <p style="color: var(--text-light); margin-bottom: 20px;">Descarga informes detallados basados en tus análisis completados.</p>
+                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                         <button class="button" disabled><i class="fas fa-download"></i> Informe Genómico</button>
+                         <button class="button" disabled><i class="fas fa-download"></i> Informe Epigenético</button>
+                         <button class="button" disabled><i class="fas fa-download"></i> Informe Biomarcadores</button>
+                         <button class="button" disabled><i class="fas fa-download"></i> Informe Integral Longevidad</button>
+                         <button class="button button-outline"><i class="fas fa-history"></i> Ver Historial</button>
+                     </div>
+                      <p class="report-placeholder" style="margin-top:20px;">Completa un análisis para habilitar la descarga de informes.</p>
+                </div>
+            </section>
+
+            <!-- ====================== -->
+            <!-- === SETTINGS SECTION === -->
+            <!-- ====================== -->
+             <section id="settings" class="content-section">
+                 <div class="page-header"><h2>Ajustes y Preferencias</h2></div>
+                  <div class="grid-layout">
+                     <div class="card"> <div class="card-header"><i class="fas fa-user-circle"></i> Perfil</div> <p>Información personal, objetivos.</p> <button class="button button-outline">Editar Perfil</button> </div>
+                      <div class="card"> <div class="card-header"><i class="fas fa-shield-alt"></i> Seguridad</div> <p>Contraseña, 2FA.</p> <button class="button button-outline">Ajustes Seguridad</button> </div>
+                     <div class="card"> <div class="card-header"><i class="fas fa-handshake"></i> Consentimientos</div> <p>Gestión de datos para investigación.</p> <button class="button button-outline">Gestionar</button> </div>
+                     <div class="card"> <div class="card-header"><i class="fas fa-palette"></i> Apariencia</div> <p>Idioma, tema claro/oscuro.</p> <button class="button button-outline theme-toggle"><i class="fas fa-adjust"></i> Cambiar Tema</button> </div>
+                      <div class="card"> <div class="card-header"><i class="fas fa-bell"></i> Notificaciones</div> <p>Preferencias de alertas.</p> <button class="button button-outline">Configurar</button> </div>
+                  </div>
+            </section>
+
+        </main>
+
+        <!-- =================== -->
+        <!-- === CHATBOT WIDGET === -->
+        <!-- =================== -->
+        <div class="chatbot-widget">
+            <button class="chatbot-button" id="chatbotToggleBtn" title="Asistente IA Aegis">
+                <i class="fas fa-comment-dots"></i>
+            </button>
+            <div class="chatbot-window hidden" id="chatbotWindow">
+                <div class="chatbot-header">
+                    <h4>Asistente IA Aegis</h4>
+                    <button id="closeChatbotBtn" title="Cerrar chat"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="chatbot-messages" id="chatbotMessages">
+                     <div class="chat-message agent-message">¡Hola! Soy tu asistente Aegis. Pregúntame sobre tus resultados o el plan de acción.</div>
+                     <!-- Mensajes se añadirán aquí -->
+                </div>
+                <div class="chatbot-input">
+                    <input type="text" id="chatbotInput" placeholder="Escribe tu pregunta...">
+                    <button id="chatbotSendBtn" title="Enviar mensaje"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= -->
+    <!-- === SCRIPTS JS === -->
+    <!-- ================= -->
+    <!-- <script src="js/analitica.js"></script> --> <!-- Si quieres separar la lógica -->
+    <script src="js/scripts.js"></script> <!-- JS Principal -->
+
+</body>
+</html>

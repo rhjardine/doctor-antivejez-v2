@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Historias - Doctor Antivejez</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo">
+        <input type="text" placeholder="Buscar historia...">
+        <div class="icons">
+            <i class="fas fa-bell" onclick="alert('Notificaciones')"></i>
+            <i class="fas fa-moon" id="theme-toggle"></i>
+        </div>
+    </header>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-item" onclick="window.location.href='index.html'"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></div>
+            <div class="sidebar-item active" onclick="window.location.href='historias.html'"><i class="fas fa-book-medical"></i><span>Historias</span></div>
+            <div class="sidebar-item"><i class="fas fa-user-md"></i><span>Profesionales</span></div>
+            <div class="sidebar-item"><i class="fas fa-chart-pie"></i><span>Reportes</span></div>
+            <div class="sidebar-item"><i class="fas fa-cog"></i><span>Configuración</span></div>
+        </div>
+        <div class="main-content">
+            <!-- Card estético -->
+            <div class="history-card">
+                <h2>Historias</h2>
+                <div class="sub-menu">
+                    <div class="sub-menu-item active" onclick="showSection('create-section')">Crear</div>
+                    <div class="sub-menu-item" onclick="showSection('modify-section')">Modificar</div>
+                    <div class="sub-menu-item" onclick="showSection('delete-section')">Eliminar</div>
+                </div>
+            </div>
+
+            <!-- Sección Crear -->
+            <div id="create-section" class="content-section">
+                <h2>Crear Nueva Historia</h2>
+                <form id="create-history-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nacionalidad">Nacionalidad</label>
+                            <input type="text" id="nacionalidad" name="nacionalidad" placeholder="e.g., Venezolano" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="v-o-e">V o E</label>
+                            <select id="v-o-e" name="v-o-e" required>
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="identificacion">Identificación</label>
+                            <input type="text" id="identificacion" name="identificacion" placeholder="e.g., V-12345678" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-historia">Fecha Historia</label>
+                            <input type="date" id="fecha-historia" name="fecha-historia" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidos">Apellidos</label>
+                            <input type="text" id="apellidos" name="apellidos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombres">Nombres</label>
+                            <input type="text" id="nombres" name="nombres" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-nacimiento">Fecha Nacimiento (dd/mm/aa)</label>
+                            <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edad-cronologica">Edad Cronológica</label>
+                            <input type="number" id="edad-cronologica" name="edad-cronologica" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="genero">Género</label>
+                            <select id="genero" name="genero" required>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Masculino Deportivo">Masculino Deportivo</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Femenino Deportivo">Femenino Deportivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lugar-nacimiento">Lugar Nacimiento</label>
+                            <input type="text" id="lugar-nacimiento" name="lugar-nacimiento">
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="e.g., +584123456789">
+                        </div>
+                        <div class="form-group">
+                            <label for="edo-civil">Edo. Civil</label>
+                            <select id="edo-civil" name="edo-civil" required>
+                                <option value="Soltero/a">Soltero/a</option>
+                                <option value="Casado/a">Casado/a</option>
+                                <option value="Viudo/a">Viudo/a</option>
+                                <option value="Comprometido/a">Comprometido/a</option>
+                                <option value="En relación">En relación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="profesion">Profesión</label>
+                            <input type="text" id="profesion" name="profesion">
+                        </div>
+                        <div class="form-group">
+                            <label for="pais">País</label>
+                            <input type="text" id="pais" name="pais">
+                        </div>
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <input type="text" id="estado" name="estado">
+                        </div>
+                        <div class="form-group">
+                            <label for="ciudad">Ciudad</label>
+                            <input type="text" id="ciudad" name="ciudad">
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <input type="text" id="direccion" name="direccion">
+                        </div>
+                        <div class="form-group">
+                            <label for="grupo-sanguineo">Grupo Sanguíneo</label>
+                            <select id="grupo-sanguineo" name="grupo-sanguineo" required>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" name="observaciones" placeholder="Notas adicionales..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit">Guardar</button>
+                        <button type="button" onclick="window.location.href='index.html'">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Secciones vacías para Modificar y Eliminar (puedes expandirlas después) -->
+            <div id="modify-section" class="content-section" style="display: none;">
+                <h2>Modificar Historia</h2>
+                <p>Funcionalidad de modificar historia (pendiente de implementación).</p>
+            </div>
+            <div id="delete-section" class="content-section" style="display: none;">
+                <h2>Eliminar Historia</h2>
+                <p>Funcionalidad de eliminar historia (pendiente de implementación).</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Mostrar sección específica y ocultar las demás
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Actualizar estado activo del submenú
+            const subMenuItems = document.querySelectorAll('.sub-menu-item');
+            subMenuItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.sub-menu-item[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        // Calcular edad cronológica automáticamente
+        document.getElementById('fecha-nacimiento').addEventListener('change', function() {
+            const birthDate = new Date(this.value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            document.getElementById('edad-cronologica').value = age;
+        });
+
+        // Manejar el envío del formulario (simulación)
+        document.getElementById('create-history-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Historia guardada correctamente');
+            window.location.href = 'index.html';
+        });
+
+        // Mostrar la sección "Crear" por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('create-section');
+        });
+    </script>
+</body>
+</html>/*

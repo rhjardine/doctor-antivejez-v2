@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edad Ortomolecular - Edades Biológicas</title>
+  <!-- Enlazar CSS de pestañas y estilo adaptado -->
+  <link rel="stylesheet" href="historias_tabs_bio.css">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Variables CSS */
+    :root {
+      --primary-color: #293B64;
+      --sky-blue: #23BCEF;
+      --bg-color: #f0f2f5;
+      --bg-gradient: linear-gradient(145deg, #293B64, #1e2b4a);
+      --neumorph-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2), -6px -6px 12px rgba(255, 255, 255, 0.1);
+      --neumorph-shadow-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+      --ortho-color: #FFA500; /* Color específico para ortomolecular */
+    }
+
+    /* Estructura principal */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Barra lateral */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-gradient);
+      box-shadow: var(--neumorph-shadow);
+      padding: 1rem;
+      transition: width 0.3s ease;
+      position: fixed;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .menu-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #ffffffcc;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .menu-item:hover {
+      background: rgba(79, 209, 225, 0.1);
+      box-shadow: var(--neumorph-shadow-inset);
+      color: var(--sky-blue);
+    }
+
+    .menu-item.active {
+      background: rgba(79, 209, 225, 0.1);
+      color: var(--sky-blue);
+      box-shadow: var(--neumorph-shadow-inset);
+    }
+
+    .menu-item i {
+      font-size: 1.2rem;
+      width: 30px;
+    }
+
+    /* Contenido principal */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      padding: 20px;
+    }
+
+    header {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Estilos específicos para la página de edad ortomolecular */
+    .bio-section {
+      margin-bottom: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .nutrient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .nutrient-card {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .nutrient-level {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .nutrient-level label {
+      flex: 1;
+    }
+
+    .nutrient-level .level-bar {
+      flex: 2;
+      height: 12px;
+      background: #eee;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nutrient-level .level-fill {
+      position: absolute;
+      height: 100%;
+      left: 0;
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+
+    .level-optimal {
+      background: #4CAF50;
+    }
+
+    .level-suboptimal {
+      background: #FFC107;
+    }
+
+    .level-deficient {
+      background: #F44336;
+    }
+
+    .nutrient-level .level-value {
+      margin-left: 10px;
+      font-weight: bold;
+      width: 70px;
+      text-align: right;
+    }
+
+    .chart-container {
+      height: 400px;
+      margin: 30px 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: var(--ortho-color);
+    }
+
+    .back-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar lateral izquierdo -->
+  <div class="sidebar">
+    <div class="menu-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-chart-line"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="menu-item active" onclick="window.location.href='historias.html'">
+      <i class="fas fa-folder-open"></i>
+      <span>Historias</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='profesionales.html'">
+      <i class="fas fa-user-md"></i>
+      <span>Profesionales</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='analitica.html'">
+      <i class="fas fa-chart-pie"></i>
+      <span>Analítica</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='reportes.html'">
+      <i class="fas fa-file-alt"></i>
+      <span>Reportes</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='configuracion.html'">
+      <i class="fas fa-cog"></i>
+      <span>Configuración</span>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <header>
+      <div class="header-logo">
+        <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+        <h1>Edad Ortomolecular</h1>
+      </div>
+      <div class="header-dark-toggle">
+        <i class="fas fa-moon" id="theme-toggle"></i>
+      </div>
+    </header>
+
+    <div class="bio-section">
+      <h2><i class="fas fa-atom"></i> Evaluación Ortomolecular</h2>
+      <p>La edad ortomolecular evalúa el equilibrio de micronutrientes, vitaminas, minerales y antioxidantes en el organismo. Esta medición permite identificar deficiencias y optimizar la bioquímica celular.</p>
+      
+      <!-- Fecha de evaluación -->
+      <div class="form-group">
+        <label for="fecha-evaluacion">Fecha de Evaluación:</label>
+        <input type="date" id="fecha-evaluacion">
+      </div>
+      
+      <!-- Niveles de nutrientes -->
+      <div class="nutrient-grid">
+        <!-- Vitaminas -->
+        <div class="nutrient-card">
+          <h3>Vitaminas</h3>
+          
+          <div class="nutrient-level">
+            <label for="vit-d">Vitamina D</label>
+            <div class="level-bar">
+              <div class="level-fill" id="vit-d-fill" style="width: 60%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="vit-d-value">30 ng/mL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="vit-b12">Vitamina B12</label>
+            <div class="level-bar">
+              <div class="level-fill" id="vit-b12-fill" style="width: 80%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="vit-b12-value">600 pg/mL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="folato">Folato</label>
+            <div class="level-bar">
+              <div class="level-fill" id="folato-fill" style="width: 70%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="folato-value">12 ng/mL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="vit-e">Vitamina E</label>
+            <div class="level-bar">
+              <div class="level-fill" id="vit-e-fill" style="width: 40%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="vit-e-value">8 mg/L</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="vit-a">Vitamina A</label>
+            <div class="level-bar">
+              <div class="level-fill" id="vit-a-fill" style="width: 90%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="vit-a-value">650 µg/L</span>
+          </div>
+        </div>
+        
+        <!-- Minerales -->
+        <div class="nutrient-card">
+          <h3>Minerales</h3>
+          
+          <div class="nutrient-level">
+            <label for="magnesio">Magnesio</label>
+            <div class="level-bar">
+              <div class="level-fill" id="magnesio-fill" style="width: 55%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="magnesio-value">1.8 mg/dL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="zinc">Zinc</label>
+            <div class="level-bar">
+              <div class="level-fill" id="zinc-fill" style="width: 45%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="zinc-value">70 µg/dL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="selenium">Selenio</label>
+            <div class="level-bar">
+              <div class="level-fill" id="selenium-fill" style="width: 65%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="selenium-value">110 µg/L</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="hierro">Hierro</label>
+            <div class="level-bar">
+              <div class="level-fill" id="hierro-fill" style="width: 75%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="hierro-value">95 µg/dL</span>
+          </div>
+        </div>
+        
+        <!-- Antioxidantes -->
+        <div class="nutrient-card">
+          <h3>Antioxidantes</h3>
+          
+          <div class="nutrient-level">
+            <label for="glutatión">Glutatión</label>
+            <div class="level-bar">
+              <div class="level-fill" id="glutatión-fill" style="width: 30%; background-color: #F44336;"></div>
+            </div>
+            <span class="level-value" id="glutatión-value">3.2 µmol/L</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="coq10">Coenzima Q10</label>
+            <div class="level-bar">
+              <div class="level-fill" id="coq10-fill" style="width: 35%; background-color: #F44336;"></div>
+            </div>
+            <span class="level-value" id="coq10-value">0.5 µg/mL</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="superoxido">Superóxido Dismutasa</label>
+            <div class="level-bar">
+              <div class="level-fill" id="superoxido-fill" style="width: 50%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="superoxido-value">1250 U/g</span>
+          </div>
+        </div>
+        
+        <!-- Ácidos Grasos -->
+        <div class="nutrient-card">
+          <h3>Ácidos Grasos</h3>
+          
+          <div class="nutrient-level">
+            <label for="omega3">Omega-3</label>
+            <div class="level-bar">
+              <div class="level-fill" id="omega3-fill" style="width: 40%; background-color: #FFC107;"></div>
+            </div>
+            <span class="level-value" id="omega3-value">4.2 %</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="omega6">Omega-6</label>
+            <div class="level-bar">
+              <div class="level-fill" id="omega6-fill" style="width: 85%; background-color: #4CAF50;"></div>
+            </div>
+            <span class="level-value" id="omega6-value">25 %</span>
+          </div>
+          
+          <div class="nutrient-level">
+            <label for="ratio-omega">Ratio Omega-6:Omega-3</label>
+            <div class="level-bar">
+              <div class="level-fill" id="ratio-omega-fill" style="width: 30%; background-color: #F44336;"></div>
+            </div>
+            <span class="level-value" id="ratio-omega-value">12:1</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráfico de radar de equilibrio nutricional -->
+      <h3>Balance Ortomolecular</h3>
+      <div class="chart-container">
+        <canvas id="orthoChart"></canvas>
+      </div>
+      
+      <!-- Resultado -->
+      <div class="result-section">
+        <h3>Resultado de Edad Ortomolecular</h3>
+        <div class="form-group">
+          <label for="resultado-ortomolecular">Edad Ortomolecular (años)</label>
+          <input type="number" id="resultado-ortomolecular">
+        </div>
+        <div class="form-group">
+          <label for="diferencia-ortomolecular">Diferencia con Edad Cronológica</label>
+          <input type="text" id="diferencia-ortomolecular" readonly>
+        </div>
+      </div>
+      
+      <!-- Botones de acción -->
+      <div class="action-buttons">
+        <button type="button" onclick="calcularEdadOrtomolecular()">Calcular Edad Ortomolecular</button>
+        <button type="button" onclick="generarRecomendaciones()">Generar Recomendaciones</button>
+        <button type="button" onclick="guardarResultados()">Guardar Resultados</button>
+      </div>
+    </div>
+    
+    <!-- Botón para volver a la página principal -->
+    <div class="back-button" onclick="window.location.href='historias.html'">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Inicializar el gráfico de radar
+      const ctx = document.getElementById('orthoChart').getContext('2d');
+      const myChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: [
+            'Vitaminas',
+            'Minerales',
+            'Antioxidantes',
+            'Ácidos Grasos',
+            'Enzimas',
+            'Aminoácidos'
+          ],
+          datasets: [
+            {
+              label: 'Nivel Actual',
+              data: [65, 60, 40, 50, 70, 55],
+              backgroundColor: 'rgba(255, 165, 0, 0.2)',
+              borderColor: '#FFA500',
+              borderWidth: 2,
+              pointBackgroundColor: '#FFA500'
+            },
+            {
+              label: 'Nivel Óptimo',
+              data: [100, 100, 100, 100, 100, 100],
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              borderColor: '#4CAF50',
+              borderWidth: 1,
+              pointBackgroundColor: '#4CAF50'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+              grid: { color: 'rgba(0, 0, 0, 0.1)' },
+              pointLabels: { color: '#333' },
+              ticks: { display: false },
+              suggestedMin: 0,
+              suggestedMax: 100
+            }
+          },
+          plugins: {
+            legend: { display: true },
+            title: {
+              display: true,
+              text: 'Balance Ortomolecular'
+            }
+          }
+        }
+      });
+    });
+    
+    // Función para calcular la edad ortomolecular (simulada)
+    function calcularEdadOrtomolecular() {
+      // Simulación de cálculo basado en los valores ingresados
+      const edad = 62 + Math.floor(Math.random() * 10);
+      document.getElementById('resultado-ortomolecular').value = edad;
+      
+      // Calcular diferencia con edad cronológica (simulado)
+      const edadCronologica = 70; // Esto debería obtenerse de la base de datos del paciente
+      const diferencia = edadCronologica - edad;
+      const texto = diferencia >= 0 ? 
+        `${Math.abs(diferencia)} años menor que la edad cronológica` : 
+        `${Math.abs(diferencia)} años mayor que la edad cronológica`;
+      
+      document.getElementById('diferencia-ortomolecular').value = texto;
+    }
+    
+    // Función para generar recomendaciones (simulada)
+    function generarRecomendaciones() {
+      alert('Recomendaciones personalizadas generadas basadas en el perfil ortomolecular del paciente.');
+    }
+    
+    // Función para guardar resultados (simulada)
+    function guardarResultados() {
+      alert('Resultados de Edad Ortomolecular guardados correctamente.');
+    }
+    
+    // Modo oscuro
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>

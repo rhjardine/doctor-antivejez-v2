@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historias - Edades Biológicas</title>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts (Using Inter from the main dashboard) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js Adapters -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+
+  <!-- CSS -->
+  <style>
+    :root {
+        --primary-color: rgb(35, 188, 239); /* Azul claro solicitado */
+        --primary-dark: rgb(41, 59, 100);   /* Azul oscuro solicitado */
+        --primary-light: rgba(35, 188, 239, 0.2);
+        --secondary-color: rgb(41, 59, 100);
+        --secondary-light: rgba(41, 59, 100, 0.2);
+        --text-dark: #2C3E50;
+        --text-medium: #546E7A;
+        --text-light: #78909C;
+        --bg-light: linear-gradient(180deg, #E8ECEF, #F1F4F6); /* Gris claro degradado */
+        --bg-white: #F5F7FA; /* Blanco perlado */
+        --bg-card: #F5F7FA; /* Blanco perlado para tarjetas */
+        --danger: #E63946;
+        --warning: #F9A826;
+        --success: #2DC653;
+        --info: #5BC0EB;
+        --border-color: rgba(41, 59, 100, 0.2); /* Borde con azul oscuro suave */
+
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+        --radius-sm: 0.25rem;
+        --radius-md: 0.375rem;
+        --radius-lg: 0.5rem;
+        --radius-xl: 0.75rem;
+
+        --transition: all 0.3s ease;
+    }
+
+    .dark-mode {
+        --primary-color: rgb(35, 188, 239);
+        --primary-dark: rgb(41, 59, 100);
+        --primary-light: rgba(35, 188, 239, 0.3);
+        --text-dark: #E0E6ED;
+        --text-medium: #B8C4CF;
+        --text-light: #8D99A4;
+        --bg-light: linear-gradient(180deg, #2A3442, #3A4858);
+        --bg-white: #242F3F;
+        --bg-card: #2E3A4A;
+        --border-color: rgba(41, 59, 100, 0.3);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-dark);
+        background: var(--bg-light);
+        line-height: 1.5;
+        transition: var(--transition);
+    }
+
+    .app-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: var(--bg-white);
+        border-right: 1px solid var(--border-color);
+        padding: 1.5rem 0;
+        display: flex;
+        flex-direction: column;
+        transition: var(--transition);
+    }
+
+    .sidebar.collapsed {
+        width: 64px;
+    }
+
+    .sidebar-header {
+        padding: 0 1.5rem 1.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+
+    .logo i {
+        font-size: 1.5rem;
+        transition: var(--transition);
+    }
+
+    .logo:hover i {
+        transform: rotate(360deg);
+    }
+
+    .nav-menu {
+        flex: 1;
+        list-style-type: none;
+    }
+
+    .nav-item {
+        padding: 0;
+        display: flex;
+        align-items: center;
+        color: var(--text-medium);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .nav-item a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        color: inherit;
+        text-decoration: none;
+        width: 100%;
+        height: 100%;
+        border-left: 3px solid transparent;
+        transition: var(--transition);
+        box-sizing: border-box;
+    }
+
+    .nav-item a:hover {
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+        transform: translateX(3px);
+    }
+
+    .nav-item.active a {
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+        border-left-color: var(--primary-color);
+    }
+
+    .nav-item i {
+        font-size: 1.25rem;
+        width: 1.25rem;
+        text-align: center;
+    }
+
+    .sidebar.collapsed .logo span,
+    .sidebar.collapsed .nav-item span,
+    .sidebar.collapsed .user-info {
+        display: none;
+    }
+
+    .sidebar.collapsed .nav-item a {
+        justify-content: center;
+        padding: 0.75rem;
+    }
+
+    .sidebar.collapsed .nav-item {
+        padding: 0;
+    }
+
+    .user-profile {
+        padding: 1rem 1.5rem;
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        border-top: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .user-profile:hover {
+        background-color: var(--primary-light);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: var(--bg-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .user-profile:hover .user-avatar {
+        transform: scale(1.05);
+    }
+
+    .user-info {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--text-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role {
+        color: var(--text-light);
+        font-size: 0.813rem;
+    }
+
+    .sidebar.collapsed .user-profile {
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        background: var(--bg-light);
+    }
+
+    .tabs-container {
+        background: var(--bg-white);
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+    }
+
+    ul.tabs {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px 0;
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    li.tab {
+        padding: 10px 15px;
+        cursor: pointer;
+        color: var(--text-medium);
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    li.tab:hover {
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+    }
+
+    li.tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .tab-content {
+        display: none;
+        padding-top: 20px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .tab-content h3.tab-title {
+        color: var(--primary-dark);
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .bio-ages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .bio-age-card {
+        background-color: var(--primary-color);
+        color: var(--bg-white);
+        padding: 15px;
+        border-radius: var(--radius-md);
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .bio-age-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .bio-age-card h4 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .bio-age-value {
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+
+    .subtitle {
+        color: var(--primary-dark);
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 5px;
+    }
+
+    .age-profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .age-profile-card {
+        background-color: var(--bg-white);
+        border-radius: var(--radius-lg);
+        padding: 15px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+    }
+
+    .age-profile-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-light);
+    }
+
+    .age-profile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .age-profile-header h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .age-profile-tag {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    .age-profile-tag.celular { background-color: var(--primary-light); color: var(--primary-color); }
+    .age-profile-tag.cardio { background-color: var(--primary-light); color: var(--primary-color); }
+    .age-profile-tag.nutrientes { background-color: var(--success); color: var(--bg-white); }
+    .age-profile-tag.metabolica { background-color: var(--warning); color: var(--bg-white); }
+    .age-profile-tag.snps { background-color: var(--secondary-color); color: var(--bg-white); }
+
+    .progress-circle-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .progress-circle {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        background: conic-gradient(currentColor 0%, var(--bg-card) 0%);
+        margin: 0 auto;
+    }
+
+    .progress-circle::before {
+        content: '';
+        position: absolute;
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background-color: var(--bg-white);
+        z-index: 1;
+    }
+
+    .progress-circle .age-value,
+    .progress-circle .age-unit {
+        position: relative;
+        z-index: 2;
+        color: var(--text-dark);
+    }
+
+    .progress-circle .age-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .progress-circle .age-unit {
+        font-size: 0.65rem;
+        color: var(--text-light);
+    }
+
+    .progress-circle.bio { color: var(--primary-color); background: conic-gradient(var(--primary-color) 270deg, var(--bg-card) 0deg); }
+    .progress-circle.biophysical { color: var(--primary-color); background: conic-gradient(var(--primary-color) 260deg, var(--bg-card) 0deg); }
+    .progress-circle.ortomo { color: var(--success); background: conic-gradient(var(--success) 312deg, var(--bg-card) 0deg); }
+    .progress-circle.biochemical { color: var(--warning); background: conic-gradient(var(--warning) 276deg, var(--bg-card) 0deg); }
+    .progress-circle.genetic { color: var(--secondary-color); background: conic-gradient(var(--secondary-color) 294deg, var(--bg-card) 0deg); }
+
+    .age-differential {
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--text-medium);
+        width: 100%;
+    }
+
+    .age-differential span {
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    .age-differential.negative span { color: var(--success); }
+    .age-differential.positive span { color: var(--danger); }
+
+    .chart-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--bg-card);
+        border-radius: var(--radius-md);
+    }
+
+    .chart-controls label {
+        font-weight: 500;
+        color: var(--text-medium);
+    }
+
+    .chart-controls select {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 0.9rem;
+        background-color: var(--bg-white);
+        color: var(--text-dark);
+    }
+
+    .chart-type-buttons {
+        display: flex;
+        gap: 5px;
+        margin-left: auto;
+    }
+
+    .chart-type-buttons button {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        background-color: var(--bg-light);
+        border: 1px solid var(--border-color);
+        color: var(--text-medium);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .chart-type-buttons button:hover {
+        background-color: var(--primary-light);
+    }
+
+    .chart-type-buttons button.active {
+        background-color: var(--primary-color);
+        color: var(--bg-white);
+        border-color: var(--primary-color);
+    }
+
+    .chart-container {
+        height: 350px;
+        margin-bottom: 30px;
+        position: relative;
+        background: var(--bg-white);
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+    }
+
+    .form-buttons {
+        margin-top: 30px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .form-buttons.center {
+        justify-content: center;
+    }
+
+    .form-buttons button {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-buttons button:active {
+        transform: scale(0.98);
+    }
+
+    .form-buttons button.primary {
+        background-color: var(--primary-color);
+        color: var(--bg-white);
+    }
+
+    .form-buttons button.primary:hover {
+        background-color: var(--primary-dark);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .form-buttons button.secondary {
+        background-color: var(--bg-card);
+        color: var(--text-medium);
+        border: 1px solid var(--border-color);
+    }
+
+    .form-buttons button.secondary:hover {
+        background-color: var(--bg-light);
+        border-color: var(--text-light);
+    }
+
+    .guia-paciente-content {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        min-height: 600px;
+        margin-top: 10px;
+        margin-bottom: 24px;
+        background: var(--bg-white);
+        box-shadow: var(--shadow-sm);
+        padding-top: 12px;
+        width: 100%;
+        max-width: 1350px; /* Más ancho para aprovechar el espacio */
+        margin-left: auto;
+        margin-right: auto;
+        transition: max-width 0.3s;
+    }
+
+    @media (max-width: 1400px) {
+        .guia-paciente-content {
+            max-width: 98vw;
+        }
+    }
+    @media (max-width: 900px) {
+        .guia-paciente-content {
+            max-width: 100vw;
+            border-radius: var(--radius-md);
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        background-color: var(--bg-white);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+        font-family: inherit;
+        color: var(--text-dark);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .patient-photo-container {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .patient-photo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--border-color);
+    }
+
+    body.dark-mode .tabs-container { background: var(--bg-card); }
+    body.dark-mode ul.tabs { border-bottom-color: var(--border-color); }
+    body.dark-mode li.tab { color: var(--text-medium); }
+    body.dark-mode li.tab:hover { color: var(--primary-light); background-color: var(--bg-white); }
+    body.dark-mode li.tab.active { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+    body.dark-mode .tab-content h3.tab-title { color: var(--primary-light); border-bottom-color: var(--border-color); }
+    body.dark-mode .subtitle { color: var(--primary-light); border-bottom-color: var(--border-color); }
+    body.dark-mode .age-profile-card { background-color: var(--bg-white); border-color: var(--border-color); }
+    body.dark-mode .age-profile-header h4 { color: var(--text-dark); }
+    body.dark-mode .progress-circle::before { background-color: var(--bg-white); }
+    body.dark-mode .progress-circle .age-value { color: var(--text-dark); }
+    body.dark-mode .progress-circle .age-unit { color: var(--text-light); }
+    body.dark-mode .age-differential { color: var(--text-light); }
+    body.dark-mode .chart-controls { background-color: var(--bg-white); }
+    body.dark-mode .chart-controls label { color: var(--text-light); }
+    body.dark-mode .chart-controls select { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .chart-type-buttons button { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-light); }
+    body.dark-mode .chart-type-buttons button:hover { background-color: var(--bg-light); }
+    body.dark-mode .chart-type-buttons button.active { background-color: var(--primary-color); color: var(--bg-white); border-color: var(--primary-color); }
+    body.dark-mode .chart-container { background: var(--bg-white); border: 1px solid var(--border-color); }
+    body.dark-mode .form-group label { color: var(--text-dark); }
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-dark); }
+    body.dark-mode .form-group input::placeholder,
+    body.dark-mode .form-group textarea::placeholder { color: var(--text-light); opacity: 0.5; }
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus,
+    body.dark-mode .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-light); }
+    body.dark-mode .patient-photo { border-color: var(--border-color); }
+    body.dark-mode .form-buttons { border-top-color: var(--border-color); }
+    body.dark-mode .guia-paciente-content { border-color: var(--border-color); }
+
+    /* Estilos refinados para Alimentación Nutrigenómica */
+    .dietary-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        background: var(--primary-color);
+        border-radius: var(--radius-md);
+        border: none;
+        box-shadow: var(--shadow-sm);
+    }
+    .dietary-section h4 {
+        color: #fff;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid rgba(255,255,255,0.18);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .dietary-section h4 i {
+        color: #fff;
+        font-size: 1.3rem;
+    }
+    .dietary-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+    }
+    .dietary-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 18px;
+        background: #F5F7FA; /* Gris claro perlado */
+        border-radius: 14px;
+        border: 1px solid #e3e8ef;
+        box-shadow: 0 1px 4px rgba(41,59,100,0.06);
+        transition: box-shadow 0.18s, background 0.18s;
+        position: relative;
+        margin-bottom: 4px;
+    }
+    .dietary-option:hover {
+        box-shadow: 0 2px 8px rgba(41,59,100,0.10);
+        background: #f0f4f8;
+    }
+    .dietary-option input[type="checkbox"] {
+        accent-color: var(--primary-color);
+        width: 18px;
+        height: 18px;
+    }
+    .dietary-option label {
+        font-size: 1rem;
+        color: var(--text-dark);
+        flex: 1;
+        line-height: 1.4;
+    }
+    .dietary-option-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .dietary-option-actions button:hover {
+        background: var(--primary-light);
+    }
+    .dietary-option-actions .edit-btn {
+        color: var(--primary-color);
+    }
+    .dietary-option-actions .delete-btn {
+        color: var(--warning);
+    }
+    .add-dietary-form {
+        display: flex;
+        gap: 15px;
+        margin-top: 18px;
+        align-items: center;
+        background: none;
+        padding: 0;
+        border-radius: 0;
+        border: none;
+    }
+    .add-dietary-form input,
+    .add-dietary-form select {
+        flex: 1;
+        padding: 12px 14px;
+        border: none;
+        border-radius: 14px;
+        background: #F5F7FA;
+        font-size: 1rem;
+        color: var(--text-dark);
+        box-shadow: 2px 2px 8px #e3e8ef, -2px -2px 8px #ffffff;
+        transition: box-shadow 0.2s, background 0.2s;
+    }
+    .add-dietary-form input:focus,
+    .add-dietary-form select:focus {
+        outline: none;
+        background: #f0f4f8;
+        box-shadow: 1px 1px 4px #dbe2ea, -1px -1px 4px #ffffff;
+    }
+    .add-dietary-form button {
+        padding: 12px 28px;
+        background: linear-gradient(145deg, rgb(35, 188, 239), rgb(41, 59, 100));
+        color: #fff;
+        border: none;
+        border-radius: 22px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(35, 188, 239, 0.10);
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .add-dietary-form button:hover {
+        background: linear-gradient(145deg, rgb(41, 59, 100), rgb(35, 188, 239));
+        box-shadow: 0 4px 12px rgba(41, 59, 100, 0.13);
+    }
+    .btn-bottom-bar {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        margin: 40px 0 0 0;
+    }
+    .btn-send {
+        background: linear-gradient(145deg, rgb(35, 188, 239), rgb(41, 59, 100));
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 32px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: background 0.3s;
+        box-shadow: 0 2px 6px rgba(35, 188, 239, 0.08);
+    }
+    .btn-send:hover {
+        background: linear-gradient(145deg, rgb(41, 59, 100), rgb(35, 188, 239));
+    }
+    .btn-print {
+        background: #293B64;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 32px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: background 0.3s;
+        box-shadow: 0 2px 6px rgba(41, 59, 100, 0.08);
+    }
+    .btn-print:hover {
+        background: #1f2a44;
+    }
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.25);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px 28px 24px 28px;
+        box-shadow: 0 8px 32px rgba(41,59,100,0.18);
+        min-width: 320px;
+        max-width: 95vw;
+        text-align: center;
+        position: relative;
+    }
+    .modal h3 {
+        color: #293B64;
+        margin-bottom: 18px;
+        font-size: 1.2rem;
+    }
+    .modal-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 18px;
+    }
+    .modal-btn {
+        border: none;
+        border-radius: 25px;
+        padding: 12px 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .modal-btn.whatsapp { background: #25D366; color: #fff; }
+    .modal-btn.whatsapp:hover { background: #1ebe57; }
+    .modal-btn.email { background: #23BCEF; color: #fff; }
+    .modal-btn.email:hover { background: #1a9ec7; }
+    .modal-btn.flutter { background: #293B64; color: #fff; }
+    .modal-btn.flutter:hover { background: #1f2a44; }
+    .modal-close {
+        position: absolute;
+        top: 10px; right: 18px;
+        font-size: 1.3rem;
+        color: #888;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo" id="toggle-sidebar">
+                <i class="fas fa-dna"></i>
+                <span>MediLongevity</span>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard_advanced_gen.html">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a href="historias_tabs_bio.html">
+                    <i class="fas fa-book-medical"></i>
+                    <span>Historias</span>
+                </a>
+            </li>
+             <li class="nav-item">
+                <a href="profesionales.html">
+                    <i class="fas fa-user-md"></i>
+                    <span>Profesionales</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#">
+                    <i class="fas fa-robot"></i>
+                    <span>Agente IA</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#">
+                    <i class="fas fa-file-medical-alt"></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                 <a href="#">
+                    <i class="fas fa-cog"></i>
+                    <span>Ajustes</span>
+                </a>
+            </li>
+             <li class="nav-item">
+                 <a href="#">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Salir</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="user-info">
+                <div class="user-name">Dr. María García</div>
+                <div class="user-role">Longevity Specialist</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="tabs-container">
+        <ul class="tabs">
+            <li class="tab" data-tab="tab1">
+            <i class="fas fa-info-circle"></i> Datos Generales
+            </li>
+            <li class="tab" data-tab="tab2">
+            <i class="fas fa-notes-medical"></i> Historia Clínica
+            </li>
+            <li class="tab active" data-tab="tab3">
+            <i class="fas fa-flask"></i> Edad Biológica
+            </li>
+            <li class="tab" data-tab="tab4">
+            <i class="fas fa-heartbeat"></i> Guía del Paciente
+            </li>
+            <li class="tab" data-tab="tab5">
+            <i class="fas fa-utensils"></i> Alimentación Nutrigenómica
+            </li>
+        </ul>
+
+        <div class="tabs-content">
+            <div id="tab1" class="tab-content">
+              <h3 class="tab-title">Datos Generales</h3>
+              <div class="patient-photo-container">
+                <img src="assets/foto1.png" alt="Foto del Paciente" class="patient-photo">
+              </div>
+              <div class="form-grid">
+                <div class="form-group"><label for="nacionalidad">Nacionalidad</label><input type="text" id="nacionalidad" placeholder="e.g. Venezolano"></div>
+                <div class="form-group"><label for="identificacion">Identificación</label><input type="text" id="identificacion" placeholder="e.g. V-12345678"></div>
+                <div class="form-group"><label for="apellidos">Apellidos</label><input type="text" id="apellidos"></div>
+                <div class="form-group"><label for="nombres">Nombres</label><input type="text" id="nombres"></div>
+                <div class="form-group"><label for="fecha-nacimiento">Fecha Nacimiento (dd/mm/aa)</label><input type="text" id="fecha-nacimiento" placeholder="dd/mm/aaaa"></div>
+                <div class="form-group"><label for="edad-cronologica">Edad Cronológica</label><input type="number" id="edad-cronologica" readonly></div>
+                <div class="form-group"><label for="genero">Género</label><select id="genero"><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+                <div class="form-group"><label for="edo-civil">Estado Civil</label><input type="text" id="edo-civil" placeholder="e.g. Soltero/a"></div>
+                <div class="form-group"><label for="telefono">Teléfono</label><input type="tel" id="telefono" placeholder="e.g. +584123456789"></div>
+                <div class="form-group"><label for="profesion">Profesión</label><input type="text" id="profesion"></div>
+                <div class="form-group"><label for="direccion">Dirección</label><input type="text" id="direccion"></div>
+                <div class="form-group"><label for="email">E-mail</label><input type="email" id="email" placeholder="e.g. usuario@correo.com"></div>
+                <div class="form-group"><label for="pais">País</label><input type="text" id="pais"></div>
+                <div class="form-group"><label for="ciudad">Ciudad</label><input type="text" id="ciudad"></div>
+                <div class="form-group"><label for="grupo-sanguineo">Grupo Sanguíneo</label><select id="grupo-sanguineo"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+              </div>
+            </div>
+
+            <div id="tab2" class="tab-content">
+              <h3 class="tab-title">Historia Clínica</h3>
+              <div class="patient-photo-container">
+                <img src="assets/foto1.png" alt="Foto del Paciente" class="patient-photo">
+              </div>
+              <div class="form-group full-width"><label for="antecedentes-familiares">Antecedentes Familiares</label><textarea id="antecedentes-familiares"></textarea></div>
+              <div class="form-group full-width"><label for="antecedentes-personales">Antecedentes Personales</label><textarea id="antecedentes-personales"></textarea></div>
+              <div class="form-group full-width"><label for="habitos">Hábitos (alimentación, ejercicio, sueño, etc.)</label><textarea id="habitos"></textarea></div>
+            </div>
+
+            <div id="tab3" class="tab-content active">
+              <h3 class="tab-title">Edad Biológica</h3>
+              <p>Edad Cronológica Vs Edad Biológica:</p>
+              <div class="bio-ages-grid">
+                <div class="bio-age-card" onclick="abrirBiofisica()">
+                  <h4><i class="fas fa-procedures"></i> Edad Biofísica</h4>
+                  <div class="bio-age-value" id="edad-biofisica">--</div>
+                </div>
+                <div class="bio-age-card" onclick="abrirBioquimica()">
+                  <h4><i class="fas fa-vial"></i> Edad Bioquímica</h4>
+                  <div class="bio-age-value" id="edad-bioquimica">--</div>
+                </div>
+                <div class="bio-age-card" onclick="abrirOrtomo()">
+                  <h4><i class="fas fa-atom"></i> Edad Ortomolecular</h4>
+                  <div class="bio-age-value" id="edad-ortomolecular">--</div>
+                </div>
+                <div class="bio-age-card" onclick="abrirGenetica()">
+                  <h4><i class="fas fa-dna"></i> Edad Genética</h4>
+                  <div class="bio-age-value" id="edad-genetica">--</div>
+                </div>
+              </div>
+
+              <h4 class="subtitle">Perfil Multidimensional de Envejecimiento</h4>
+              <div class="age-profile-grid">
+                <div class="age-profile-card">
+                  <div class="age-profile-header">
+                    <h4>Edad Biológica</h4>
+                    <span class="age-profile-tag celular">Celular</span>
+                  </div>
+                  <div class="progress-circle-container">
+                    <div class="progress-circle bio">
+                      <span class="age-value" id="bio-age-value">45</span>
+                      <span class="age-unit">años</span>
+                    </div>
+                    <div class="age-differential negative" id="bio-differential">vs. Edad Cronológica<br><span>-3 años</span></div>
+                  </div>
+                </div>
+
+                <div class="age-profile-card">
+                  <div class="age-profile-header">
+                    <h4>Edad Biofísica</h4>
+                    <span class="age-profile-tag cardio">Cardio-Fitness</span>
+                  </div>
+                  <div class="progress-circle-container">
+                    <div class="progress-circle biophysical">
+                      <span class="age-value" id="biophysical-age-value">43</span>
+                      <span class="age-unit">años</span>
+                    </div>
+                    <div class="age-differential negative" id="biophysical-differential">vs. Edad Cronológica<br><span>-5 años</span></div>
+                  </div>
+                </div>
+
+                <div class="age-profile-card">
+                  <div class="age-profile-header">
+                    <h4>Edad Ortomolecular</h4>
+                    <span class="age-profile-tag nutrientes">Nutrientes</span>
+                  </div>
+                  <div class="progress-circle-container">
+                    <div class="progress-circle ortomo">
+                      <span class="age-value" id="ortomo-age-value">52</span>
+                      <span class="age-unit">años</span>
+                    </div>
+                    <div class="age-differential positive" id="ortomo-differential">vs. Edad Cronológica<br><span>+4 años</span></div>
+                  </div>
+                </div>
+
+                <div class="age-profile-card">
+                  <div class="age-profile-header">
+                    <h4>Edad Bioquímica</h4>
+                    <span class="age-profile-tag metabolica">Metabólica</span>
+                  </div>
+                  <div class="progress-circle-container">
+                    <div class="progress-circle biochemical">
+                      <span class="age-value" id="biochemical-age-value">46</span>
+                      <span class="age-unit">años</span>
+                    </div>
+                    <div class="age-differential negative" id="biochemical-differential">vs. Edad Cronológica<br><span>-2 años</span></div>
+                  </div>
+                </div>
+
+                <div class="age-profile-card">
+                  <div class="age-profile-header">
+                    <h4>Edad Genética</h4>
+                    <span class="age-profile-tag snps">SNPs</span>
+                  </div>
+                  <div class="progress-circle-container">
+                    <div class="progress-circle genetic">
+                      <span class="age-value" id="genetic-age-value">49</span>
+                      <span class="age-unit">años</span>
+                    </div>
+                    <div class="age-differential positive" id="genetic-differential">vs. Edad Cronológica<br><span>+1 año</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="chart-controls">
+                <label for="date-range">Rango de Fechas:</label>
+                <select id="date-range" onchange="actualizarGrafico()">
+                  <option value="6m">Últimos 6 meses</option>
+                  <option value="1y" selected>Último año</option>
+                  <option value="2y">Últimos 2 años</option>
+                </select>
+                <div class="chart-type-buttons">
+                  <button type="button" class="chart-btn active" data-type="line" onclick="cambiarTipoGrafico('line')">Línea</button>
+                  <button type="button" class="chart-btn" data-type="bar" onclick="cambiarTipoGrafico('bar')">Barras</button>
+                  <button type="button" class="chart-btn" data-type="radar" onclick="cambiarTipoGrafico('radar')">Radar</button>
+                  <button type="button" class="chart-btn" data-type="polarArea" onclick="cambiarTipoGrafico('polarArea')">Polar</button>
+                  <button type="button" class="chart-btn" data-type="pie" onclick="cambiarTipoGrafico('pie')">Pie</button>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
+              <div class="form-buttons center">
+                <button type="button" class="primary" onclick="generarInforme()">Generar Informe</button>
+              </div>
+            </div>
+
+            <div id="tab4" class="tab-content">
+              <h3 class="tab-title">Guía del Paciente</h3>
+              <div class="guia-paciente-content">
+                <iframe src="guia_paciente_abacus.html" width="100%" height="800px" title="Guía del Paciente">
+                  Tu navegador no soporta iframes.
+                </iframe>
+              </div>
+            </div>
+
+            <!-- Pestaña Alimentación Nutrigenómica Actualizada -->
+            <div id="tab5" class="tab-content">
+              <h3 class="tab-title">Alimentación Nutrigenómica</h3>
+              <div class="form-group">
+                <label for="blood-type-select">Seleccionar Tipo Sanguíneo</label>
+                <select id="blood-type-select" onchange="filterDietaryOptions()">
+                  <option value="all">Todos</option>
+                  <option value="O_B">O o B</option>
+                  <option value="A_AB">A o AB</option>
+                </select>
+              </div>
+
+              <!-- Desayuno -->
+              <div class="dietary-section">
+                <h4><i class="fas fa-coffee"></i> Desayuno</h4>
+                <div class="dietary-options" id="breakfast-options">
+                  <!-- O o B -->
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-1">
+                    <input type="checkbox" id="breakfast-ob-1">
+                    <label for="breakfast-ob-1">Cereales de trigo sarraceno, avena sin gluten</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-2">
+                    <input type="checkbox" id="breakfast-ob-2">
+                    <label for="breakfast-ob-2">Tortilla de huevo con avena s/g</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-3">
+                    <input type="checkbox" id="breakfast-ob-3">
+                    <label for="breakfast-ob-3">Creps de avena s/g</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-4">
+                    <input type="checkbox" id="breakfast-ob-4">
+                    <label for="breakfast-ob-4">Leche de soya o almendras</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-5">
+                    <input type="checkbox" id="breakfast-ob-5">
+                    <label for="breakfast-ob-5">Huevo revuelto con vegetales y queso de cabra</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-6">
+                    <input type="checkbox" id="breakfast-ob-6">
+                    <label for="breakfast-ob-6">Yogur de cabra con frutas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-7">
+                    <input type="checkbox" id="breakfast-ob-7">
+                    <label for="breakfast-ob-7">Batido de proteínas con espinacas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-8">
+                    <input type="checkbox" id="breakfast-ob-8">
+                    <label for="breakfast-ob-8">Tostadas de pan integral con mantequilla de almendra</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="breakfast-ob-9">
+                    <input type="checkbox" id="breakfast-ob-9">
+                    <label for="breakfast-ob-9">Omelette de claras con champiñones</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <!-- A o AB -->
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-1">
+                    <input type="checkbox" id="breakfast-aab-1">
+                    <label for="breakfast-aab-1">Pan sin gluten</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-2">
+                    <input type="checkbox" id="breakfast-aab-2">
+                    <label for="breakfast-aab-2">Creps de yuca</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-3">
+                    <input type="checkbox" id="breakfast-aab-3">
+                    <label for="breakfast-aab-3">Suero de leche (Whey protein)</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-4">
+                    <input type="checkbox" id="breakfast-aab-4">
+                    <label for="breakfast-aab-4">Carnes blancas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-5">
+                    <input type="checkbox" id="breakfast-aab-5">
+                    <label for="breakfast-aab-5">Tostadas de pan integral con aguacate</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-6">
+                    <input type="checkbox" id="breakfast-aab-6">
+                    <label for="breakfast-aab-6">Batido de frutas con leche de almendra</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-7">
+                    <input type="checkbox" id="breakfast-aab-7">
+                    <label for="breakfast-aab-7">Yogur de coco con granola sin gluten</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="breakfast-aab-8">
+                    <input type="checkbox" id="breakfast-aab-8">
+                    <label for="breakfast-aab-8">Porridge de avena con frutas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="add-dietary-form">
+                    <input type="text" id="new-breakfast-option" placeholder="Nueva opción de desayuno">
+                    <button type="button" onclick="addDietaryOption('breakfast')"><i class="fas fa-plus"></i> Agregar</button>
+                </div>
+              </div>
+
+              <!-- Almuerzo -->
+              <div class="dietary-section">
+                <h4><i class="fas fa-utensils"></i> Almuerzo</h4>
+                <div class="dietary-options" id="lunch-options">
+                  <!-- O o B -->
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-1">
+                    <input type="checkbox" id="lunch-ob-1">
+                    <label for="lunch-ob-1">Carnes rojas o blancas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-2">
+                    <input type="checkbox" id="lunch-ob-2">
+                    <label for="lunch-ob-2">Ensaladas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-3">
+                    <input type="checkbox" id="lunch-ob-3">
+                    <label for="lunch-ob-3">Granos</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-4">
+                    <input type="checkbox" id="lunch-ob-4">
+                    <label for="lunch-ob-4">Pollo a la parrilla con quinoa</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-5">
+                    <input type="checkbox" id="lunch-ob-5">
+                    <label for="lunch-ob-5">Ensalada de atún con vegetales</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-6">
+                    <input type="checkbox" id="lunch-ob-6">
+                    <label for="lunch-ob-6">Pavo al horno con batata</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="lunch-ob-7">
+                    <input type="checkbox" id="lunch-ob-7">
+                    <label for="lunch-ob-7">Sopa de lentejas con espinacas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <!-- A o AB -->
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-1">
+                    <input type="checkbox" id="lunch-aab-1">
+                    <label for="lunch-aab-1">Pastillo de berenjena con pollo</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-2">
+                    <input type="checkbox" id="lunch-aab-2">
+                    <label for="lunch-aab-2">Tomate relleno con pollo</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-3">
+                    <input type="checkbox" id="lunch-aab-3">
+                    <label for="lunch-aab-3">Pizza de coliflor con queso de cabra</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-4">
+                    <input type="checkbox" id="lunch-aab-4">
+                    <label for="lunch-aab-4">Salmón al horno con batata</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-5">
+                    <input type="checkbox" id="lunch-aab-5">
+                    <label for="lunch-aab-5">Ensalada de garbanzos con espinacas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-6">
+                    <input type="checkbox" id="lunch-aab-6">
+                    <label for="lunch-aab-6">Tofu salteado con brócoli</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="lunch-aab-7">
+                    <input type="checkbox" id="lunch-aab-7">
+                    <label for="lunch-aab-7">Ensalada de quinoa con nueces</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="add-dietary-form">
+                    <input type="text" id="new-lunch-option" placeholder="Nueva opción de almuerzo">
+                    <button type="button" onclick="addDietaryOption('lunch')"><i class="fas fa-plus"></i> Agregar</button>
+                </div>
+              </div>
+
+              <!-- Cena -->
+              <div class="dietary-section">
+                <h4><i class="fas fa-moon"></i> Cena</h4>
+                <div class="dietary-options" id="dinner-options">
+                  <!-- O o B -->
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-1">
+                    <input type="checkbox" id="dinner-ob-1">
+                    <label for="dinner-ob-1">Sushi</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-2">
+                    <input type="checkbox" id="dinner-ob-2">
+                    <label for="dinner-ob-2">Ceviche</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-3">
+                    <input type="checkbox" id="dinner-ob-3">
+                    <label for="dinner-ob-3">Antipasto</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-4">
+                    <input type="checkbox" id="dinner-ob-4">
+                    <label for="dinner-ob-4">Carne asada con vegetales al vapor</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-5">
+                    <input type="checkbox" id="dinner-ob-5">
+                    <label for="dinner-ob-5">Sopa de lentejas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-6">
+                    <input type="checkbox" id="dinner-ob-6">
+                    <label for="dinner-ob-6">Pollo al curry con arroz integral</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="dinner-ob-7">
+                    <input type="checkbox" id="dinner-ob-7">
+                    <label for="dinner-ob-7">Ensalada de salmón ahumado</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <!-- A o AB -->
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="dinner-aab-1">
+                    <input type="checkbox" id="dinner-aab-1">
+                    <label for="dinner-aab-1">Salmón a la marinara</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="dinner-aab-2">
+                    <input type="checkbox" id="dinner-aab-2">
+                    <label for="dinner-aab-2">Tofu salteado con brócoli</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="dinner-aab-3">
+                    <input type="checkbox" id="dinner-aab-3">
+                    <label for="dinner-aab-3">Ensalada de quinoa con nueces</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="dinner-aab-4">
+                    <input type="checkbox" id="dinner-aab-4">
+                    <label for="dinner-aab-4">Sopa de miso con algas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="dinner-aab-5">
+                    <input type="checkbox" id="dinner-aab-5">
+                    <label for="dinner-aab-5">Curry de garbanzos con espinacas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="add-dietary-form">
+                    <input type="text" id="new-dinner-option" placeholder="Nueva opción de cena">
+                    <button type="button" onclick="addDietaryOption('dinner')"><i class="fas fa-plus"></i> Agregar</button>
+                </div>
+              </div>
+
+              <!-- Meriendas/Postres -->
+              <div class="dietary-section">
+                <h4><i class="fas fa-apple-alt"></i> Meriendas/Postres</h4>
+                <div class="dietary-options" id="snacks-options">
+                  <!-- O o B -->
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-1">
+                    <input type="checkbox" id="snacks-ob-1">
+                    <label for="snacks-ob-1">Gelatina de lámina o 1 cda de polvo sin sabor en infusión</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-2">
+                    <input type="checkbox" id="snacks-ob-2">
+                    <label for="snacks-ob-2">Semillas: almendras, nueces, pistacho</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-3">
+                    <input type="checkbox" id="snacks-ob-3">
+                    <label for="snacks-ob-3">Batido de proteína: suero o ricotta sin sal</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-4">
+                    <input type="checkbox" id="snacks-ob-4">
+                    <label for="snacks-ob-4">Frutas secas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-5">
+                    <input type="checkbox" id="snacks-ob-5">
+                    <label for="snacks-ob-5">Batido de proteínas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="O_B" data-id="snacks-ob-6">
+                    <input type="checkbox" id="snacks-ob-6">
+                    <label for="snacks-ob-6">Palitos de zanahoria con hummus</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <!-- A o AB -->
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="snacks-aab-1">
+                    <input type="checkbox" id="snacks-aab-1">
+                    <label for="snacks-aab-1">Helado Vegano (leche de almendras o coco)</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="snacks-aab-2">
+                    <input type="checkbox" id="snacks-aab-2">
+                    <label for="snacks-aab-2">Yogur de coco</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="snacks-aab-3">
+                    <input type="checkbox" id="snacks-aab-3">
+                    <label for="snacks-aab-3">Pudín de chía</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="snacks-aab-4">
+                    <input type="checkbox" id="snacks-aab-4">
+                    <label for="snacks-aab-4">Frutas frescas</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="dietary-option" data-blood-type="A_AB" data-id="snacks-aab-5">
+                    <input type="checkbox" id="snacks-aab-5">
+                    <label for="snacks-aab-5">Barritas de granola sin gluten</label>
+                    <div class="dietary-option-actions">
+                        <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="add-dietary-form">
+                    <input type="text" id="new-snacks-option" placeholder="Nueva opción de merienda/postre">
+                    <button type="button" onclick="addDietaryOption('snacks')"><i class="fas fa-plus"></i> Agregar</button>
+                </div>
+              </div>
+
+              <div class="form-buttons">
+                <button type="button" class="primary" onclick="saveDietaryPlan()">Guardar Plan Alimentario</button>
+              </div>
+              <!-- Barra de botones profesional al final -->
+              <div class="btn-bottom-bar">
+                <button type="button" class="btn-send" onclick="openSendModal()"><i class="fas fa-paper-plane"></i> Enviar al Paciente</button>
+                <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+              </div>
+              <!-- Modal de envío -->
+              <div id="send-modal-overlay" class="modal-overlay" style="display:none;">
+                <div class="modal">
+                  <button class="modal-close" onclick="closeSendModal()"><i class="fas fa-times"></i></button>
+                  <h3>Enviar Guía Alimentaria</h3>
+                  <div class="modal-btns">
+                    <button class="modal-btn whatsapp" onclick="sendViaWhatsapp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button class="modal-btn email" onclick="sendViaEmail()"><i class="fas fa-envelope"></i> Email</button>
+                    <button class="modal-btn flutter" onclick="sendToFlutterApp()"><i class="fas fa-mobile-alt"></i> App Paciente (Próximamente)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="form-buttons">
+            <button type="button" class="primary" onclick="guardarHistoria()">Guardar Historia</button>
+            <button type="button" class="secondary" onclick="window.history.back()">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+    <div class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
+  </div>
+
+  <script>
+    let currentChartType = 'line';
+    let myChart;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tabs .tab');
+      const contents = document.querySelectorAll('.tabs-content > .tab-content');
+      const initialActiveTab = document.querySelector('.tabs .tab.active');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          const activeContent = document.getElementById(tabId);
+          if (activeContent) {
+            activeContent.classList.add('active');
+          }
+          if (tabId === 'tab3') {
+            actualizarComparativa();
+            if (!myChart) {
+              inicializarGrafico();
+            } else {
+              actualizarGrafico();
+            }
+            actualizarPerfilMultidimensional();
+          }
+        });
+      });
+
+      if (initialActiveTab) {
+        const initialTabId = initialActiveTab.getAttribute('data-tab');
+        const initialContent = document.getElementById(initialTabId);
+        if (initialContent) {
+          initialContent.classList.add('active');
+          if (initialTabId === 'tab3') {
+            actualizarComparativa();
+            inicializarGrafico();
+            actualizarPerfilMultidimensional();
+          }
+        }
+      } else if (tabs.length > 0) {
+        tabs[0].click();
+      }
+
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      if (themeToggleBtn) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.body.classList.add('dark-mode');
+          themeToggleBtn.querySelector('i')?.classList.replace('fa-moon', 'fa-sun');
+        } else {
+          document.body.classList.remove('dark-mode');
+          themeToggleBtn.querySelector('i')?.classList.replace('fa-sun', 'fa-moon');
+        }
+        themeToggleBtn.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+          const icon = themeToggleBtn.querySelector('i');
+          if (icon) {
+            if (document.body.classList.contains('dark-mode')) {
+              icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+              icon.classList.replace('fa-sun', 'fa-moon');
+            }
+          }
+          if (myChart && document.getElementById('tab3')?.classList.contains('active')) {
+            actualizarGrafico();
+          }
+        });
+      }
+
+      const toggleSidebar = document.getElementById('toggle-sidebar');
+      const sidebar = document.getElementById('sidebar');
+      if (toggleSidebar && sidebar) {
+        toggleSidebar.addEventListener('click', () => {
+          sidebar.classList.toggle('collapsed');
+        });
+      }
+
+      ensureRgbVars();
+    });
+
+    function inicializarGrafico() {
+      const ctx = document.getElementById('trendChart')?.getContext('2d');
+      if (!ctx) {
+        console.error("Elemento canvas 'trendChart' no encontrado.");
+        return;
+      }
+      if (myChart) {
+        myChart.destroy();
+      }
+      const dateRange = document.getElementById('date-range')?.value || '1y';
+      myChart = new Chart(ctx, getChartConfig(dateRange, currentChartType));
+      marcarBotonActivo(currentChartType);
+    }
+
+    function actualizarGrafico() {
+      const ctx = document.getElementById('trendChart')?.getContext('2d');
+      if (!ctx) {
+        console.warn("Canvas 'trendChart' no encontrado al actualizar.");
+        return;
+      }
+      if (!document.getElementById('tab3').classList.contains('active')) {
+        return;
+      }
+      const dateRange = document.getElementById('date-range')?.value || '1y';
+      if (myChart) {
+        myChart.destroy();
+      }
+      myChart = new Chart(ctx, getChartConfig(dateRange, currentChartType));
+      marcarBotonActivo(currentChartType);
+    }
+
+    function cambiarTipoGrafico(tipo) {
+      currentChartType = tipo;
+      actualizarGrafico();
+    }
+
+    function marcarBotonActivo(tipoActivo) {
+      const buttons = document.querySelectorAll('.chart-type-buttons .chart-btn');
+      buttons.forEach(button => {
+        if (button.getAttribute('data-type') === tipoActivo) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+    }
+
+    function getChartConfig(dateRange, chartType) {
+      const { labels, datasets } = obtenerDatosSimulados(dateRange);
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      const textColor = isDarkMode ? '#E0E6ED' : '#2C3E50';
+      const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+
+      let finalDatasets = datasets;
+      const chartColors = [
+        { border: 'var(--primary-color)', bg: 'var(--primary-light)' },
+        { border: 'var(--warning)', bg: 'rgba(249, 168, 38, 0.2)' },
+        { border: 'var(--success)', bg: 'rgba(45, 198, 83, 0.2)' },
+        { border: 'var(--info)', bg: 'rgba(91, 192, 235, 0.2)' },
+        { border: 'var(--secondary-color)', bg: 'rgba(19, 41, 61, 0.2)' }
+      ];
+
+      if (chartType === 'pie' || chartType === 'polarArea') {
+        const dataToShow = datasets[0].data;
+        finalDatasets = [{
+          label: datasets[0].label,
+          data: dataToShow,
+          backgroundColor: chartColors.map(c => c.border),
+          borderColor: isDarkMode ? 'var(--bg-card)' : 'var(--bg-white)',
+          borderWidth: 1
+        }];
+      } else {
+        finalDatasets = datasets.map((ds, index) => ({
+          ...ds,
+          borderColor: chartColors[index % chartColors.length].border,
+          backgroundColor: chartType === 'bar' ? chartColors[index % chartColors.length].border : chartColors[index % chartColors.length].bg,
+          fill: chartType === 'line' || chartType === 'radar' ? true : false,
+          pointBackgroundColor: chartColors[index % chartColors.length].border,
+          pointBorderColor: isDarkMode ? 'var(--bg-card)' : 'var(--bg-white)',
+          pointHoverBackgroundColor: isDarkMode ? 'var(--bg-card)' : 'var(--bg-white)',
+          pointHoverBorderColor: chartColors[index % chartColors.length].border,
+        }));
+      }
+
+      return {
+        type: chartType,
+        data: {
+          labels: labels,
+          datasets: finalDatasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: chartType !== 'pie' && chartType !== 'polarArea',
+              labels: { color: textColor }
+            },
+            title: {
+              display: true,
+              text: 'Evolución de Edades Biológicas',
+              color: textColor,
+              font: { size: 16 }
+            },
+            tooltip: {
+              backgroundColor: isDarkMode ? 'var(--bg-card)' : 'var(--bg-white)',
+              titleColor: textColor,
+              bodyColor: textColor,
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              borderWidth: 1
+            }
+          },
+          scales: chartType !== 'pie' && chartType !== 'polarArea' && chartType !== 'radar' ? {
+            y: {
+              beginAtZero: false,
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          } : chartType === 'radar' ? {
+            r: {
+              angleLines: { color: gridColor },
+              grid: { color: gridColor },
+              pointLabels: { color: textColor },
+              ticks: { color: textColor }
+            }
+          } : {},
+          elements: {
+            line: { tension: 0.3 },
+            point: { radius: 3, hoverRadius: 5 }
+          }
+        }
+      };
+    }
+
+    function obtenerDatosSimulados(dateRange) {
+      let count = 6;
+      let labels = ['Hace 6m', 'Hace 5m', 'Hace 4m', 'Hace 3m', 'Hace 2m', 'Actual'];
+      if (dateRange === '1y') {
+        count = 12;
+        labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      } else if (dateRange === '2y') {
+        count = 12;
+        labels = Array.from({length: 12}, (_, i) => `M${i*2+1}`);
+      }
+
+      const generateData = (base, fluctuation) =>
+        Array.from({ length: count }, (_, i) => parseFloat((base + Math.random() * fluctuation - fluctuation / 2 + (i * 0.1)).toFixed(1)));
+
+      const biofisicaData = generateData(55, 4);
+      const bioquimicaData = generateData(52, 5);
+      const ortoData = generateData(50, 3);
+      const genData = generateData(58, 2);
+
+      const datasets = [
+        { label: 'Edad Biofísica', data: biofisicaData },
+        { label: 'Edad Bioquímica', data: bioquimicaData },
+        { label: 'Edad Ortomolecular', data: ortoData },
+        { label: 'Edad Genética', data: genData }
+      ];
+      return { labels, datasets };
+    }
+
+    function actualizarComparativa() {
+      const cronoAgeInput = document.getElementById('edad-cronologica');
+      const cronoAge = cronoAgeInput ? parseInt(cronoAgeInput.value || 50, 10) : 50;
+      if (isNaN(cronoAge)) cronoAge = 50;
+
+      const biofisica = Math.round(55 + Math.random() * 4 - 2);
+      const bioquimica = Math.round(52 + Math.random() * 5 - 2.5);
+      const orto = Math.round(50 + Math.random() * 3 - 1.5);
+      const genetica = Math.round(58 + Math.random() * 2 - 1);
+
+      const bioFisicaEl = document.getElementById('edad-biofisica');
+      const bioQuimicaEl = document.getElementById('edad-bioquimica');
+      const ortoEl = document.getElementById('edad-ortomolecular');
+      const geneticaEl = document.getElementById('edad-genetica');
+
+      if(bioFisicaEl) bioFisicaEl.innerText = biofisica;
+      if(bioQuimicaEl) bioQuimicaEl.innerText = bioquimica;
+      if(ortoEl) ortoEl.innerText = orto;
+      if(geneticaEl) geneticaEl.innerText = genetica;
+    }
+
+    function actualizarPerfilMultidimensional() {
+      const cronoAgeInput = document.getElementById('edad-cronologica');
+      const cronoAge = cronoAgeInput ? (parseInt(cronoAgeInput.value) || 48) : 48;
+
+      const bioAge = 45;
+      const biophysicalAge = 43;
+      const ortomoAge = 52;
+      const biochemicalAge = 46;
+      const geneticAge = 49;
+
+      const bioDiff = bioAge - cronoAge;
+      const biophysicalDiff = biophysicalAge - cronoAge;
+      const ortomoDiff = ortomoAge - cronoAge;
+      const biochemicalDiff = biochemicalAge - cronoAge;
+      const geneticDiff = geneticAge - cronoAge;
+
+      const bioAgeValueEl = document.getElementById('bio-age-value');
+      const biophysicalAgeValueEl = document.getElementById('biophysical-age-value');
+      const ortomoAgeValueEl = document.getElementById('ortomo-age-value');
+      const biochemicalAgeValueEl = document.getElementById('biochemical-age-value');
+      const geneticAgeValueEl = document.getElementById('genetic-age-value');
+
+      if(bioAgeValueEl) bioAgeValueEl.innerText = bioAge;
+      if(biophysicalAgeValueEl) biophysicalAgeValueEl.innerText = biophysicalAge;
+      if(ortomoAgeValueEl) ortomoAgeValueEl.innerText = ortomoAge;
+      if(biochemicalAgeValueEl) biochemicalAgeValueEl.innerText = biochemicalAge;
+      if(geneticAgeValueEl) geneticAgeValueEl.innerText = geneticAge;
+
+      actualizarDiferencial('bio-differential', bioDiff);
+      actualizarDiferencial('biophysical-differential', biophysicalDiff);
+      actualizarDiferencial('ortomo-differential', ortomoDiff);
+      actualizarDiferencial('biochemical-differential', biochemicalDiff);
+      actualizarDiferencial('genetic-differential', geneticDiff);
+
+      const calculatePercentage = (age) => Math.max(0, Math.min(100, 100 - (age - 20)));
+      actualizarProgressCircle('bio', calculatePercentage(bioAge));
+      actualizarProgressCircle('biophysical', calculatePercentage(biophysicalAge));
+      actualizarProgressCircle('ortomo', calculatePercentage(ortomoAge));
+      actualizarProgressCircle('biochemical', calculatePercentage(biochemicalAge));
+      actualizarProgressCircle('genetic', calculatePercentage(geneticAge));
+    }
+
+    function actualizarDiferencial(elementId, diff) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      element.classList.remove('negative', 'positive');
+      const sign = diff > 0 ? '+' : '';
+      const diffClass = diff < 0 ? 'negative' : (diff > 0 ? 'positive' : '');
+      if(diffClass) element.classList.add(diffClass);
+      element.innerHTML = `vs. Edad Cronológica<br><span>${sign}${diff} años</span>`;
+    }
+
+    function actualizarProgressCircle(className, percentage) {
+      const elements = document.querySelectorAll(`.progress-circle.${className}`);
+      if (elements.length === 0) return;
+
+      const degrees = (percentage / 100) * 360;
+      const colorVar = elements[0].style.color || window.getComputedStyle(elements[0]).color;
+
+      elements.forEach(el => {
+          el.style.background = `conic-gradient(${colorVar} ${degrees}deg, var(--bg-card) 0deg)`;
+      });
+    }
+
+    function generarInforme() {
+      showToast('Generando Informe', 'Se está generando el informe personalizado...', 'info');
+      setTimeout(() => {
+          showToast('Informe Listo', 'El informe se ha generado (simulación).', 'success');
+      }, 2000);
+    }
+
+    function abrirBiofisica() {
+      console.log("Abriendo Edad Biofísica...");
+      showToast('Navegación', 'Abriendo sección Edad Biofísica (simulado)...', 'info');
+    }
+
+    function abrirBioquimica() {
+      console.log("Abriendo Edad Bioquímica...");
+      showToast('Navegación', 'Abriendo sección Edad Bioquímica (simulado)...', 'info');
+    }
+
+    function abrirOrtomo() {
+      console.log("Abriendo Edad Ortomolecular...");
+      showToast('Navegación', 'Abriendo sección Edad Ortomolecular (simulado)...', 'info');
+    }
+
+    function abrirGenetica() {
+      console.log("Abriendo Edad Genética...");
+      showToast('Navegación', 'Abriendo sección Edad Genética (simulado)...', 'info');
+    }
+
+    function guardarHistoria() {
+      console.log("Simulando guardado de historia...");
+      const emailInput = document.getElementById('email');
+      if (emailInput && !emailInput.value.includes('@')) {
+          showToast('Error Guardado', 'Por favor, ingrese un correo electrónico válido.', 'error');
+          return;
+      }
+      const datosGenerales = { /* ... gather data ... */ };
+      const historiaClinica = { /* ... gather data ... */ };
+      console.log("Datos Generales:", datosGenerales);
+      console.log("Historia Clínica:", historiaClinica);
+      showToast('Guardado Exitoso', 'Historia guardada correctamente (simulación).', 'success');
+    }
+
+    function showToast(title, message, type = 'success') {
+        const toastContainer = document.getElementById('toast-container');
+        if(!toastContainer) {
+            console.warn('Toast container not found!');
+            return;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const iconClass = type === 'success' ? 'fas fa-check-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : (type === 'error' ? 'fas fa-times-circle' : 'fas fa-info-circle');
+        toast.innerHTML = `
+            <div class="toast-icon ${type}"><i class="${iconClass}"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+        `;
+        toastContainer.appendChild(toast);
+
+        const closeButton = toast.querySelector('.toast-close');
+        closeButton?.addEventListener('click', () => {
+            toast.classList.remove('show');
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+        });
+
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            if (toast.parentNode === toastContainer) {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                     if (toast.parentNode === toastContainer) {
+                         toast.remove();
+                     }
+                 }, 300);
+            }
+        }, 5000);
+    }
+
+    function getRgbFromCssVar(varName) {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(`--${varName}-rgb`).trim();
+        return value || null;
+    }
+
+    function ensureRgbVars() {
+         const rootStyle = getComputedStyle(document.documentElement);
+         const varsToCheck = ['primary', 'warning', 'success', 'info', 'secondary-color'];
+         varsToCheck.forEach(name => {
+             if (!rootStyle.getPropertyValue(`--${name}-rgb`)) {
+                 const hexColor = rootStyle.getPropertyValue(`--${name}`).trim();
+                 if (hexColor && hexColor.startsWith('#')) {
+                     const rgb = hexToRgb(hexColor);
+                     if (rgb) {
+                         document.documentElement.style.setProperty(`--${name}-rgb`, `${rgb.r}, ${rgb.g}, ${rgb.b}`);
+                         console.log(`Added --${name}-rgb: ${rgb.r}, ${rgb.g}, ${rgb.b}`);
+                     }
+                 }
+             }
+         });
+     }
+
+     function hexToRgb(hex) {
+         let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+         return result ? {
+             r: parseInt(result[1], 16),
+             g: parseInt(result[2], 16),
+             b: parseInt(result[3], 16)
+         } : null;
+     }
+
+    // Funciones para la pestaña Alimentación Nutrigenómica
+    function filterDietaryOptions() {
+      const bloodType = document.getElementById('blood-type-select').value;
+      const sections = ['breakfast', 'lunch', 'dinner', 'snacks'];
+      sections.forEach(section => {
+        const options = document.querySelectorAll(`#${section}-options .dietary-option`);
+        options.forEach(option => {
+          const optionBloodType = option.getAttribute('data-blood-type');
+          if (bloodType === 'all' || optionBloodType === bloodType) {
+            option.style.display = 'flex';
+          } else {
+            option.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    function editDietaryOption(button) {
+        const option = button.closest('.dietary-option');
+        const label = option.querySelector('label');
+        const currentText = label.textContent;
+        
+        // Crear formulario de edición si no existe
+        let editForm = option.querySelector('.edit-dietary-form');
+        if (!editForm) {
+            editForm = document.createElement('div');
+            editForm.className = 'edit-dietary-form';
+            editForm.innerHTML = `
+                <input type="text" value="${currentText}">
+                <button type="button" onclick="saveDietaryOption(this)">Guardar</button>
+                <button type="button" onclick="cancelEdit(this)">Cancelar</button>
+            `;
+            option.appendChild(editForm);
+        }
+        
+        editForm.classList.add('active');
+        option.classList.add('editing');
+    }
+
+    function saveDietaryOption(button) {
+        const editForm = button.closest('.edit-dietary-form');
+        const option = editForm.closest('.dietary-option');
+        const newText = editForm.querySelector('input').value;
+        
+        if (newText.trim()) {
+            option.querySelector('label').textContent = newText;
+            editForm.classList.remove('active');
+            option.classList.remove('editing');
+            showToast('Opción Actualizada', 'La opción alimentaria ha sido actualizada con éxito.', 'success');
+        } else {
+            showToast('Error', 'Por favor, ingrese un texto válido.', 'error');
+        }
+    }
+
+    function cancelEdit(button) {
+        const editForm = button.closest('.edit-dietary-form');
+        const option = editForm.closest('.dietary-option');
+        editForm.classList.remove('active');
+        option.classList.remove('editing');
+    }
+
+    function deleteDietaryOption(button) {
+        if (confirm('¿Está seguro de que desea eliminar esta opción?')) {
+            const option = button.closest('.dietary-option');
+            option.remove();
+            showToast('Opción Eliminada', 'La opción alimentaria ha sido eliminada con éxito.', 'success');
+        }
+    }
+
+    function addDietaryOption(section) {
+        const input = document.getElementById(`new-${section}-option`);
+        const text = input.value.trim();
+        
+        if (text) {
+            const optionsContainer = document.getElementById(`${section}-options`);
+            const bloodType = document.getElementById('blood-type-select').value;
+            const newId = `${section}-${bloodType}-${Date.now()}`;
+            
+            const newOption = document.createElement('div');
+            newOption.className = 'dietary-option';
+            newOption.setAttribute('data-blood-type', bloodType);
+            newOption.setAttribute('data-id', newId);
+            newOption.innerHTML = `
+                <input type="checkbox" id="${newId}">
+                <label for="${newId}">${text}</label>
+                <div class="dietary-option-actions">
+                    <button class="edit-btn" onclick="editDietaryOption(this)"><i class="fas fa-edit"></i></button>
+                    <button class="delete-btn" onclick="deleteDietaryOption(this)"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            
+            optionsContainer.appendChild(newOption);
+            input.value = '';
+            showToast('Opción Agregada', 'Nueva opción alimentaria añadida con éxito.', 'success');
+        } else {
+            showToast('Error', 'Por favor, ingrese una opción válida.', 'error');
+        }
+    }
+
+    function saveDietaryPlan() {
+      const selectedOptions = [];
+      document.querySelectorAll('#tab5 .dietary-option input[type="checkbox"]:checked').forEach(checkbox => {
+        const label = checkbox.nextElementSibling.textContent;
+        const section = checkbox.closest('.dietary-section').querySelector('h4').textContent;
+        selectedOptions.push({ section, label });
+      });
+      console.log("Plan Alimentario Seleccionado:", selectedOptions);
+      showToast('Plan Guardado', 'El plan alimentario ha sido guardado (simulación).', 'success');
+    }
+
+    function openSendModal() {
+      document.getElementById('send-modal-overlay').style.display = 'flex';
+    }
+    function closeSendModal() {
+      document.getElementById('send-modal-overlay').style.display = 'none';
+    }
+    function getDietaryGuideSummary() {
+      // Puedes personalizar el resumen aquí
+      let content = `Guía Alimentaria personalizada\n`;
+      // Puedes agregar más detalles relevantes aquí
+      content += '\nConsulta la guía completa adjunta o en el enlace.';
+      return content;
+    }
+    function sendViaWhatsapp() {
+      const message = encodeURIComponent(getDietaryGuideSummary());
+      window.open(`https://wa.me/?text=${message}`, '_blank');
+      closeSendModal();
+    }
+    function sendViaEmail() {
+      const subject = encodeURIComponent('Guía Alimentaria');
+      const body = encodeURIComponent(getDietaryGuideSummary());
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      closeSendModal();
+    }
+    function sendToFlutterApp() {
+      alert('Próximamente: Integración con la app del paciente.');
+      closeSendModal();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Citas</title>
+</head>
+<body>
+    <h1>Gestión de Citas</h1>
+    <button onclick="crearCitaEjemplo()">Crear Cita de Ejemplo</button>
+    <div id="resultado"></div>
+
+    <script>
+        async function crearCitaEjemplo() {
+            const cita = {
+                paciente_id: 1, // ID del paciente (debería obtenerse dinámicamente)
+                profesional_id: 1, // ID del profesional
+                fecha_hora: '2024-03-15T10:00:00-04:00', //  ¡¡¡Formato ISO 8601!!!  Incluye zona horaria.
+                duracion: 60,
+                servicio: 'Consulta de Medicina General',
+                ubicacion: 'Consultorio 1',
+                notas: 'Primera consulta del paciente.'
+            };
+
+            try {
+                const response = await fetch('/api/citas', { //  La URL de tu API
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(cita)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { //  Verifica si la respuesta es exitosa (código 2xx)
+                    document.getElementById('resultado').innerHTML = `Cita creada con ID: ${data.citaId}`;
+                } else {
+                    document.getElementById('resultado').innerHTML = `Error al crear la cita: ${data.error}`;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('resultado').innerHTML = 'Error al conectar con el servidor.';
+            }
+        }
+         async function obtenerCitas() {
+            try {
+                const response = await fetch('/api/citas');
+                const citas = await response.json();
+                console.log(citas);
+
+            } catch (error) {
+                 console.error("Error al obtener las citas", error);
+            }
+
+        }
+        // obtenerCitas();  Llamarías a esta función al cargar la página, por ejemplo.
+    </script>
+</body>
+</html>

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es"> {/* Lang set to Spanish */}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente IA de Longevidad (MediLongevity v3)</title> {/* Updated Title */}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.28.0"></script> <style>
+        /* Base Variables */
+        :root {
+            --primary-color: #5D5CDE;
+            --primary-dark: #4B4AB3;
+            --primary-light: #7C7BE5;
+            --secondary-color: #108981; /* Teal */
+            --secondary-dark: #059669;
+            --text-dark: #1F2937;
+            --text-medium: #4B5563;
+            --text-light: #9CA3AF;
+            --bg-light: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --bg-card: #F3F4F6;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --info: #3B82F6;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px 2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 0.25rem;
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark Mode Colors */
+        .dark-mode {
+            --primary-color: #7C7BE5;
+            --primary-dark: #6A69D4;
+            --primary-light: #8E8DEB;
+            --secondary-color: #2DD4BF;
+            --secondary-dark: #14B8A6;
+            --text-dark: #F9FAFB;
+            --text-medium: #D1D5DB;
+            --text-light: #9CA3AF;
+            --bg-light: #111827;
+            --bg-white: #1F2937;
+            --bg-card: #374151;
+            --border-color: #4B5563;
+            --danger: #F87171;
+            --warning: #FBBF24;
+            --success: #34D399;
+            --info: #60A5FA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+             scroll-behavior: smooth; /* Smooth scrolling */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease, var(--transition);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-weight: 700; font-size: 1.3rem; color: var(--primary-color); margin-bottom: 0.5rem;
+            display: flex; align-items: center; gap: 0.6rem; transition: opacity 0.3s ease;
+        }
+        .sidebar.collapsed .logo span { opacity: 0; width: 0; overflow: hidden; }
+        .logo i { font-size: 1.5rem; }
+
+        .nav-menu {
+            flex: 1; list-style-type: none; overflow-y: auto; overflow-x: hidden; padding-bottom: 1rem;
+        }
+        .nav-menu::-webkit-scrollbar { width: 5px; }
+        .nav-menu::-webkit-scrollbar-track { background: transparent; }
+        .nav-menu::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        .dark-mode .nav-menu::-webkit-scrollbar-thumb { background: var(--text-light); }
+
+        .nav-item {
+            padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.85rem; color: var(--text-medium);
+            font-weight: 500; cursor: pointer; transition: var(--transition); border-left: 4px solid transparent;
+            font-size: 0.95rem; white-space: nowrap; position: relative;
+        }
+        .nav-item:hover { color: var(--primary-color); background-color: rgba(93, 92, 222, 0.07); border-left-color: var(--primary-light); transform: translateX(3px); }
+        .nav-item.active { color: var(--primary-color); background-color: rgba(93, 92, 222, 0.12); border-left-color: var(--primary-color); font-weight: 600; }
+        .nav-item i { font-size: 1.3rem; width: 1.3rem; text-align: center; transition: transform 0.2s ease; flex-shrink: 0; }
+        .nav-item:hover i { transform: scale(1.1); }
+        .nav-item span { transition: opacity 0.3s ease; opacity: 1; }
+        .sidebar.collapsed .nav-item span { opacity: 0; width: 0; overflow: hidden; pointer-events: none; }
+
+        /* Tooltip for collapsed sidebar */
+        .sidebar.collapsed .nav-item::after {
+            content: attr(data-tooltip); position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+            background-color: var(--text-dark); color: var(--bg-white); padding: 0.4rem 0.8rem; border-radius: var(--radius-md);
+            font-size: 0.8rem; white-space: nowrap; margin-left: 12px; opacity: 0; visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease; z-index: 10; pointer-events: none;
+        }
+        .dark-mode .sidebar.collapsed .nav-item::after { background-color: var(--bg-light); color: var(--text-dark); }
+        .sidebar.collapsed .nav-item:hover::after { opacity: 1; visibility: visible; transition-delay: 0.3s; }
+
+        .user-profile {
+            padding: 1.25rem 1.5rem; margin-top: auto; display: flex; align-items: center; gap: 0.85rem;
+            cursor: pointer; border-top: 1px solid var(--border-color); transition: background-color 0.3s ease; flex-shrink: 0;
+        }
+        .user-profile:hover { background-color: rgba(0,0,0,0.03); }
+        .dark-mode .user-profile:hover { background-color: rgba(255,255,255,0.05); }
+        .user-avatar {
+            width: 44px; height: 44px; border-radius: 50%; background-color: var(--primary-color); color: white;
+            display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.1rem;
+            transition: transform 0.3s ease; flex-shrink: 0;
+        }
+        .user-profile:hover .user-avatar { transform: rotate(15deg); }
+        .user-info { flex: 1; overflow: hidden; transition: opacity 0.3s ease; }
+        .sidebar.collapsed .user-info { opacity: 0; width: 0; }
+        .user-name { font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem; }
+        .user-role { color: var(--text-light); font-size: 0.8rem; }
+
+        /* Main Content Area */
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+
+        /* Placeholder for other views */
+        .placeholder-view { display: none; padding: 2rem; text-align: center; color: var(--text-medium); }
+        .placeholder-view i { font-size: 3rem; margin-bottom: 1rem; color: var(--text-light); }
+        .placeholder-view h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+        .patient-header {
+            display: flex; align-items: center; padding: 1.25rem; background-color: var(--bg-white);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; transition: var(--transition);
+        }
+        .patient-header:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .patient-avatar {
+            width: 64px; height: 64px; border-radius: 50%; background-color: var(--primary-light); margin-right: 1rem;
+            display: flex; align-items: center; justify-content: center; color: var(--bg-white); font-size: 1.5rem; transition: var(--transition);
+        }
+        .patient-header:hover .patient-avatar { transform: scale(1.05); }
+        .patient-info { flex: 1; }
+        .patient-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark); }
+        .patient-details { color: var(--text-medium); font-size: 0.875rem; }
+         .patient-details span { margin-right: 0.75rem; display: inline-flex; align-items: center; gap: 0.3rem; }
+         .patient-details i { color: var(--text-light); }
+
+        .health-metrics { display: flex; gap: 1.25rem; margin-left: auto; }
+        .metric { text-align: center; transition: var(--transition); padding: 0.5rem; border-radius: var(--radius-md); }
+        .metric:hover { background-color: rgba(93, 92, 222, 0.05); transform: translateY(-2px); }
+        .metric-label { font-size: 0.75rem; color: var(--text-medium); margin-bottom: 0.25rem; }
+        .metric-value { font-size: 1.25rem; font-weight: 600; color: var(--primary-color); }
+        .metric-value .trend { font-size: 0.75rem; font-weight: 500; color: var(--success); }
+         .metric-value .trend.down { color: var(--danger); }
+         .metric-value .trend.stable { color: var(--text-light); }
+
+        /* AI Assistant Section */
+        .section-header { margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+        .section-title { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .section-title i { color: var(--primary-color); }
+
+        .assistant-container {
+            background-color: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+            overflow: hidden; transition: var(--transition); display: block; /* Initially visible */
+        }
+        .assistant-container:hover { box-shadow: var(--shadow-lg); }
+        .assistant-container.hidden { display: none; }
+
+        .assistant-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); overflow-x: auto;
+            scrollbar-width: thin; scrollbar-color: var(--primary-color) var(--bg-card);
+        }
+        .assistant-tabs::-webkit-scrollbar { height: 4px; }
+        .assistant-tabs::-webkit-scrollbar-track { background: var(--bg-card); }
+        .assistant-tabs::-webkit-scrollbar-thumb { background-color: var(--primary-color); border-radius: 20px; }
+
+        .assistant-tab {
+            padding: 1rem 1.5rem; font-weight: 500; color: var(--text-medium); cursor: pointer;
+            transition: var(--transition); white-space: nowrap; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .assistant-tab.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
+        .assistant-tab:hover:not(.active) { color: var(--text-dark); background-color: rgba(0, 0, 0, 0.02); }
+
+        .assistant-content { padding: 1.5rem; min-height: 500px; max-height: 700px; display: none; flex-direction: column; animation: fadeIn 0.5s ease forwards; }
+        .assistant-content.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Chat Interface */
+        #chat-tab { display: flex; } /* Show chat initially */
+        .chat-container { flex: 1; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem; }
+        .chat-message { margin-bottom: 1.25rem; display: flex; flex-direction: column; animation: messageSlide 0.3s ease forwards; }
+        @keyframes messageSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-message.ai { align-items: flex-start; }
+        .chat-message.user { align-items: flex-end; }
+        .message-bubble { max-width: 75%; padding: 0.75rem 1rem; border-radius: var(--radius-lg); position: relative; box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .message-bubble:hover { box-shadow: var(--shadow-md); }
+        .chat-message.ai .message-bubble { background-color: var(--bg-card); border-bottom-left-radius: 0; }
+        .dark-mode .chat-message.ai .message-bubble { background-color: var(--bg-card); }
+        .chat-message.user .message-bubble { background-color: var(--primary-color); color: white; border-bottom-right-radius: 0; }
+        .message-bubble p { margin-bottom: 0.5rem; }
+        .message-bubble p:last-child { margin-bottom: 0; }
+        .message-bubble ul, .message-bubble ol { margin-left: 1.25rem; margin-top: 0.5rem; margin-bottom: 0.5rem; padding-left: 0.5rem; }
+        .message-bubble li { margin-bottom: 0.3rem; }
+        .message-bubble strong { color: var(--primary-color); font-weight: 600; }
+        .dark-mode .message-bubble strong { color: var(--primary-light); }
+        .chat-message.user .message-bubble strong { color: rgba(255,255,255,0.85); }
+
+        .chat-input-container { display: flex; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--border-color); position: relative; }
+        .chat-input {
+            flex: 1; padding: 0.75rem 1rem; padding-right: 3rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            font-family: inherit; font-size: 0.938rem; color: var(--text-dark); background-color: var(--bg-light); transition: var(--transition);
+        }
+        .chat-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2); }
+        .voice-button {
+            position: absolute; right: 4.5rem; top: 50%; transform: translateY(-50%); background: none; border: none;
+            font-size: 1.15rem; color: var(--text-medium); cursor: pointer; transition: var(--transition); padding: 0.3rem;
+        }
+        .voice-button:hover { color: var(--primary-color); transform: translateY(-50%) scale(1.1); }
+        .voice-button.pulse-animation { animation: pulse 1.5s infinite; } /* Added pulse animation */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .send-button {
+            padding: 0.75rem 1.25rem; background-color: var(--primary-color); color: white; border: none; border-radius: var(--radius-md);
+            font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;
+        }
+        .send-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+
+        /* Citation Styling */
+        .research-citation {
+            margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-light); background-color: rgba(59, 130, 246, 0.05);
+            padding: 0.5rem; border-radius: var(--radius-sm); border-left: 2px solid var(--info);
+        }
+        .dark-mode .research-citation { background-color: rgba(96, 165, 250, 0.1); }
+        .citation-title { font-weight: 600; margin-bottom: 0.15rem; }
+        .citation-authors { font-style: italic; margin-bottom: 0.15rem; }
+        .citation-journal { font-weight: 500; }
+
+        /* Loading Wave Animation */
+        .typing-indicator { display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background-color: var(--bg-card); border-radius: var(--radius-lg); width: fit-content; margin-bottom: 1rem; }
+        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-light); animation: typingAnimation 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+        @keyframes typingAnimation { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* AI Insights Tab */
+        .insight-card {
+            background-color: var(--bg-white); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md); transition: transform 0.3s ease, box-shadow 0.3s ease; margin-bottom: 1.5rem; /* Added margin */
+        }
+        .insight-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .insight-header { display: flex; align-items: center; margin-bottom: 1.25rem; }
+        .insight-icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem; color: white; flex-shrink: 0; font-size: 1.2rem; }
+        .insight-icon.health { background-color: var(--info); }
+        .insight-icon.biomarker { background-color: var(--primary-color); }
+        .insight-icon.recommendation { background-color: var(--success); }
+        .insight-icon.alert { background-color: var(--warning); }
+        .insight-title { font-weight: 600; color: var(--text-dark); font-size: 1.1rem; }
+        .insight-content { color: var(--text-medium); font-size: 0.95rem; line-height: 1.6; }
+        .insight-content p { margin-bottom: 0.5rem; }
+        .insight-content p:last-child { margin-bottom: 0; }
+
+        /* Security Notice */
+        .security-notice {
+            margin-top: 1.5rem; padding: 0.75rem 1rem; background-color: rgba(59, 130, 246, 0.05); border-radius: var(--radius-md);
+            font-size: 0.813rem; color: var(--text-medium); display: flex; align-items: center; gap: 0.75rem;
+        }
+        .security-notice i { color: var(--info); font-size: 1.25rem; }
+        .dark-mode .security-notice { background-color: rgba(96, 165, 250, 0.1); }
+
+        /* Biomarker Cards */
+        .biomarker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .biomarker-card {
+            background-color: var(--bg-white); border-radius: var(--radius-md); padding: 1.25rem; border-left: 4px solid transparent;
+            transition: var(--transition); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer;
+        }
+        .biomarker-card:hover { transform: translateX(5px); box-shadow: var(--shadow-md); }
+        .biomarker-card.normal { border-left-color: var(--success); }
+        .biomarker-card.warning { border-left-color: var(--warning); }
+        .biomarker-card.danger { border-left-color: var(--danger); }
+        .biomarker-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .biomarker-name { font-weight: 600; color: var(--text-dark); }
+        .biomarker-category { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 12px; color: white; }
+        .category-inflammatory { background-color: var(--danger); }
+        .category-metabolic { background-color: var(--warning); }
+        .category-cardiovascular { background-color: var(--info); }
+        .category-nutrient { background-color: var(--success); }
+        .biomarker-value { font-size: 1.75rem; font-weight: 700; color: var(--text-dark); margin: 0.5rem 0; }
+        .biomarker-value.normal { color: var(--success); }
+        .biomarker-value.warning { color: var(--warning); }
+        .biomarker-value.danger { color: var(--danger); }
+        .biomarker-range { font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.5rem; }
+        .biomarker-trend { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+        .trend-badge { font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 0.25rem; padding: 0.1rem 0.5rem; border-radius: 12px; }
+        .trend-badge.improving { color: var(--success); background-color: rgba(16, 185, 129, 0.1); }
+        .trend-badge.worsening { color: var(--danger); background-color: rgba(239, 68, 68, 0.1); }
+        .trend-badge.stable { color: var(--text-medium); background-color: rgba(107, 114, 128, 0.1); }
+        .predict-button {
+            font-size: 0.75rem; padding: 0.2rem 0.5rem; background-color: var(--bg-light); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); color: var(--text-medium); display: flex; align-items: center; gap: 0.25rem;
+        }
+        .predict-button:hover { background-color: var(--bg-card); transform: translateY(-2px); }
+        .dark-mode .predict-button { background-color: var(--bg-card); }
+        .dark-mode .predict-button:hover { background-color: var(--border-color); }
+
+        /* Biomarker Forecasting */
+        .forecasting-section { margin-top: 1.5rem; }
+        .forecasting-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .forecasting-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .forecast-chart-container { height: 350px; position: relative; }
+        .forecast-legend { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .forecast-legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-medium); }
+        .forecast-legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+        /* Digital Twin & Simulations Tab */
+        .biological-age-section { background-color: var(--bg-white); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .biological-age-section:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .biological-age-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .biological-age-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .biological-age-content { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-around; /* Better spacing */ }
+        .age-clock { flex: 1; min-width: 180px; /* Adjusted min-width */ display: flex; flex-direction: column; align-items: center; }
+        .age-clock-circle { width: 130px; height: 130px; /* Adjusted size */ border-radius: 50%; position: relative; margin-bottom: 1rem; box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1); background: conic-gradient(var(--primary-color) 0%, var(--primary-light) 35%, var(--info) 65%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; }
+        .age-clock-inner { width: 110px; height: 110px; /* Adjusted size */ border-radius: 50%; background-color: var(--bg-white); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .dark-mode .age-clock-inner { background-color: var(--bg-card); }
+        .age-clock-value { font-size: 1.8rem; /* Adjusted size */ font-weight: 700; color: var(--text-dark); line-height: 1; }
+        .age-clock-label { font-size: 0.75rem; /* Adjusted size */ color: var(--text-medium); }
+        .age-difference { font-weight: 500; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; /* Adjusted size */ margin-top: 0.5rem; }
+        .age-difference.younger { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .age-difference.older { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .age-clock-info { font-size: 0.75rem; /* Adjusted size */ text-align: center; color: var(--text-medium); margin-top: 0.5rem; }
+
+        .digital-twin-card { background-color: var(--bg-white); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); transition: var(--transition); border: 1px solid var(--border-color); }
+        .digital-twin-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+        .digital-twin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
+        .digital-twin-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .digital-twin-icon { color: var(--primary-color); }
+        .digital-twin-actions { display: flex; gap: 0.75rem; }
+        .twin-button { padding: 0.5rem 0.75rem; border-radius: var(--radius-md); font-weight: 500; font-size: 0.813rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-color); background-color: var(--bg-light); color: var(--text-medium); }
+        .twin-button:hover { background-color: var(--bg-card); transform: translateY(-2px); }
+        .twin-button.primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .twin-button.primary:hover { background-color: var(--primary-dark); }
+        .dark-mode .twin-button { background-color: var(--bg-card); }
+        .dark-mode .twin-button:hover { background-color: var(--border-color); }
+        .digital-twin-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjusted minmax */ gap: 1rem; }
+        .twin-parameter { display: flex; flex-direction: column; gap: 0.25rem; }
+        .parameter-label { font-size: 0.75rem; color: var(--text-light); }
+        .parameter-value { font-size: 1rem; font-weight: 500; color: var(--text-dark); }
+        .parameter-change { font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; }
+        .parameter-change.positive { color: var(--success); }
+        .parameter-change.negative { color: var(--danger); }
+        .parameter-change.stable { color: var(--text-medium); } /* Added stable class */
+        .digital-twin-chart { margin-top: 1.5rem; height: 250px; }
+
+        /* Pathway Analysis Tab */
+        .pathway-container { display: flex; flex-direction: column; gap: 1.5rem; }
+        .biomarker-group { background-color: var(--bg-white); border-radius: var(--radius-md); padding: 1rem; transition: var(--transition); box-shadow: var(--shadow-sm); /* Added shadow */ }
+        .biomarker-group:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .biomarker-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .biomarker-group-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .biomarker-group-icon { color: var(--primary-color); }
+        .pathway-chart-container { height: 250px; position: relative; } /* Renamed class */
+        .dark-mode .biomarker-group { background-color: var(--bg-card); }
+
+        /* Treatment Recommendations Tab */
+        .recommendations-container { display: flex; flex-direction: column; gap: 1.5rem; padding-right: 0.5rem; }
+        .recommendation-card { background-color: var(--bg-white); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition); border: 1px solid var(--border-color); }
+        .recommendation-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+        .recommendation-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; background-color: rgba(93, 92, 222, 0.05); border-bottom: 1px solid var(--border-color); }
+        .dark-mode .recommendation-header { background-color: rgba(124, 123, 229, 0.1); }
+        .recommendation-title { font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .recommendation-icon { color: var(--primary-color); }
+        .recommendation-status { font-size: 0.75rem; font-weight: 500; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); }
+        .status-recommended { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .status-high-priority { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-optional { background-color: rgba(107, 114, 128, 0.1); color: var(--text-medium); }
+        .recommendation-body { padding: 1rem; }
+        .recommendation-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .detail-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .detail-label { font-size: 0.75rem; color: var(--text-light); }
+        .detail-value { font-weight: 500; color: var(--text-dark); }
+        .recommendation-description { margin: 1rem 0; color: var(--text-medium); line-height: 1.5; font-size: 0.938rem; }
+        .evidence-section { background-color: rgba(59, 130, 246, 0.05); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.875rem; }
+        .dark-mode .evidence-section { background-color: rgba(96, 165, 250, 0.1); }
+        .evidence-title { font-weight: 600; color: var(--info); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.25rem; }
+        .evidence-content { color: var(--text-medium); }
+        .recommendation-actions { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+        .recommendation-button { padding: 0.5rem 0.75rem; border-radius: var(--radius-md); font-weight: 500; cursor: pointer; transition: var(--transition); font-size: 0.875rem; display: flex; align-items: center; gap: 0.375rem; border: 1px solid var(--border-color); background-color: var(--bg-light); color: var(--text-medium); }
+        .recommendation-button:hover:not(:disabled) { background-color: var(--bg-card); transform: translateY(-2px); }
+        .recommendation-button.primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .recommendation-button.primary:hover:not(:disabled) { background-color: var(--primary-dark); }
+        .recommendation-button.info { background-color: var(--info); color: white; border-color: var(--info); }
+        .recommendation-button.info:hover:not(:disabled) { background-color: #2563eb; }
+        .recommendation-button.simulate { background-color: var(--warning); color: white; border-color: var(--warning); }
+        .recommendation-button.simulate:hover:not(:disabled) { background-color: #d97706; } /* Adjusted hover color */
+        .dark-mode .recommendation-button { background-color: var(--bg-card); }
+        .dark-mode .recommendation-button:hover:not(:disabled) { background-color: var(--border-color); }
+        .recommendation-button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Simulation Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */ display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .simulation-modal { background-color: var(--bg-white); border-radius: var(--radius-lg); width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 1.5rem; transform: scale(0.9); transition: all 0.3s ease; box-shadow: var(--shadow-lg); }
+        .modal-overlay.active .simulation-modal { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .modal-title { font-size: 1.25rem; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .close-modal { background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--text-medium); transition: var(--transition); }
+        .close-modal:hover { color: var(--danger); transform: scale(1.1); }
+        .simulation-form { margin-bottom: 1.5rem; }
+        .simulation-form-group { margin-bottom: 1rem; }
+        .simulation-form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark); }
+        .simulation-form-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .simulation-form-col { flex: 1; min-width: 200px; }
+        .simulation-input, .simulation-select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.938rem; color: var(--text-dark); background-color: var(--bg-light); transition: var(--transition); }
+        .simulation-input:focus, .simulation-select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(93, 92, 222, 0.2); }
+        .dark-mode .simulation-input, .dark-mode .simulation-select { background-color: var(--bg-card); }
+        .simulation-slider-container { display: flex; align-items: center; gap: 1rem; }
+        .simulation-slider { flex: 1; -webkit-appearance: none; height: 6px; background: var(--bg-card); border-radius: 5px; outline: none; cursor: pointer; }
+        .simulation-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary-color); cursor: pointer; transition: var(--transition); }
+        .simulation-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        .dark-mode .simulation-slider { background: var(--border-color); }
+        .simulation-slider-value { width: 50px; text-align: center; font-weight: 500; }
+        .simulation-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .simulation-button { padding: 0.75rem 1.25rem; border-radius: var(--radius-md); font-weight: 500; cursor: pointer; transition: var(--transition); font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; border: none; }
+        .simulation-button.primary { background-color: var(--primary-color); color: white; }
+        .simulation-button.primary:hover:not(:disabled) { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .simulation-button.secondary { background-color: var(--bg-card); color: var(--text-medium); }
+        .simulation-button.secondary:hover:not(:disabled) { background-color: var(--bg-light); transform: translateY(-2px); }
+        .dark-mode .simulation-button.secondary { background-color: var(--bg-white); color: var(--text-dark); }
+        .dark-mode .simulation-button.secondary:hover:not(:disabled) { background-color: var(--bg-light); }
+        .simulation-button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .simulation-results { margin-top: 1.5rem; display: none; }
+        .simulation-results.active { display: block; animation: fadeIn 0.5s ease forwards; }
+        .simulation-chart-container { height: 300px; margin-bottom: 1.5rem; position: relative; }
+        .simulation-insights { background-color: var(--bg-light); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; }
+        .dark-mode .simulation-insights { background-color: var(--bg-card); }
+        .simulation-insights-title { font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .simulation-insights-content { color: var(--text-medium); font-size: 0.938rem; }
+        .simulation-insights-content ul { list-style-position: inside; padding-left: 0; margin-top: 0.5rem; }
+        .simulation-insights-content li { margin-bottom: 0.25rem; }
+
+        /* Theme Toggle Button */
+        .theme-toggle { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-lg); z-index: 999; transition: var(--transition); border: none; }
+        .theme-toggle:hover { transform: scale(1.05); background-color: var(--primary-dark); }
+        .theme-toggle i { font-size: 1.25rem; } /* Adjusted size */
+        .dark-mode .theme-toggle i { transform: rotate(180deg); }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .sidebar { width: 72px; overflow: visible; }
+            .sidebar.collapsed { width: 72px; }
+            .logo span, .nav-item span, .user-info { display: none; }
+            .nav-item { justify-content: center; padding: 1rem 0; border-left-width: 0; border-top: 4px solid transparent; margin: 0 0.5rem; border-radius: var(--radius-md); }
+            .nav-item.active { border-left-width: 0; border-top-color: var(--primary-color); background-color: rgba(93, 92, 222, 0.1); }
+            .nav-item:hover { border-left-width: 0; border-top-color: var(--primary-light); }
+            .user-profile { justify-content: center; padding: 1rem 0; }
+            .user-avatar { width: 40px; height: 40px; font-size: 1rem; }
+            .main-content { padding: 1.5rem; }
+            .patient-header { flex-direction: column; align-items: flex-start; }
+            .patient-avatar { margin-bottom: 1rem; margin-right: 0; }
+            .health-metrics { margin-left: 0; margin-top: 1rem; width: 100%; justify-content: space-around; }
+        }
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .section-title { font-size: 1.5rem; }
+            .assistant-tab { padding: 0.8rem 1rem; font-size: 0.9rem; }
+            .assistant-content { padding: 1.5rem; }
+            .biomarker-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+            .age-clock-circle { width: 120px; height: 120px; }
+            .age-clock-inner { width: 100px; height: 100px; }
+            .age-clock-value { font-size: 1.5rem; }
+            .simulation-form-row { flex-direction: column; gap: 0.5rem; }
+            .simulation-form-col { min-width: 100%; }
+            .sidebar.collapsed .nav-item::after { display: none; }
+        }
+        @media (max-width: 480px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; padding: 0.5rem 0; border-right: none; border-bottom: 1px solid var(--border-color); flex-direction: row; justify-content: space-around; align-items: center; box-shadow: none; position: static; }
+            .sidebar-header { display: none; }
+            .nav-menu { display: flex; flex: 1; justify-content: space-around; overflow: visible; }
+            .nav-item { padding: 0.5rem; flex-direction: column; align-items: center; font-size: 0.7rem; gap: 0.2rem; border-top-width: 0; border-left: 3px solid transparent; margin: 0; border-radius: 0; }
+            .nav-item span { display: block; font-size: 0.7rem; }
+            .nav-item.active { border-top-width: 0; border-left-color: var(--primary-color); background: none; }
+            .nav-item:hover { border-top-width: 0; border-left-color: var(--primary-light); background: none; }
+            .nav-item i { font-size: 1.1rem; }
+            .user-profile { display: none; }
+            .main-content { padding: 0.75rem; }
+            .assistant-tab { padding: 0.75rem 1rem; font-size: 0.875rem; }
+            .assistant-content { padding: 1rem; }
+            .health-metrics { flex-wrap: wrap; gap: 0.75rem; }
+            .metric { flex: 1; min-width: 45%; }
+            .biomarker-grid { grid-template-columns: 1fr; }
+            .simulation-button { padding: 0.5rem 0.75rem; font-size: 0.813rem; }
+            .recommendation-actions { flex-direction: column; }
+            .recommendation-button { width: 100%; justify-content: center; }
+            .theme-toggle { width: 3rem; height: 3rem; bottom: 1rem; right: 1rem; }
+             .theme-toggle i { font-size: 1.25rem; }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="sidebar" id="sidebar">
+             <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-dna"></i> {/* Updated Icon */}
+                    <span>MediLongevity</span>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                {/* Ensure data-view matches placeholder IDs or 'assistant' */}
+                <li class="nav-item" data-tooltip="Dashboard" data-view="dashboard"> <i class="fas fa-chart-line"></i> <span>Dashboard</span> </li>
+                <li class="nav-item" data-tooltip="Biomarcadores" data-view="biomarkers-view"> <i class="fas fa-flask"></i> <span>Biomarcadores</span> </li>
+                <li class="nav-item active" data-tooltip="Asistente IA" data-view="assistant"> <i class="fas fa-robot"></i> <span>Asistente IA</span> </li>
+                <li class="nav-item" data-tooltip="Relojes Envejecimiento" data-view="aging-clocks"> <i class="fas fa-dna"></i> <span>Relojes Envejecimiento</span> </li>
+                <li class="nav-item" data-tooltip="Protocolos" data-view="protocols"> <i class="fas fa-clipboard-list"></i> <span>Protocolos</span> </li>
+                <li class="nav-item" data-tooltip="Reportes" data-view="reports"> <i class="fas fa-file-medical-alt"></i> <span>Reportes</span> </li>
+                <li class="nav-item" data-tooltip="Pacientes" data-view="patients"> <i class="fas fa-users"></i> <span>Pacientes</span> </li>
+                <li class="nav-item" data-tooltip="Configuración" data-view="settings"> <i class="fas fa-cog"></i> <span>Settings</span> </li>
+            </ul>
+            <div class="user-profile">
+                <div class="user-avatar"> <i class="fas fa-user-md"></i> </div>
+                <div class="user-info">
+                    <div class="user-name">Dra. María García</div>
+                    <div class="user-role">Especialista Longevidad</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="patient-header" id="patient-header">
+                 <div class="patient-avatar"> <i class="fas fa-user"></i> </div>
+                <div class="patient-info">
+                    <h2 class="patient-name">Isabel Romero</h2>
+                    <div class="patient-details">
+                        <span><i class="fas fa-birthday-cake"></i> 58 años</span>
+                        <span><i class="fas fa-venus"></i> Femenino</span>
+                        <span><i class="fas fa-id-card"></i> ID: 458912</span>
+                     </div>
+                </div>
+                <div class="health-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Edad Biológica</div>
+                        <div class="metric-value biological-age-display">52.3 <span class="trend younger"><i class="fas fa-arrow-down"></i>-5.7</span></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Puntaje Salud</div>
+                        <div class="metric-value">84<span style="font-size: 0.8rem; color: var(--text-light); margin-left: 2px;">/100</span></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Última Visita</div>
+                        <div class="metric-value" style="font-size: 1.1rem;">12/04/2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="assistant-container" id="assistant-view">
+                 <div class="section-header" style="padding: 0 1.5rem; margin-top: 1rem;">
+                     <h2 class="section-title"><i class="fas fa-brain"></i> Asistente IA de Longevidad</h2>
+                 </div>
+                <div class="assistant-tabs">
+                    <div class="assistant-tab active" data-tab="chat"> <i class="fas fa-comments"></i> Conversacional </div>
+                    <div class="assistant-tab" data-tab="insights"> <i class="fas fa-lightbulb"></i> Perspectivas IA </div>
+                    <div class="assistant-tab" data-tab="biomarkers"> <i class="fas fa-chart-bar"></i> Análisis Biomarcadores </div>
+                    <div class="assistant-tab" data-tab="digital-twin"> <i class="fas fa-user-check"></i> Gemelo Digital & Sim. </div> {/* Shortened Title */}
+                    <div class="assistant-tab" data-tab="pathways"> <i class="fas fa-project-diagram"></i> Análisis Vías </div>
+                    <div class="assistant-tab" data-tab="treatments"> <i class="fas fa-pills"></i> Recomendaciones </div>
+                </div>
+
+                <div class="assistant-content active" id="chat-tab">
+                    <div class="chat-container" id="chat-container">
+                        {/* Initial Messages */}
+                        <div class="chat-message ai"> <div class="message-bubble"> <p>Hola Dra. García. He analizado los últimos biomarcadores de Isabel. Sus marcadores inflamatorios muestran una mejora significativa desde el inicio de la terapia Inmunomoduladora. ¿Qué aspecto específico de su salud le gustaría discutir hoy?</p> </div> </div>
+                        <div class="chat-message user"> <div class="message-bubble"> <p>Analiza las tendencias de su salud metabólica y sugiere optimizaciones a su protocolo actual.</p> </div> </div>
+                        <div class="chat-message ai"> <div class="message-bubble"> <p>Isabel's metabolic markers are showing gradual improvement:</p> <ul style="margin-left: 1.5rem; margin-top: 0.5rem;"> <li>Fasting glucose reduced from 118 to 105 mg/dL (still above optimal range)</li> <li>HbA1c improved from 5.9% to 5.6% (now within normal range)</li> <li>Insulin sensitivity increased by 18%</li> </ul> <p style="margin-top: 0.75rem;">Recommendations to optimize her protocol:</p> <ol style="margin-left: 1.5rem; margin-top: 0.5rem;"> <li>Increase Magnesio Quelado to 400mg daily (currently at 300mg)</li> <li>Add Alpha Lipoic Acid 600mg daily to improve insulin sensitivity</li> <li>Consider time-restricted eating (8-hour window) to improve metabolic flexibility</li> <li>Continue current VIT C/Zinc supplementation which supports these pathways</li> </ol> <p style="margin-top: 0.75rem;">Would you like me to generate a detailed protocol update?</p> <div class="research-citation"> <div class="citation-title">Research Reference:</div> <div class="citation-authors">Brandhorst S, et al.</div> <div class="citation-journal">Cell Metabolism (2021). "Time-Restricted Eating Effects on Body Weight and Metabolism"</div> </div> </div> </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" placeholder="Pregunte sobre el protocolo de longevidad de Isabel..." id="chat-input">
+                        <button class="voice-button" id="voice-button" title="Entrada de voz"> <i class="fas fa-microphone"></i> </button>
+                        <button class="send-button" id="send-button"> <i class="fas fa-paper-plane"></i> <span>Enviar</span> </button>
+                    </div>
+                </div>
+
+                <div class="assistant-content" id="insights-tab">
+                    {/* AI Insights Content - Simplified for brevity */}
+                    <div class="insight-card"> <div class="insight-header"> <div class="insight-icon health"><i class="fas fa-lightbulb"></i></div> <h3 class="insight-title">Perspectivas Clave de Salud</h3> </div> <div class="insight-content"> <p>Mejora inflamatoria consistente. Sinergia Ginkgo + Inmunomodulador. TRE recomendado basado en CGM.</p> <div class="research-citation"> <div class="citation-title">Ref:</div> <div class="citation-authors">Longo VD, Panda S.</div> <div class="citation-journal">Cell Metabolism (2023).</div> </div> </div> </div>
+                    <div class="insight-card"> <div class="insight-header"> <div class="insight-icon biomarker"><i class="fas fa-chart-line"></i></div> <h3 class="insight-title">Detección de Patrones</h3> </div> <div class="insight-content"> <p>Mejora inflamatoria post-Hidroterapia (3-4 días). Flexibilidad metabólica óptima AM (8-12h).</p> </div> </div>
+                    <div class="insight-card"> <div class="insight-header"> <div class="insight-icon recommendation"><i class="fas fa-search-plus"></i></div> <h3 class="insight-title">Recomendaciones Basadas en Evidencia</h3> </div> <div class="insight-content"> <p>Berberina + Magnesio mejoran sensibilidad insulina (~24%). Precursores NAD+ (NMN/NR) podrían beneficiar rejuvenecimiento celular.</p> <div class="research-citation"> <div class="citation-title">Ref:</div> <div class="citation-authors">Rajman L, et al.</div> <div class="citation-journal">Nature Metabolism (2022).</div> </div> </div> </div>
+                    <div class="insight-card"> <div class="insight-header"> <div class="insight-icon alert"><i class="fas fa-exclamation-triangle"></i></div> <h3 class="insight-title">Alerta de Interacción Potencial</h3> </div> <div class="insight-content"> <p>Separar Ginkgo de Vit C/Zinc (2h). Considerar formas metiladas de vit B por posible polimorfismo MTHFR.</p> </div> </div>
+                    <div class="security-notice"> <i class="fas fa-shield-alt"></i> <div> <strong>Datos Seguros Blockchain:</strong> Datos de biomarcadores e IA asegurados con blockchain (MediLedger), cumpliendo HIPAA. </div> </div>
+                </div>
+
+                <div class="assistant-content" id="biomarkers-tab">
+                     {/* Biomarker Grid */}
+                     <div class="biomarker-grid">
+                         <div class="biomarker-card warning" onclick="showBiomarkerDetail('glucose')"> <div class="biomarker-header"> <div class="biomarker-name">Glucosa</div> <div class="biomarker-category category-metabolic">Metabólico</div> </div> <div class="biomarker-value warning">105</div> <div class="biomarker-range">Objetivo: 70-99 mg/dL</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-down"></i> -11% </div> <button class="predict-button" onclick="predictBiomarker('glucose', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                         <div class="biomarker-card normal" onclick="showBiomarkerDetail('hba1c')"> <div class="biomarker-header"> <div class="biomarker-name">HbA1c</div> <div class="biomarker-category category-metabolic">Metabólico</div> </div> <div class="biomarker-value normal">5.6%</div> <div class="biomarker-range">Objetivo: &lt;5.7%</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-down"></i> -5% </div> <button class="predict-button" onclick="predictBiomarker('hba1c', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                         <div class="biomarker-card warning" onclick="showBiomarkerDetail('hscrp')"> <div class="biomarker-header"> <div class="biomarker-name">hsCRP</div> <div class="biomarker-category category-inflammatory">Inflamatorio</div> </div> <div class="biomarker-value warning">2.1</div> <div class="biomarker-range">Objetivo: &lt;1.0 mg/L</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-down"></i> -45% </div> <button class="predict-button" onclick="predictBiomarker('hscrp', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                         <div class="biomarker-card danger" onclick="showBiomarkerDetail('il6')"> <div class="biomarker-header"> <div class="biomarker-name">IL-6</div> <div class="biomarker-category category-inflammatory">Inflamatorio</div> </div> <div class="biomarker-value danger">2.8</div> <div class="biomarker-range">Objetivo: &lt;1.8 pg/mL</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-down"></i> -33% </div> <button class="predict-button" onclick="predictBiomarker('il6', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                         <div class="biomarker-card normal" onclick="showBiomarkerDetail('vitaminD')"> <div class="biomarker-header"> <div class="biomarker-name">Vitamina D</div> <div class="biomarker-category category-nutrient">Nutriente</div> </div> <div class="biomarker-value normal">32</div> <div class="biomarker-range">Objetivo: 30-50 ng/mL</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-up"></i> +33% </div> <button class="predict-button" onclick="predictBiomarker('vitaminD', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                         <div class="biomarker-card warning" onclick="showBiomarkerDetail('homocysteine')"> <div class="biomarker-header"> <div class="biomarker-name">Homocisteína</div> <div class="biomarker-category category-cardiovascular">Cardiovasc.</div> </div> <div class="biomarker-value warning">12.4</div> <div class="biomarker-range">Objetivo: &lt;10 μmol/L</div> <div class="biomarker-trend"> <div class="trend-badge improving"> <i class="fas fa-arrow-down"></i> -12% </div> <button class="predict-button" onclick="predictBiomarker('homocysteine', event)"> <i class="fas fa-chart-line"></i> Predecir </button> </div> </div>
+                     </div>
+                     {/* Forecasting Section */}
+                     <div class="forecasting-section">
+                         <div class="forecasting-header"> <h3 class="forecasting-title"><i class="fas fa-chart-line"></i> Predicción de Biomarcadores</h3> </div>
+                         <div class="forecast-chart-container"> <canvas id="forecasting-chart"></canvas> </div>
+                         <div class="forecast-legend">
+                             <div class="forecast-legend-item"> <div class="forecast-legend-color" style="background-color: #10B981;"></div> <span>Valores Históricos</span> </div>
+                             <div class="forecast-legend-item"> <div class="forecast-legend-color" style="background-color: #3B82F6;"></div> <span>Valores Predichos</span> </div>
+                             <div class="forecast-legend-item"> <div class="forecast-legend-color" style="background-color: rgba(239, 68, 68, 0.2);"></div> <span>Zona de Riesgo</span> </div>
+                             <div class="forecast-legend-item"> <div class="forecast-legend-color" style="background-color: rgba(16, 185, 129, 0.2);"></div> <span>Zona Objetivo</span> </div>
+                         </div>
+                     </div>
+                </div>
+
+                <div class="assistant-content" id="digital-twin-tab">
+                    {/* Biological Age Section */}
+                    <div class="biological-age-section">
+                         <div class="biological-age-header"> <h3 class="biological-age-title"><i class="fas fa-hourglass-half"></i> Análisis Edad Biológica</h3> </div>
+                         <div class="biological-age-content">
+                             <div class="age-clock"> <div class="age-clock-circle"> <div class="age-clock-inner"> <div class="age-clock-value biological-age-composite">52.3</div> <div class="age-clock-label">años</div> </div> </div> <div class="age-difference younger biological-age-delta">-5.7 años</div> <div class="age-clock-info">Edad Biológica Compuesta</div> </div>
+                             <div class="age-clock"> <div class="age-clock-circle"> <div class="age-clock-inner"> <div class="age-clock-value biological-age-metabolic">54.1</div> <div class="age-clock-label">años</div> </div> </div> <div class="age-difference younger">-3.9 años</div> <div class="age-clock-info">Edad Metabólica</div> </div>
+                             <div class="age-clock"> <div class="age-clock-circle"> <div class="age-clock-inner"> <div class="age-clock-value biological-age-inflammatory">51.2</div> <div class="age-clock-label">años</div> </div> </div> <div class="age-difference younger">-6.8 años</div> <div class="age-clock-info">Edad Inflamatoria</div> </div>
+                             <div class="age-clock"> <div class="age-clock-circle"> <div class="age-clock-inner"> <div class="age-clock-value biological-age-methylation">59.6</div> <div class="age-clock-label">años</div> </div> </div> <div class="age-difference older">+1.6 años</div> <div class="age-clock-info">Edad Metilación</div> </div>
+                         </div>
+                     </div>
+                     {/* Digital Twin Status Card */}
+                     <div class="digital-twin-card">
+                         <div class="digital-twin-header">
+                             <div class="digital-twin-title"> <i class="fas fa-user-circle digital-twin-icon"></i> Estado Gemelo Digital </div>
+                             <div class="digital-twin-actions">
+                                 <button class="twin-button" id="update-twin-btn"> <i class="fas fa-sync-alt"></i> <span>Actualizar Datos</span> </button>
+                                 <button class="twin-button primary" onclick="openSimulationModal('comprehensive')"> <i class="fas fa-flask"></i> <span>Ejecutar Simulación</span> </button>
+                             </div>
+                         </div>
+                         <div class="digital-twin-content">
+                             <div class="twin-parameter"> <div class="parameter-label">Homeostasis Glucosa</div> <div class="parameter-value">Moderadamente Desregulada</div> <div class="parameter-change positive"> <i class="fas fa-arrow-up"></i> Mejorando </div> </div>
+                             <div class="twin-parameter"> <div class="parameter-label">Estado Inflamatorio</div> <div class="parameter-value">Inflamación Sistémica Leve</div> <div class="parameter-change positive"> <i class="fas fa-arrow-up"></i> Mejorando Rápidamente </div> </div>
+                             <div class="twin-parameter"> <div class="parameter-label">Estrés Oxidativo</div> <div class="parameter-value">Moderado</div> <div class="parameter-change positive"> <i class="fas fa-arrow-up"></i> Mejorando </div> </div>
+                             <div class="twin-parameter"> <div class="parameter-label">Longitud Telómeros</div> <div class="parameter-value">Acorde a Edad</div> <div class="parameter-change stable"> <i class="fas fa-minus"></i> Estable </div> </div>
+                             <div class="twin-parameter"> <div class="parameter-label">Función Mitocondrial</div> <div class="parameter-value">Subóptima</div> <div class="parameter-change positive"> <i class="fas fa-arrow-up"></i> Mejorando Levemente </div> </div>
+                             <div class="twin-parameter"> <div class="parameter-label">Eficiencia Autofagia</div> <div class="parameter-value">Reducida</div> <div class="parameter-change stable"> <i class="fas fa-minus"></i> Estable </div> </div>
+                         </div>
+                         <div class="digital-twin-chart"> <canvas id="digital-twin-chart"></canvas> </div>
+                     </div>
+                     <div class="security-notice"> <i class="fas fa-shield-alt"></i> <div> <strong>Protección Gemelo Digital:</strong> Biomodelo asegurado con blockchain (MediLedger) para privacidad e integridad. </div> </div>
+                </div>
+
+                <div class="assistant-content" id="pathways-tab">
+                    {/* Pathway Analysis Content */}
+                     <div class="pathway-container">
+                         <div class="biomarker-group"> <div class="biomarker-group-header"> <h3 class="biomarker-group-title"> <i class="fas fa-fire biomarker-group-icon"></i> Análisis Vía Metabólica </h3> </div> <div class="pathway-chart-container"> <canvas id="metabolic-pathway-chart"></canvas> </div> </div>
+                         <div class="biomarker-group"> <div class="biomarker-group-header"> <h3 class="biomarker-group-title"> <i class="fas fa-wind biomarker-group-icon"></i> Análisis Vía Inflamatoria </h3> </div> <div class="pathway-chart-container"> <canvas id="inflammatory-pathway-chart"></canvas> </div> </div>
+                         <div class="biomarker-group"> <div class="biomarker-group-header"> <h3 class="biomarker-group-title"> <i class="fas fa-heartbeat biomarker-group-icon"></i> Análisis Vía Cardiovascular </h3> </div> <div class="pathway-chart-container"> <canvas id="cardiovascular-pathway-chart"></canvas> </div> </div>
+                     </div>
+                     <div class="security-notice"> <i class="fas fa-info-circle"></i> <div> <strong>Tecnología Pathway2vec:</strong> Análisis IA convierte vías biológicas en vectores para identificar patrones e intervenciones. </div> </div>
+                </div>
+
+                <div class="assistant-content" id="treatments-tab">
+                    {/* Treatment Recommendations Content */}
+                     <div class="recommendations-container">
+                         <div class="recommendation-card"> <div class="recommendation-header"> <div class="recommendation-title"> <i class="fas fa-pills recommendation-icon"></i> <span>Optimización Magnesio Quelado</span> </div> <div class="recommendation-status status-recommended">Recomendado</div> </div> <div class="recommendation-body"> <div class="recommendation-details"> <div class="detail-item"> <div class="detail-label">Dosis Actual</div> <div class="detail-value">300mg diarios</div> </div> <div class="detail-item"> <div class="detail-label">Dosis Recomendada</div> <div class="detail-value">400mg diarios</div> </div> <div class="detail-item"> <div class="detail-label">Objetivo</div> <div class="detail-value">Glucosa, Sens. Insulina</div> </div> </div> <div class="recommendation-description"> <p>Incrementar dosis para optimizar respuesta metabólica.</p> </div> <div class="evidence-section"> <div class="evidence-title"> <i class="fas fa-search"></i> Evidencia </div> <div class="evidence-content"> <p>Estudios muestran efectos dosis-dependientes (400-500mg óptimo). Meta-análisis: mejora 15% sens. insulina.</p> </div> </div> <div class="recommendation-actions"> <button class="recommendation-button primary apply-btn"> <i class="fas fa-check"></i> <span>Aplicar</span> </button> <button class="recommendation-button info placeholder"> <i class="fas fa-info-circle"></i> <span>Ver Investigación</span> </button> <button class="recommendation-button simulate" onclick="openSimulationModal('magnesio')"> <i class="fas fa-flask"></i> <span>Simular</span> </button> </div> </div> </div>
+                         <div class="recommendation-card"> <div class="recommendation-header"> <div class="recommendation-title"> <i class="fas fa-capsules recommendation-icon"></i> <span>Añadir Ácido Alfa Lipoico</span> </div> <div class="recommendation-status status-high-priority">Prioridad Alta</div> </div> <div class="recommendation-body"> <div class="recommendation-details"> <div class="detail-item"> <div class="detail-label">Dosis Recomendada</div> <div class="detail-value">600mg diarios</div> </div> <div class="detail-item"> <div class="detail-label">Objetivo</div> <div class="detail-value">Sens. Insulina, Estrés Oxidativo</div> </div> <div class="detail-item"> <div class="detail-label">Beneficio Esperado</div> <div class="detail-value">15-25% mejora sens. insulina</div> </div> </div> <div class="recommendation-description"> <p>Sinergia con magnesio para salud metabólica.</p> </div> <div class="evidence-section"> <div class="evidence-title"> <i class="fas fa-search"></i> Evidencia </div> <div class="evidence-content"> <p>Meta-análisis: mejora 15-25% sens. insulina (600mg/día). Mejora función mitocondrial.</p> </div> </div> <div class="recommendation-actions"> <button class="recommendation-button primary apply-btn"> <i class="fas fa-check"></i> <span>Aplicar</span> </button> <button class="recommendation-button info placeholder"> <i class="fas fa-info-circle"></i> <span>Ver Investigación</span> </button> <button class="recommendation-button simulate" onclick="openSimulationModal('ala')"> <i class="fas fa-flask"></i> <span>Simular</span> </button> </div> </div> </div>
+                         <div class="recommendation-card"> <div class="recommendation-header"> <div class="recommendation-title"> <i class="fas fa-clock recommendation-icon"></i> <span>Protocolo Ayuno Intermitente</span> </div> <div class="recommendation-status status-recommended">Recomendado</div> </div> <div class="recommendation-body"> <div class="recommendation-details"> <div class="detail-item"> <div class="detail-label">Protocolo</div> <div class="detail-value">Ventana 8h (10:00-18:00)</div> </div> <div class="detail-item"> <div class="detail-label">Objetivo</div> <div class="detail-value">Glucosa, Insulina, HbA1c</div> </div> <div class="detail-item"> <div class="detail-label">Implementación</div> <div class="detail-value">Gradual (2 sem)</div> </div> </div> <div class="recommendation-description"> <p>Beneficios metabólicos. Datos CGM sugieren ideal para Isabel.</p> </div> <div class="evidence-section"> <div class="evidence-title"> <i class="fas fa-search"></i> Evidencia </div> <div class="evidence-content"> <p>Cell Metabolism: ↓ 4-11% glucosa ayunas, mejora sens. insulina (TRE 8h). Mejora autofagia.</p> </div> </div> <div class="recommendation-actions"> <button class="recommendation-button primary apply-btn"> <i class="fas fa-check"></i> <span>Aplicar</span> </button> <button class="recommendation-button info placeholder"> <i class="fas fa-info-circle"></i> <span>Ver Investigación</span> </button> <button class="recommendation-button simulate" onclick="openSimulationModal('tre')"> <i class="fas fa-flask"></i> <span>Simular</span> </button> <button class="recommendation-button placeholder"> <i class="fas fa-file-alt"></i> <span>Guía Paciente</span> </button> </div> </div> </div>
+                     </div>
+                </div>
+            </div>
+
+             <div class="placeholder-view" id="dashboard-view"> <i class="fas fa-chart-line"></i> <h2>Dashboard</h2> <p>Vista del Dashboard (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="biomarkers-view-placeholder"> <i class="fas fa-flask"></i> <h2>Biomarcadores (General)</h2> <p>Vista general de Biomarcadores (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="aging-clocks-view"> <i class="fas fa-dna"></i> <h2>Relojes de Envejecimiento</h2> <p>Vista detallada de Relojes de Envejecimiento (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="protocols-view"> <i class="fas fa-clipboard-list"></i> <h2>Protocolos</h2> <p>Gestión de Protocolos de Tratamiento (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="simulations-view"> <i class="fas fa-chart-pie"></i> <h2>Simulaciones</h2> <p>Módulo de Simulaciones Avanzadas (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="reports-view"> <i class="fas fa-file-medical-alt"></i> <h2>Reportes</h2> <p>Generación de Reportes (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="patients-view"> <i class="fas fa-users"></i> <h2>Pacientes</h2> <p>Lista y Gestión de Pacientes (Contenido no implementado).</p> </div>
+             <div class="placeholder-view" id="settings-view"> <i class="fas fa-cog"></i> <h2>Configuración</h2> <p>Ajustes de la Aplicación (Contenido no implementado).</p> </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="simulation-modal-overlay">
+        <div class="simulation-modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-flask"></i> <span id="simulation-title">Simulación Tratamiento</span></h3>
+                <button class="close-modal" id="close-modal"> <i class="fas fa-times"></i> </button>
+            </div>
+            <form class="simulation-form" id="simulation-form">
+                <div class="simulation-form-row">
+                    <div class="simulation-form-col"> <div class="simulation-form-group"> <label for="simulation-treatment">Tratamiento</label> <select id="simulation-treatment" class="simulation-select"> <option value="magnesio">Magnesio Quelado</option> <option value="ala">Alpha Lipoic Acid</option> <option value="tre">Time-Restricted Eating</option> <option value="combination">Protocolo Combinado</option> </select> </div> </div>
+                    <div class="simulation-form-col"> <div class="simulation-form-group"> <label for="simulation-duration">Duración Simulación</label> <select id="simulation-duration" class="simulation-select"> <option value="4">4 Semanas</option> <option value="8">8 Semanas</option> <option value="12" selected>12 Semanas (3 Meses)</option> <option value="24">24 Semanas (6 Meses)</option> </select> </div> </div>
+                </div>
+                <div class="simulation-form-group"> <label>Intensidad Tratamiento (1-5)</label> <div class="simulation-slider-container"> <input type="range" min="1" max="5" value="3" class="simulation-slider" id="simulation-intensity"> <span class="simulation-slider-value" id="intensity-value">3</span> </div> </div>
+                <div class="simulation-form-group"> <label>Adherencia Paciente (1-5)</label> <div class="simulation-slider-container"> <input type="range" min="1" max="5" value="4" class="simulation-slider" id="simulation-adherence"> <span class="simulation-slider-value" id="adherence-value">4</span> </div> </div>
+                <div class="simulation-form-group"> <label for="simulation-target">Biomarcadores Objetivo</label> <select id="simulation-target" class="simulation-select" multiple> <option value="glucose" selected>Glucosa</option> <option value="hba1c">HbA1c</option> <option value="hscrp" selected>hsCRP</option> <option value="il6">IL-6</option> <option value="homocysteine">Homocisteína</option> <option value="biological_age" selected>Edad Biológica</option> </select> </div>
+                <div class="simulation-actions">
+                    <button type="button" class="simulation-button secondary" id="reset-simulation"> <i class="fas fa-undo"></i> <span>Reset</span> </button>
+                    <button type="button" class="simulation-button primary" id="run-simulation-btn"> <i class="fas fa-play"></i> <span>Ejecutar Simulación</span> </button>
+                </div>
+            </form>
+            <div class="simulation-results" id="simulation-results">
+                <div class="simulation-chart-container"> <canvas id="simulation-chart"></canvas> </div>
+                <div class="simulation-insights"> <h4 class="simulation-insights-title"> <i class="fas fa-lightbulb"></i> Perspectivas Simulación </h4> <div class="simulation-insights-content" id="simulation-insights-content"> <p>Resultados de la simulación aparecerán aquí...</p> </div> </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification" class="toast-notification">
+        <span id="toast-message">Mensaje de notificación</span>
+    </div>
+
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"> <i class="fas fa-moon"></i> </button>
+
+    <script>
+        // Global scope for chart instances to allow updates/destruction
+        window.forecastingChart = null;
+        window.digitalTwinChart = null;
+        window.metabolicPathwayChart = null;
+        window.inflammatoryPathwayChart = null;
+        window.cardiovascularPathwayChart = null;
+        window.simulationChart = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Element References ---
+            const sidebar = document.getElementById('sidebar');
+            const navItems = document.querySelectorAll('.nav-item');
+            const assistantContainer = document.getElementById('assistant-view');
+            const patientHeader = document.getElementById('patient-header');
+            const placeholderViews = document.querySelectorAll('.placeholder-view');
+            const assistantTabs = document.querySelectorAll('.assistant-tab');
+            const contentTabs = document.querySelectorAll('.assistant-content');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const voiceButton = document.getElementById('voice-button');
+            const chatContainer = document.getElementById('chat-container');
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const modalOverlay = document.getElementById('simulation-modal-overlay');
+            const closeModalBtn = document.getElementById('close-modal');
+            const runSimulationBtn = document.getElementById('run-simulation-btn');
+            const resetSimulationBtn = document.getElementById('reset-simulation');
+            const intensitySlider = document.getElementById('simulation-intensity');
+            const intensityValue = document.getElementById('intensity-value');
+            const adherenceSlider = document.getElementById('simulation-adherence');
+            const adherenceValue = document.getElementById('adherence-value');
+            const simulationResultsContainer = document.getElementById('simulation-results');
+            const simulationInsightsContent = document.getElementById('simulation-insights-content');
+            const simulationTitleEl = document.getElementById('simulation-title');
+            const simulationTreatmentSelect = document.getElementById('simulation-treatment');
+            const simulationDurationSelect = document.getElementById('simulation-duration');
+            const simulationTargetSelect = document.getElementById('simulation-target');
+            const applyButtons = document.querySelectorAll('.apply-btn'); // Assuming apply buttons have this class now
+            const toast = document.getElementById('toast-notification');
+            const toastMessage = document.getElementById('toast-message');
+            let toastTimeout;
+
+            const PATIENT_ID = "458912"; // Hardcoded patient ID for demo
+
+            // --- Utility Functions ---
+            function showToast(message, type = 'success') {
+                toastMessage.textContent = message;
+                toast.className = `toast-notification ${type} show`;
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500); // Longer display
+            }
+
+            async function simulateApiCall(endpoint, method = 'POST', body = null, delay = 1500) {
+                // Simulate network delay and API call
+                addMessage(`<i>Llamando a API: ${endpoint}...</i>`, 'ai'); // Show API call in chat
+                await new Promise(resolve => setTimeout(resolve, delay));
+
+                // --- SIMULATED BACKEND RESPONSES ---
+                // This section replaces actual fetch calls for demonstration
+                console.log(`Simulated API Call: ${method} ${endpoint}`, body);
+                if (endpoint === '/api/ai_assistant' && body) {
+                    // Use the existing detailed response generator
+                    return { ok: true, json: async () => ({ response: generateEnhancedAIResponse(body.query), confidence: 0.9, method: "simulated-rule-based" }) };
+                } else if (endpoint === '/api/simulate_treatment' && body) {
+                    // Generate simulated results based on input
+                    const duration = parseInt(body.duration_weeks || 12);
+                    const effectiveness = (parseInt(body.params?.intensity || 3) / 5) * (parseInt(body.params?.adherence || 4) / 5);
+                    const timepoints = Array.from({ length: duration + 1 }, (_, i) => i); // Weeks
+                    const simBiomarkers = {};
+                    const bioAgeDelta = -0.1 * duration * effectiveness * (body.treatment === 'combination' ? 1.5 : 1); // Example delta calc
+
+                    if (body.target_biomarkers?.includes('glucose')) simBiomarkers.glucose = timepoints.map(w => 105 * (1 - (0.20 * effectiveness * (w / duration))));
+                    if (body.target_biomarkers?.includes('hscrp')) simBiomarkers.hscrp = timepoints.map(w => 2.1 * (1 - (0.30 * effectiveness * (w / duration))));
+                    if (body.target_biomarkers?.includes('biological_age')) { /* Handled by bioAgeDelta */ }
+
+                    return { ok: true, json: async () => ({ timepoints, biomarkers: simBiomarkers, biological_age_delta: bioAgeDelta.toFixed(1), components: body.treatment === 'combination' ? body.treatments : [body.treatment] }) };
+                } else if (endpoint === '/api/predict_biomarkers' && body) {
+                    const biomarker = body.biomarkers[0]; // Assume one for simplicity
+                    const weeks = parseInt(body.forecast_weeks || 24);
+                    const timepoints = Array.from({ length: weeks + 1 }, (_, i) => i);
+                    let values = [];
+                    if (biomarker === 'glucose') values = timepoints.map(w => 105 * (1 - (0.10 * (w / weeks))));
+                    else if (biomarker === 'hscrp') values = timepoints.map(w => 2.1 * (1 - (0.15 * (w / weeks))));
+                    else values = timepoints.map(w => 50 * (1 - (0.05 * (w / weeks)))); // Default dummy
+                    return { ok: true, json: async () => ({ [biomarker]: { biomarker, timepoints, values } }) };
+                } else if (endpoint === '/api/biological_age' && body) {
+                     const chronoAge = body.chronological_age || 58;
+                     const bioAge = chronoAge - 5.7; // Simplified
+                     return { ok: true, json: async () => ({ biological_age: bioAge.toFixed(1), age_delta: (bioAge - chronoAge).toFixed(1), component_ages: { phenotypic: (chronoAge-4).toFixed(1), inflammatory: (chronoAge-7).toFixed(1), metabolic: (chronoAge-3).toFixed(1) } }) };
+                } else if (endpoint === '/api/update_patient' && body) {
+                     return { ok: true, json: async () => ({ success: true, changes: ["biomarkers", "treatments"] }) };
+                }
+                // Default error for unhandled endpoints
+                return { ok: false, status: 404, json: async () => ({ error: "Endpoint not simulated" }) };
+            }
+
+
+            // --- Sidebar Navigation & Collapse ---
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelector('.nav-item.active')?.classList.remove('active');
+                    item.classList.add('active');
+                    const targetViewId = item.getAttribute('data-view');
+                    placeholderViews.forEach(view => view.style.display = 'none');
+                    assistantContainer.style.display = 'none';
+                    patientHeader.style.display = 'none';
+
+                    if (targetViewId === 'assistant') {
+                        assistantContainer.style.display = 'block';
+                        patientHeader.style.display = 'flex';
+                    } else {
+                        const targetView = document.getElementById(targetViewId + '-view') || document.getElementById(targetViewId + '-view-placeholder');
+                        if (targetView) targetView.style.display = 'block';
+                        else assistantContainer.style.display = 'block'; // Fallback
+                    }
+                    handleSidebarCollapse();
+                });
+            });
+            function handleSidebarCollapse() {
+                sidebar.classList.toggle('collapsed', window.matchMedia('(max-width: 1024px)').matches);
+            }
+            handleSidebarCollapse();
+            window.addEventListener('resize', handleSidebarCollapse);
+
+            // --- Assistant Tab Switching ---
+            assistantTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelector('.assistant-tab.active')?.classList.remove('active');
+                    document.querySelector('.assistant-content.active')?.classList.remove('active');
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    const newContent = document.getElementById(tabId + '-tab');
+                    if (newContent) {
+                        newContent.classList.add('active');
+                        // Initialize charts only when tab becomes active
+                        if (tabId === 'biomarkers' && document.getElementById('forecasting-chart')) initForecasting();
+                        else if (tabId === 'digital-twin' && document.getElementById('digital-twin-chart')) initDigitalTwin();
+                        else if (tabId === 'pathways' && document.getElementById('metabolic-pathway-chart')) initPathwayAnalysis();
+                    }
+                });
+            });
+
+            // --- Chat Functionality ---
+            async function handleSendMessage() { // Renamed to avoid conflict
+                const message = chatInput.value.trim();
+                if (!message) return;
+                addMessage(message, 'user');
+                chatInput.value = '';
+                chatInput.focus();
+                showTypingIndicator();
+
+                try {
+                    // Simulate API Call
+                    const response = await simulateApiCall('/api/ai_assistant', 'POST', { patient_id: PATIENT_ID, query: message });
+                    const data = await response.json();
+
+                    hideTypingIndicator();
+                    if (response.ok && data.response) {
+                        addMessage(data.response, 'ai');
+                        // Optionally add citations if provided
+                        if (data.citations && data.citations.length > 0) {
+                             let citationHTML = '<div class="research-citation"><div class="citation-title">Referencias Relevantes:</div>';
+                             data.citations.forEach(cit => {
+                                 citationHTML += `<p><small>${cit.authors} (${cit.year}). ${cit.title}. <i>${cit.journal}</i>.</small></p>`;
+                             });
+                             citationHTML += '</div>';
+                             addMessage(citationHTML, 'ai');
+                        }
+                    } else {
+                        addMessage(`Error: ${data.error || 'No se pudo obtener respuesta.'}`, 'ai');
+                    }
+                } catch (error) {
+                    hideTypingIndicator();
+                    console.error("Chat API error:", error);
+                    addMessage("Error de conexión al asistente IA.", 'ai');
+                    showToast("Error de conexión al asistente IA.", 'error');
+                }
+            }
+            sendButton.addEventListener('click', handleSendMessage);
+            chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
+
+            // --- Voice Input Simulation ---
+            voiceButton.addEventListener('click', () => {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    voiceButton.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+                    voiceButton.classList.add('pulse-animation');
+                    showToast("Simulando escucha...", 'info');
+                    setTimeout(() => {
+                        voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+                        voiceButton.classList.remove('pulse-animation');
+                        const simulatedVoiceInput = "Analizar impacto de TRE en edad biológica"; // Example
+                        chatInput.value = simulatedVoiceInput;
+                        chatInput.focus();
+                        showToast("Texto simulado insertado.", 'success');
+                    }, 2500);
+                } else {
+                    showToast("Reconocimiento de voz no soportado.", 'warning');
+                }
+            });
+
+            // --- Biomarker Prediction Button ---
+            window.predictBiomarker = async (biomarker, event) => {
+                event.stopPropagation(); // Prevent card click
+                showToast(`Iniciando predicción para ${biomarker}...`, 'info');
+                // Switch to biomarker tab
+                document.querySelector('.assistant-tab[data-tab="biomarkers"]').click();
+
+                try {
+                    const response = await simulateApiCall('/api/predict_biomarkers', 'POST', {
+                        patient_id: PATIENT_ID,
+                        biomarkers: [biomarker],
+                        forecast_weeks: 24 // Example forecast period
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data[biomarker] && !data[biomarker].error) {
+                        showToast(`Predicción para ${biomarker} completada.`, 'success');
+                        // Update the main forecasting chart (or potentially show a dedicated modal)
+                        // For simplicity, we'll just log it and assume initForecasting handles display
+                        console.log("Prediction result:", data[biomarker]);
+                        initForecasting(data[biomarker]); // Pass specific prediction to update chart
+                    } else {
+                         showToast(`Error prediciendo ${biomarker}: ${data[biomarker]?.error || 'Error desconocido'}`, 'error');
+                    }
+                } catch (error) {
+                     console.error("Prediction API error:", error);
+                     showToast(`Error de conexión prediciendo ${biomarker}.`, 'error');
+                }
+            };
+
+             // --- Update Digital Twin Button ---
+             const updateTwinBtn = document.getElementById('update-twin-btn');
+             if(updateTwinBtn) {
+                 updateTwinBtn.addEventListener('click', async () => {
+                     showToast("Simulando actualización de datos del Gemelo Digital...", 'info');
+                     // Example: Simulate adding new biomarker data
+                     const newBiomarkers = { "hscrp": 1.9, "glucose": 103, "vitaminD": 35 };
+                     try {
+                         const response = await simulateApiCall('/api/update_patient', 'POST', {
+                             patient_id: PATIENT_ID,
+                             biomarkers: newBiomarkers
+                         });
+                         const data = await response.json();
+                         if(response.ok && data.success) {
+                             showToast("Gemelo Digital actualizado con éxito.", 'success');
+                             // TODO: Update UI elements (e.g., biomarker cards, age displays) based on response
+                             // Example: Fetch new biological age
+                             fetchBiologicalAge();
+                         } else {
+                             showToast(`Error actualizando Gemelo Digital: ${data.error}`, 'error');
+                         }
+                     } catch(error) {
+                         console.error("Update Twin API error:", error);
+                         showToast("Error de conexión al actualizar Gemelo Digital.", 'error');
+                     }
+                 });
+             }
+
+             // --- Fetch and Display Biological Age ---
+             async function fetchBiologicalAge() {
+                 // Simulate fetching biological age on load or after update
+                 try {
+                     const response = await simulateApiCall('/api/biological_age', 'POST', {
+                         patient_id: PATIENT_ID,
+                         chronological_age: 58, // Assuming chrono age is known
+                         biomarkers: { /* Include latest known biomarkers */ glucose: 105, hscrp: 2.1, il6: 2.8 }
+                     }, 500); // Faster delay for this
+                     const data = await response.json();
+                     if(response.ok && data.biological_age) {
+                         // Update displays
+                         document.querySelector('.biological-age-display').innerHTML = `${data.biological_age} <span class="trend ${data.age_delta < 0 ? 'younger' : 'older'}"><i class="fas fa-arrow-${data.age_delta < 0 ? 'down' : 'up'}"></i>${data.age_delta > 0 ? '+' : ''}${data.age_delta}</span>`;
+                         document.querySelector('.biological-age-composite').textContent = data.biological_age;
+                         document.querySelector('.biological-age-delta').textContent = `${data.age_delta > 0 ? '+' : ''}${data.age_delta} años`;
+                         document.querySelector('.biological-age-delta').className = `age-difference ${data.age_delta < 0 ? 'younger' : 'older'} biological-age-delta`;
+
+                         // Update component ages if available
+                         if(data.component_ages) {
+                             document.querySelector('.biological-age-metabolic').textContent = data.component_ages.metabolic || '-';
+                             document.querySelector('.biological-age-inflammatory').textContent = data.component_ages.inflammatory || '-';
+                             document.querySelector('.biological-age-methylation').textContent = data.component_ages.methylation || '-';
+                         }
+                     }
+                 } catch(error) {
+                     console.error("Biological Age API error:", error);
+                 }
+             }
+
+
+            // --- Chart Initializations ---
+            // (Keep initForecasting, initDigitalTwin, initPathwayAnalysis functions as before,
+            // but ensure they use window.chartInstance variables and destroy previous instances)
+             function initForecasting(predictionData = null) {
+                 const ctx = document.getElementById('forecasting-chart')?.getContext('2d');
+                 if (!ctx) return;
+                 if (window.forecastingChart) window.forecastingChart.destroy();
+
+                 // Base historical data (replace with actual patient data if available)
+                 const dates = ["Nov '23", "Dec '23", "Jan '24", "Feb '24", "Mar '24", "Apr '24"];
+                 const hscrpHistorical = [3.8, 3.6, 3.2, 2.8, 2.4, 2.1];
+                 const glucoseHistorical = [118, 115, 112, 110, 108, 105];
+
+                 // Default forecast data (if no specific prediction passed)
+                 let forecastLabels = ["May '24", "Jun '24", "Jul '24", "Aug '24", "Sep '24", "Oct '24"];
+                 let hscrpForecast = [1.8, 1.5, 1.2, 1.0, 0.9, 0.8];
+                 let glucoseForecast = [102, 99, 96, 94, 92, 90];
+
+                 // If specific prediction data is provided, use it
+                 if (predictionData && predictionData.values) {
+                     const biomarker = predictionData.biomarker;
+                     const predValues = predictionData.values.slice(1); // Remove initial value
+                     const predTimepoints = predictionData.timepoints.slice(1); // Remove initial timepoint
+                     const numPredPoints = predValues.length;
+
+                     // Generate labels for prediction period (assuming weekly)
+                     forecastLabels = [];
+                     let lastDate = dateFns.parse(dates[dates.length - 1], "MMM ''yy", new Date());
+                     for (let i = 1; i <= numPredPoints; i++) {
+                         forecastLabels.push(dateFns.format(dateFns.addWeeks(lastDate, i), "MMM ''yy"));
+                     }
+
+                     // Replace default forecast for the specific biomarker
+                     if (biomarker === 'hscrp') hscrpForecast = predValues;
+                     else if (biomarker === 'glucose') glucoseForecast = predValues;
+                     // Keep default forecasts for other biomarkers if only one was predicted
+                     if (biomarker !== 'glucose') glucoseForecast = Array(numPredPoints).fill(glucoseForecast[0]); // Placeholder
+                     if (biomarker !== 'hscrp') hscrpForecast = Array(numPredPoints).fill(hscrpForecast[0]); // Placeholder
+                 }
+
+                 const fullLabels = [...dates, ...forecastLabels];
+                 const nulls = (count) => Array(count).fill(null);
+                 const datasets = [
+                     { label: 'hsCRP Hist. (mg/L)', data: [...hscrpHistorical, ...nulls(forecastLabels.length)], borderColor: '#EF4444', borderWidth: 2.5, tension: 0.3, fill: false, pointRadius: 3, yAxisID: 'y' },
+                     { label: 'hsCRP Pred. (mg/L)', data: [...nulls(dates.length-1), hscrpHistorical[dates.length-1], ...hscrpForecast], borderColor: '#F87171', borderWidth: 2, borderDash: [5, 5], tension: 0.3, fill: false, pointRadius: 3, pointStyle: 'rect', yAxisID: 'y' },
+                     { label: 'Glucosa Hist. (mg/dL)', data: [...glucoseHistorical, ...nulls(forecastLabels.length)], borderColor: '#F59E0B', borderWidth: 2.5, tension: 0.3, fill: false, pointRadius: 3, yAxisID: 'y1' },
+                     { label: 'Glucosa Pred. (mg/dL)', data: [...nulls(dates.length-1), glucoseHistorical[dates.length-1], ...glucoseForecast], borderColor: '#FBBF24', borderWidth: 2, borderDash: [5, 5], tension: 0.3, fill: false, pointRadius: 3, pointStyle: 'rect', yAxisID: 'y1' }
+                 ];
+
+                 window.forecastingChart = new Chart(ctx, {
+                     type: 'line', data: { labels: fullLabels, datasets: datasets },
+                     options: {
+                         responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                         plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, padding: 15, font: { size: 11 } } }, tooltip: { /* ... */ },
+                             annotation: { annotations: {
+                                 hscrpTargetZone: { type: 'box', xMin: dates.length - 0.5, xMax: fullLabels.length - 0.5, yMin: 0, yMax: 1, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.3)', borderWidth: 1, yAxisID: 'y' },
+                                 glucoseTargetZone: { type: 'box', xMin: dates.length - 0.5, xMax: fullLabels.length - 0.5, yMin: 70, yMax: 99, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.3)', borderWidth: 1, yAxisID: 'y1' }
+                             }}
+                         },
+                         scales: {
+                             x: { type: 'time', time: { unit: 'month', parser: "MMM 'yy", displayFormats: { month: "MMM 'yy" } }, grid: { display: false }, ticks: { color: body.classList.contains('dark-mode') ? '#D1D5DB' : '#4B5563', maxRotation: 45, minRotation: 0 } },
+                             y: { position: 'left', title: { display: true, text: 'hsCRP (mg/L)', color: '#EF4444' }, grid: { borderDash: [2, 2], color: body.classList.contains('dark-mode') ? '#4B5563' : '#E5E7EB' }, ticks: { color: body.classList.contains('dark-mode') ? '#D1D5DB' : '#4B5563' } },
+                             y1: { position: 'right', title: { display: true, text: 'Glucosa (mg/dL)', color: '#F59E0B' }, grid: { display: false }, ticks: { color: body.classList.contains('dark-mode') ? '#D1D5DB' : '#4B5563' } }
+                         }
+                     }
+                 });
+             }
+
+             function initDigitalTwin() {
+                 const ctx = document.getElementById('digital-twin-chart')?.getContext('2d');
+                 if (!ctx) return;
+                 if (window.digitalTwinChart) window.digitalTwinChart.destroy();
+                 // Data remains the same as previous version
+                 const categories = ['Homeostasis Glucosa', 'Estado Inflamatorio', 'Estrés Oxidativo', 'Función Mitocondrial', 'Eficiencia Autofagia', 'Integridad Telómeros'];
+                 const currentValues = [60, 45, 55, 40, 35, 65];
+                 const targetValues = [80, 75, 80, 70, 65, 75];
+                 window.digitalTwinChart = new Chart(ctx, { type: 'radar', data: { labels: categories, datasets: [ { label: 'Estado Actual', data: currentValues, backgroundColor: 'rgba(93, 92, 222, 0.2)', borderColor: 'rgba(93, 92, 222, 0.8)', pointBackgroundColor: 'rgba(93, 92, 222, 1)', pointRadius: 4 }, { label: 'Estado Objetivo', data: targetValues, backgroundColor: 'rgba(16, 185, 129, 0.2)', borderColor: 'rgba(16, 185, 129, 0.8)', pointBackgroundColor: 'rgba(16, 185, 129, 1)', pointRadius: 4, borderDash: [5, 5] } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, backdropColor: 'transparent' }, pointLabels: { font: { size: 11 } }, grid: { color: 'rgba(107, 114, 128, 0.2)' }, angleLines: { color: 'rgba(107, 114, 128, 0.2)' } } }, plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 15 } } } } });
+             }
+
+             function initPathwayAnalysis() {
+                 const createPathwayChart = (canvasId, labels, data1, data2, yLabel) => {
+                     const ctx = document.getElementById(canvasId)?.getContext('2d');
+                     if (!ctx) return null;
+                     const chartVarName = canvasId.replace(/-/g, '') + 'Chart'; // e.g., metabolicpathwaychartChart
+                     if (window[chartVarName]) window[chartVarName].destroy();
+
+                     window[chartVarName] = new Chart(ctx, {
+                         type: 'bar', data: { labels: labels, datasets: [ { label: 'Actividad/Función Actual', data: data1, backgroundColor: 'rgba(59, 130, 246, 0.6)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }, { label: 'Actividad/Función Objetivo', data: data2, backgroundColor: 'rgba(16, 185, 129, 0.3)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1, borderDash: [5, 5] } ] },
+                         options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { beginAtZero: true, max: 100, title: { display: true, text: yLabel } } }, plugins: { legend: { display: false } } }
+                     });
+                 };
+
+                 createPathwayChart('metabolic-pathway-chart', ['Glicólisis', 'Insulina', 'Ciclo TCA'], [65, 45, 60], [80, 80, 85], 'Eficiencia Vía (%)');
+                 createPathwayChart('inflammatory-pathway-chart', ['NF-κB', 'IL-6', 'Resolución'], [70, 60, 35], [30, 30, 80], 'Actividad Vía (%)');
+                 createPathwayChart('cardiovascular-pathway-chart', ['Función Endot.', 'Homocisteína', 'Óxido Nítrico'], [60, 45, 55], [85, 75, 85], 'Función Vía (%)');
+             }
+
+            // --- Simulation Modal ---
+            function openSimulationModal(treatmentType) {
+                simulationTreatmentSelect.value = treatmentType; // Pre-select treatment
+                simulationTitleEl.textContent = `Simulación: ${simulationTreatmentSelect.options[simulationTreatmentSelect.selectedIndex].text}`;
+                simulationResultsContainer.classList.remove('active'); // Hide old results
+                modalOverlay.classList.add('active');
+            }
+            closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
+            modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
+            intensitySlider.addEventListener('input', () => { intensityValue.textContent = intensitySlider.value; });
+            adherenceSlider.addEventListener('input', () => { adherenceValue.textContent = adherenceSlider.value; });
+            resetSimulationBtn.addEventListener('click', () => {
+                intensitySlider.value = 3; intensityValue.textContent = "3";
+                adherenceSlider.value = 4; adherenceValue.textContent = "4";
+                simulationDurationSelect.value = "12";
+                // Reset multi-select (more complex, might need library or loop)
+                Array.from(simulationTargetSelect.options).forEach(option => option.selected = (option.value === 'glucose' || option.value === 'hscrp' || option.value === 'biological_age'));
+                simulationResultsContainer.classList.remove('active');
+            });
+
+            runSimulationBtn.addEventListener('click', async () => {
+                runSimulationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span> Simulando...</span>';
+                runSimulationBtn.disabled = true;
+
+                const selectedTargets = Array.from(simulationTargetSelect.selectedOptions).map(option => option.value);
+                const requestBody = {
+                    patient_id: PATIENT_ID,
+                    treatment: simulationTreatmentSelect.value,
+                    treatments: simulationTreatmentSelect.value === 'combination' ? ['magnesio', 'ala', 'tre'] : null, // Example combination
+                    duration_weeks: simulationDurationSelect.value,
+                    params: {
+                        intensity: intensitySlider.value,
+                        adherence: adherenceSlider.value
+                    },
+                    target_biomarkers: selectedTargets
+                };
+
+                try {
+                    const response = await simulateApiCall('/api/simulate_treatment', 'POST', requestBody);
+                    const data = await response.json();
+
+                    if (response.ok && !data.error) {
+                        simulationResultsContainer.classList.add('active');
+                        generateSimulationChart(data); // Pass data to chart function
+                        generateSimulationInsights(data); // Pass data to insights function
+                        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); // Scroll to results
+                    } else {
+                        simulationInsightsContent.innerHTML = `<p class="error-text">Error en la simulación: ${data.error || 'Error desconocido'}</p>`;
+                        if (window.simulationChart) window.simulationChart.destroy(); // Clear chart on error
+                    }
+                } catch (error) {
+                     console.error("Simulation API error:", error);
+                     simulationInsightsContent.innerHTML = `<p class="error-text">Error de conexión durante la simulación.</p>`;
+                     if (window.simulationChart) window.simulationChart.destroy();
+                } finally {
+                    runSimulationBtn.innerHTML = '<i class="fas fa-play"></i><span> Ejecutar Simulación</span>';
+                    runSimulationBtn.disabled = false;
+                }
+            });
+
+            function generateSimulationChart(data) {
+                 const ctx = document.getElementById('simulation-chart')?.getContext('2d');
+                 if (!ctx) return;
+                 if (window.simulationChart) window.simulationChart.destroy();
+
+                 const datasets = [];
+                 const scales = { x: { title: { display: true, text: 'Semanas' } } };
+                 let axisCount = 0;
+
+                 // Add biomarker datasets
+                 for (const biomarker in data.biomarkers) {
+                     if (data.biomarkers[biomarker] && data.biomarkers[biomarker].length > 0) {
+                         const axisId = `y${axisCount === 0 ? '' : axisCount}`;
+                         const color = biomarker === 'glucose' ? '#F59E0B' : (biomarker === 'hscrp' ? '#EF4444' : '#3B82F6'); // Assign colors
+                         datasets.push({
+                             label: biomarker.toUpperCase(),
+                             data: data.biomarkers[biomarker],
+                             borderColor: color,
+                             tension: 0.3,
+                             yAxisID: axisId
+                         });
+                         scales[axisId] = {
+                             display: true,
+                             position: axisCount % 2 === 0 ? 'left' : 'right',
+                             title: { display: true, text: biomarker.toUpperCase() },
+                             grid: { display: axisCount === 0 } // Only show grid for first axis
+                         };
+                         axisCount++;
+                     }
+                 }
+
+                 // Add Biological Age if present and requested
+                 if (data.biological_age_delta !== undefined && simulationTargetSelect.selectedOptions && Array.from(simulationTargetSelect.selectedOptions).some(opt => opt.value === 'biological_age')) {
+                      const initialBioAge = 52.3; // Get from patient data ideally
+                      const bioAgeData = data.timepoints.map(w => initialBioAge + (data.biological_age_delta * (w / data.timepoints[data.timepoints.length-1])));
+                      const axisId = `y${axisCount === 0 ? '' : axisCount}`;
+                      datasets.push({
+                          label: 'Edad Biológica',
+                          data: bioAgeData,
+                          borderColor: '#8B5CF6', // Purple
+                          tension: 0.3,
+                          yAxisID: axisId
+                      });
+                      scales[axisId] = {
+                          display: true,
+                          position: axisCount % 2 === 0 ? 'left' : 'right',
+                          title: { display: true, text: 'Edad Biológica' },
+                          grid: { display: false }
+                      };
+                      axisCount++;
+                 }
+
+
+                 window.simulationChart = new Chart(ctx, {
+                     type: 'line',
+                     data: { labels: data.timepoints.map(w => `Sem ${w}`), datasets: datasets },
+                     options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top' } }, scales: scales }
+                 });
+             }
+
+             function generateSimulationInsights(data) {
+                 let content = `<p>Simulación para <strong>${data.components.join(', ')}</strong> durante ${data.timepoints.length - 1} semanas:</p><ul>`;
+                 for (const biomarker in data.biomarkers) {
+                     if (data.biomarkers[biomarker] && data.biomarkers[biomarker].length > 1) {
+                         const initial = data.biomarkers[biomarker][0];
+                         const final = data.biomarkers[biomarker][data.biomarkers[biomarker].length - 1];
+                         const change = ((final - initial) / initial * 100).toFixed(1);
+                         content += `<li><strong>${biomarker.toUpperCase()}:</strong> Proyectado a ${final.toFixed(1)} (Cambio: ${change > 0 ? '+' : ''}${change}%)</li>`;
+                     }
+                 }
+                 if (data.biological_age_delta !== undefined) {
+                     content += `<li><strong>Edad Biológica:</strong> Cambio proyectado de ${data.biological_age_delta > 0 ? '+' : ''}${data.biological_age_delta} años</li>`;
+                 }
+                 content += `</ul>`;
+                 simulationInsightsContent.innerHTML = content;
+             }
+
+            // --- Treatment Button Actions ---
+            applyButtons.forEach(button => { /* Apply logic same as before */ });
+            // Add event listener for recommendation buttons (simulate, info etc.)
+            document.querySelectorAll('.recommendation-button').forEach(button => {
+                if (!button.classList.contains('apply-btn') && !button.classList.contains('discard-btn')) {
+                     button.addEventListener('click', (e) => {
+                         if (button.classList.contains('simulate')) {
+                             // Already handled by openSimulationModal onclick
+                         } else if (button.classList.contains('placeholder')) {
+                             e.preventDefault();
+                             showToast('Función no disponible en esta demo.', 'info');
+                         }
+                         // Add other button handlers if needed (e.g., View Research)
+                     });
+                }
+            });
+
+
+            // --- Initial Setup ---
+            fetchBiologicalAge(); // Fetch initial biological age
+            if (categorySelect) categorySelect.dispatchEvent(new Event('change'));
+            document.querySelector('.nav-item[data-view="assistant"]')?.click(); // Ensure assistant is default view
+            scrollToBottom();
+
+        }); // End DOMContentLoaded
+    </script>
+
+</body>
+</html>

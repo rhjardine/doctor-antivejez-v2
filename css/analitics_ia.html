@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Médico Antienvejecimiento</title>
+    <!-- CSS Centralizado para Layout y Contenido -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- FontAwesome (versión recomendada 6+) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+        <div class="header-logo">
+            <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo">
+        </div>
+        <div class="header-search">
+            <input type="text" id="main-search-input" placeholder="Buscar paciente o historia...">
+        </div>
+        <div class="header-actions">
+            <i class="fas fa-bell" onclick="alert('Notificaciones')"></i>
+            <i class="fas fa-moon" id="theme-toggle"></i>
+            <i class="fas fa-user"></i>
+        </div>
+    </header>
+
+    <!-- Sidebar lateral -->
+    <nav class="sidebar">
+        <div class="menu-item active" onclick="window.location.href='index.html'">
+            <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='historias_tabs_bio.html'">
+            <i class="fas fa-book-medical"></i> <span>Historias</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='profesionales.html'">
+            <i class="fas fa-user-md"></i> <span>Profesionales</span>
+        </div>
+        <div class="menu-item" onclick="openAIAssistant()">
+            <i class="fas fa-robot"></i> <span>Asistente IA</span>
+        </div>
+        <div class="menu-item reports-item" id="reportes-item" tabindex="0" onclick="toggleSubmenu()">
+            <i class="fas fa-file-alt"></i> <span>Reportes</span>
+            <ul class="popup-submenu" id="reportes-submenu">
+                <li><a href="#" class="submenu-item"><i class="fas fa-users"></i> Resumen de Pacientes</a></li>
+                <li><a href="#" class="submenu-item"><i class="fas fa-user"></i> Reportes Individuales</a></li>
+                <li><a href="#" class="submenu-item"><i class="fas fa-chart-line"></i> Análisis Biomarcadores</a></li>
+                <li><a href="#" class="submenu-item"><i class="fas fa-history"></i> Consulta de Historial</a></li>
+            </ul>
+        </div>
+        <div class="menu-item" onclick="window.location.href='configuracion.html'">
+            <i class="fas fa-cog"></i> <span>Configuración</span>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <!-- Primera fila de cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Edad Biológica Promedio</h3>
+                <div class="gauge" id="bio-age-gauge" data-value="0" style="--gauge-value: 0%;"></div>
+            </div>
+            <div class="card">
+                <h3>Pacientes Registrados</h3>
+                <p id="patient-count">Cargando...</p>
+            </div>
+            <div class="card">
+                <h3>Nuevos Registros</h3>
+                <p id="new-records">Cargando...</p>
+            </div>
+        </div>
+
+        <!-- Segunda fila de cards (Pacientes Activos) -->
+        <div class="cards">
+            <div class="card">
+                <h3 class="card-title">
+                    Pacientes Activos
+                    <select id="activeRange" style="float: right; margin-left: 10px;" onchange="updateActivePatientsChart()">
+                        <option value="week">Última Semana</option>
+                        <option value="month">Último Mes</option>
+                        <option value="quarter">Último Trimestre</option>
+                        <option value="semester">Último Semestre</option>
+                        <option value="year" selected>Último Año</option>
+                    </select>
+                </h3>
+                <canvas id="activePatientsChart" style="margin-top: 1rem; max-height: 300px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Tercera fila de cards (Gráficos) -->
+        <div class="cards">
+            <div class="card">
+                <h3>Edad Biológica vs. Cronológica</h3>
+                <canvas id="bioAgeVsChronoChart" style="max-height: 350px;"></canvas>
+            </div>
+            <div class="card">
+                <h3>Evolución Edad Biológica (Paciente Actual)</h3>
+                <canvas id="bioAgeChart" style="max-height: 350px;"></canvas>
+            </div>
+            <div class="card">
+                <h3>Comparación por Grupos</h3>
+                <canvas id="groupComparisonChart" style="max-height: 350px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Resto del contenido -->
+        <div class="patient-details">
+            <img id="patient-photo" src="assets/default-patient.png" alt="Foto del Paciente">
+            <div class="patient-info">
+                <h4 id="patient-name">Seleccione un Paciente</h4>
+                <p>Edad Cronológica: <span id="chrono-age">--</span></p>
+                <p>Edad Biológica: <span id="bio-age">--</span></p>
+            </div>
+        </div>
+        <div id="disease-risks">
+            <h4>Riesgos de Enfermedades</h4>
+            <p>Cardiovascular: <progress value="0" max="100" id="progress-cardio"></progress> <span id="risk-cardio">0%</span></p>
+            <p>Diabetes: <progress value="0" max="100" id="progress-diabetes"></progress> <span id="risk-diabetes">0%</span></p>
+            <p>Cáncer: <progress value="0" max="100" id="progress-cancer"></progress> <span id="risk-cancer">0%</span></p>
+            <p>Alzheimer: <progress value="0" max="100" id="progress-alzheimers"></progress> <span id="risk-alzheimers">0%</span></p>
+        </div>
+        <div id="ai-insights">
+            <h4>Insights de IA</h4>
+            <p id="insight-text">Seleccione un paciente para ver análisis...</p>
+            <p id="health-potential">...</p>
+        </div>
+        <div class="recent-patients">
+            <h3>Pacientes Recientes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Edad Cronológica</th>
+                        <th>Edad Biológica</th>
+                        <th>Última Visita</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-patients-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Asistente IA -->
+    <div id="ai-assistant-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAIAssistant()">&times;</span>
+            <h2>Asistente IA</h2>
+            <form id="file-upload-form">
+                <input type="file" id="file-input" multiple accept=".pdf,.txt,.docx">
+                <button type="button" onclick="uploadFiles()">Analizar Archivos</button>
+            </form>
+            <div id="analysis-results"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Función para alternar la visibilidad del submenú
+        function toggleSubmenu() {
+            const submenu = document.getElementById('reportes-submenu');
+            submenu.classList.toggle('open');
+        }
+
+        // Función para abrir el modal de Asistente IA
+        function openAIAssistant() {
+            document.getElementById('ai-assistant-modal').classList.remove('hidden');
+        }
+
+        // Función para cerrar el modal de Asistente IA
+        function closeAIAssistant() {
+            document.getElementById('ai-assistant-modal').classList.add('hidden');
+        }
+
+        // Función para manejar la carga de archivos
+        async function uploadFiles() {
+            const fileInput = document.getElementById('file-input');
+            const files = fileInput.files;
+            const resultsDiv = document.getElementById('analysis-results');
+            resultsDiv.innerHTML = ''; // Limpiar resultados anteriores
+
+            for (const file of files) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const content = e.target.result;
+                    const analysis = await analyzeWithAI(content, file.name);
+                    displayAnalysis(analysis, file.name);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Función para analizar el contenido del archivo con IA
+        async function analyzeWithAI(content, fileName) {
+            // Aquí se debe integrar con una API de IA avanzada como Gemini Pro
+            // Por ahora, simulamos un análisis
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(`Análisis del archivo ${fileName}: ${content.substring(0, 100)}...`);
+                }, 1000);
+            });
+        }
+
+        // Función para mostrar los resultados del análisis
+        function displayAnalysis(analysis, fileName) {
+            const resultsDiv = document.getElementById('analysis-results');
+            const resultItem = document.createElement('div');
+            resultItem.innerHTML = `<strong>${fileName}</strong><p>${analysis}</p>`;
+            resultsDiv.appendChild(resultItem);
+        }
+
+        // --- Variables Globales para Gráficos ---
+        let activeChart;
+        let bioAgeVsChronoChart;
+        let bioAgeEvolutionChart;
+        let groupCompChart;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            const body = document.body;
+
+            if (toggleBtn && sidebar && body) {
+                toggleBtn.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-expanded');
+                    sidebar.classList.toggle('expanded');
+                });
+            }
+
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    // Actualizar gráficos si están inicializados
+                    if (activeChart) updateActivePatientsChart();
+                    if (bioAgeVsChronoChart) initBioAgeVsChronoChart();
+                    if (bioAgeEvolutionChart) initBioAgeEvolutionChart();
+                    if (groupCompChart) initGroupComparisonChart();
+                });
+            }
+
+            // Inicializar gráficos del Dashboard
+            if (document.getElementById('activePatientsChart')) initActivePatientsChart();
+            if (document.getElementById('bioAgeVsChronoChart')) initBioAgeVsChronoChart();
+            if (document.getElementById('bioAgeChart')) initBioAgeEvolutionChart();
+            if (document.getElementById('groupComparisonChart')) initGroupComparisonChart();
+
+            loadDashboardData(); // Cargar datos iniciales
+        });
+
+        // --- Funciones para Gráficos ---
+        function initActivePatientsChart() {
+            const ctx = document.getElementById('activePatientsChart')?.getContext('2d');
+            if (!ctx) return;
+            activeChart = new Chart(ctx, getGenericChartConfig('year', 'line', getActivePatientData));
+        }
+
+        function updateActivePatientsChart() {
+            const range = document.getElementById('activeRange')?.value || 'year';
+            if (activeChart) { activeChart.destroy(); }
+            const ctx = document.getElementById('activePatientsChart')?.getContext('2d');
+            if (!ctx) return;
+            activeChart = new Chart(ctx, getGenericChartConfig(range, 'line', getActivePatientData));
+        }
+
+        function initBioAgeVsChronoChart() {
+            const ctx = document.getElementById('bioAgeVsChronoChart')?.getContext('2d');
+            if (!ctx) return;
+            if (bioAgeVsChronoChart) { bioAgeVsChronoChart.destroy(); }
+            bioAgeVsChronoChart = new Chart(ctx, getGenericChartConfig(null, 'line', getPatientBioAgeData, {
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.dataset.label || ''}: ${ctx.parsed.y !== null ? ctx.parsed.y + ' años' : ''}`,
+                            title: ctx => `Edad Cronológica: ${ctx[0].label} años`
+                        }
+                    }
+                },
+                scales: {
+                    y: { title: { display: true, text: 'Edad Biológica (Años)' } },
+                    x: { title: { display: true, text: 'Edad Cronológica (Años)' }, grid: { display: false } }
+                }
+            }));
+        }
+
+        function initBioAgeEvolutionChart() {
+            const ctx = document.getElementById('bioAgeChart')?.getContext('2d');
+            if (!ctx) return;
+            if (bioAgeEvolutionChart) { bioAgeEvolutionChart.destroy(); }
+            bioAgeEvolutionChart = new Chart(ctx, getGenericChartConfig('year', 'line', getSinglePatientBioAgeEvolutionData, {
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { title: { display: true, text: 'Edad Biológica (Años)' } },
+                    x: { title: { display: true, text: 'Tiempo' } }
+                }
+            }));
+        }
+
+        function initGroupComparisonChart() {
+            const ctx = document.getElementById('groupComparisonChart')?.getContext('2d');
+            if (!ctx) return;
+            if (groupCompChart) { groupCompChart.destroy(); }
+            groupCompChart = new Chart(ctx, getGenericChartConfig(null, 'bar', getGroupComparisonData, {
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { title: { display: true, text: 'Grupo' } },
+                    x: { title: { display: true, text: 'Edad Biológica Promedio' } }
+                }
+            }));
+        }
+
+        function getGenericChartConfig(range, chartType, dataFetchingFn, specificOptions = {}) {
+            const data = dataFetchingFn(range);
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = isDarkMode ? '#ffffffcc' : '#293B64';
+            const defaultBorderColor = isDarkMode ? '#64b5f6' : '#23BCEF';
+            const datasetColors = [
+                { border: '#23BCEF', background: 'rgba(35,188,239,0.2)' },
+                { border: '#FF7F50', background: 'rgba(255,127,80,0.2)' },
+                { border: '#28a745', background: 'rgba(40,167,69,0.2)' },
+                { border: '#ffc107', background: 'rgba(255,193,7,0.2)' },
+                { border: '#6f42c1', background: 'rgba(111,66,193,0.2)' },
+            ];
+            const baseOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { color: textColor } },
+                    title: { display: false },
+                    tooltip: {
+                        backgroundColor: isDarkMode ? 'rgba(40, 40, 40, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: textColor,
+                        bodyColor: textColor,
+                        borderColor: gridColor,
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: false, ticks: { color: textColor }, grid: { color: gridColor } },
+                    x: { ticks: { color: textColor }, grid: { color: gridColor } }
+                }
+            };
+            const finalOptions = {
+                ...baseOptions,
+                ...specificOptions,
+                plugins: {
+                    ...baseOptions.plugins,
+                    ...(specificOptions.plugins || {})
+                },
+                scales: {
+                    ...baseOptions.scales,
+                    ...(specificOptions.scales || {})
+                }
+            };
+            return {
+                type: chartType,
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets.map((ds, index) => ({
+                        tension: chartType === 'line' ? 0.3 : 0,
+                        fill: chartType === 'line',
+                        pointRadius: chartType === 'line' ? 4 : 0,
+                        pointHoverRadius: chartType === 'line' ? 6 : 0,
+                        ...ds,
+                        borderColor: ds.borderColor || datasetColors[index % datasetColors.length].border || defaultBorderColor,
+                        backgroundColor: ds.backgroundColor || (chartType === 'line' ? datasetColors[index % datasetColors.length].background : datasetColors[index % datasetColors.length].border) || defaultBorderColor,
+                    }))
+                },
+                options: finalOptions
+            };
+        }
+
+        // --- Funciones para Obtener Datos (Simulados) ---
+        function getActivePatientData(range) {
+            let labels = [];
+            let data1 = [];
+            let data2 = [];
+            switch (range) {
+                case 'week':
+                    labels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+                    data1 = [30, 34, 28, 40, 38, 50, 45];
+                    data2 = [10, 15, 12, 20, 18, 25, 22];
+                    break;
+                case 'month':
+                    labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
+                    data1 = [80, 95, 120, 140];
+                    data2 = [30, 40, 60, 80];
+                    break;
+                case 'quarter':
+                    labels = ['Mes 1', 'Mes 2', 'Mes 3'];
+                    data1 = [200, 250, 300];
+                    data2 = [100, 130, 180];
+                    break;
+                case 'semester':
+                    labels = ['Bim 1', 'Bim 2', 'Bim 3'];
+                    data1 = [400, 480, 550];
+                    data2 = [150, 200, 280];
+                    break;
+                case 'year':
+                default:
+                    labels = ['Q1 \'23', 'Q2 \'23', 'Q3 \'23', 'Q4 \'23', 'Q1 \'24'];
+                    data1 = [70, 90, 109, 120, 126];
+                    data2 = [50, 60, 80, 90, 100];
+                    break;
+            }
+            return {
+                labels,
+                datasets: [
+                    { label: 'Pacientes Activos', data: data1 },
+                    { label: 'Onboarded', data: data2, borderColor: '#FF7F50', backgroundColor: 'rgba(255,127,80,0.2)' }
+                ]
+            };
+        }
+
+        function getPatientBioAgeData() {
+            const labels = [20, 30, 40, 50, 60, 70, 80];
+            const biologicalAges = labels.map(age => Math.max(18, age + Math.floor(Math.random() * 15) - 7));
+            return {
+                labels,
+                datasets: [
+                    { label: 'Edad Biológica (Promedio Grupo)', data: biologicalAges, borderColor: '#23BCEF', backgroundColor: 'rgba(35,188,239,0.2)' },
+                    { label: 'Ideal (Edad Cronológica)', data: labels, borderDash: [5, 5], pointRadius: 0, pointHoverRadius: 0, borderColor: '#28a745', backgroundColor: 'transparent', fill: false }
+                ]
+            };
+        }
+
+        function getSinglePatientBioAgeEvolutionData(range = 'year') {
+            let labels = [];
+            let data = [];
+            const startAge = 45 + Math.floor(Math.random() * 5) - 2;
+            switch (range) {
+                case 'year':
+                default:
+                    labels = ['Ene \'23', 'Abr \'23', 'Jul \'23', 'Oct \'23', 'Ene \'24'];
+                    data = [startAge, startAge - 1, startAge - 2, startAge - 2, startAge - 3];
+                    break;
+            }
+            return {
+                labels,
+                datasets: [{ label: 'Edad Biológica', data, borderColor: '#FF7F50', backgroundColor: 'rgba(255,127,80,0.2)' }]
+            };
+        }
+
+        function getGroupComparisonData() {
+            const labels = ['20-30', '31-40', '41-50', '51-60', '60+'];
+            const data = [
+                25 + Math.floor(Math.random() * 5) - 2,
+                36 + Math.floor(Math.random() * 6) - 3,
+                47 + Math.floor(Math.random() * 8) - 4,
+                58 + Math.floor(Math.random() * 10) - 5,
+                69 + Math.floor(Math.random() * 12) - 6,
+            ];
+            return {
+                labels,
+                datasets: [{ label: 'Edad Bio. Promedio', data, backgroundColor: ['#23BCEF', '#FF7F50', '#28a745', '#ffc107', '#6f42c1'] }]
+            };
+        }
+
+        function loadDashboardData() {
+            console.log("Cargando datos simulados del Dashboard...");
+            document.getElementById('patient-count').innerText = Math.floor(Math.random() * 500) + 100;
+            document.getElementById('new-records').innerText = Math.floor(Math.random() * 50) + 5;
+            const avgBioAge = 40 + Math.floor(Math.random() * 15);
+            const gaugeElement = document.getElementById('bio-age-gauge');
+            if (gaugeElement) {
+                const percentage = (avgBioAge / 100) * 100;
+                gaugeElement.dataset.value = avgBioAge;
+                gaugeElement.style.setProperty('--gauge-value', `${percentage}%`);
+            }
+            const pacienteEjemplo = {
+                name: 'Elena Gómez',
+                chronoAge: 48,
+                bioAge: 45,
+                photoUrl: 'assets/elena_gomez.jpg',
+                risks: { cardiovascular: 25, diabetes: 15, cancer: 10, alzheimers: 20 },
+                aiInsights: { summary: 'Edad biológica favorable. Riesgos generales bajos. Mantener estilo de vida saludable.', healthPotential: 'Potencial de longevidad alto.' },
+                history: {
+                    prevDiseases: 'Ninguna relevante.',
+                    treatmentsSurgeries: 'Apendicectomía (2005).',
+                    treatmentPlan: 'Seguimiento anual, dieta mediterránea, ejercicio regular.',
+                    alerts: ['Recordatorio: Analítica anual en Junio.'],
+                    notes: 'Paciente colaboradora y motivada.'
+                }
+            };
+            document.getElementById('patient-name').textContent = pacienteEjemplo.name;
+            document.getElementById('chrono-age').textContent = pacienteEjemplo.chronoAge;
+            document.getElementById('bio-age').textContent = pacienteEjemplo.bioAge;
+            const patientPhoto = document.getElementById('patient-photo');
+            if (patientPhoto) {
+                patientPhoto.src = pacienteEjemplo.photoUrl;
+                patientPhoto.onerror = () => { patientPhoto.src = 'assets/default-patient.png'; };
+            }
+            document.getElementById('progress-cardio').value = pacienteEjemplo.risks.cardiovascular;
+            document.getElementById('risk-cardio').textContent = `${pacienteEjemplo.risks.cardiovascular}%`;
+            document.getElementById('progress-diabetes').value = pacienteEjemplo.risks.diabetes;
+            document.getElementById('risk-diabetes').textContent = `${pacienteEjemplo.risks.diabetes}%`;
+            document.getElementById('progress-cancer').value = pacienteEjemplo.risks.cancer;
+            document.getElementById('risk-cancer').textContent = `${pacienteEjemplo.risks.cancer}%`;
+            document.getElementById('progress-alzheimers').value = pacienteEjemplo.risks.alzheimers;
+            document.getElementById('risk-alzheimers').textContent = `${pacienteEjemplo.risks.alzheimers}%`;
+            document.getElementById('insight-text').textContent = pacienteEjemplo.aiInsights.summary;
+            document.getElementById('health-potential').textContent = pacienteEjemplo.aiInsights.healthPotential;
+            const recentPatients = [
+                { name: 'Carlos Rodríguez', chronologicalAge: 62, biologicalAge: 68, lastVisit: '2024-03-08' },
+                { name: 'Ana Martínez', chronologicalAge: 35, biologicalAge: 32, lastVisit: '2024-03-05' },
+                { name: 'Luis Fernandez', chronologicalAge: 55, biologicalAge: 58, lastVisit: '2024-02-28' }
+            ];
+            const recentPatientsBody = document.getElementById('recent-patients-body');
+            if (recentPatientsBody) {
+                recentPatientsBody.innerHTML = '';
+                recentPatients.forEach(p => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${p.name}</td><td>${p.chronologicalAge}</td><td>${p.biologicalAge}</td><td>${p.lastVisit}</td>`;
+                    recentPatientsBody.appendChild(row);
+                });
+            }
+            const modalContent = document.getElementById('patient-history');
+            if (modalContent) {
+                modalContent.querySelector('#prev-diseases').textContent = pacienteEjemplo.history.prevDiseases;
+                modalContent.querySelector('#treatments-surgeries').textContent = pacienteEjemplo.history.treatmentsSurgeries;
+                modalContent.querySelector('#treatment-plan').textContent = pacienteEjemplo.history.treatmentPlan;
+                const alertsList = modalContent.querySelector('#alerts');
+                alertsList.innerHTML = '';
+                pacienteEjemplo.history.alerts.forEach(alertText => {
+                    const li = document.createElement('li');
+                    li.textContent = alertText;
+                    alertsList.appendChild(li);
+                });
+                modalContent.querySelector('#doctor-notes').value = pacienteEjemplo.history.notes;
+            }
+            initActivePatientsChart();
+            initBioAgeVsChronoChart();
+            initBioAgeEvolutionChart();
+            initGroupComparisonChart();
+        }
+    </script>
+</body>
+
+</html>

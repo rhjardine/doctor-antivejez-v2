@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historias - Edades Biológicas</title>
+  <!-- Se asume que ya tienes FontAwesome y Google Fonts en tu proyecto -->
+  <link rel="stylesheet" href="historias_tabs_bio.css">
+</head>
+<body>
+  <header>
+    <h1>Historias - Diseño en Pestañas</h1>
+  </header>
+
+  <div class="tabs-container">
+    <!-- Barra de pestañas -->
+    <ul class="tabs">
+      <li class="tab active" data-tab="tab1">Datos Generales</li>
+      <li class="tab" data-tab="tab2">Historia Clínica</li>
+      <li class="tab" data-tab="tab3">Edad Biológica</li>
+      <li class="tab" data-tab="tab4">Plan de Tratamiento</li>
+    </ul>
+
+    <!-- Contenido de cada pestaña -->
+    <div class="tabs-content">
+      <!-- Pestaña 1: Datos Generales -->
+      <div id="tab1" class="tab-content active">
+        <h2>Datos Generales</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nacionalidad">Nacionalidad</label>
+            <input type="text" id="nacionalidad" placeholder="e.g. Venezolano">
+          </div>
+          <div class="form-group">
+            <label for="identificacion">Identificación</label>
+            <input type="text" id="identificacion" placeholder="e.g. V-12345678">
+          </div>
+          <div class="form-group">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos">
+          </div>
+          <div class="form-group">
+            <label for="nombres">Nombres</label>
+            <input type="text" id="nombres">
+          </div>
+          <div class="form-group">
+            <label for="fecha-nacimiento">Fecha Nacimiento (dd/mm/aa)</label>
+            <input type="text" id="fecha-nacimiento" placeholder="dd/mm/aaaa">
+          </div>
+          <div class="form-group">
+            <label for="edad-cronologica">Edad Cronológica</label>
+            <input type="number" id="edad-cronologica">
+          </div>
+          <div class="form-group">
+            <label for="genero">Género</label>
+            <select id="genero">
+              <option>Masculino</option>
+              <option>Femenino</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edo-civil">Estado Civil</label>
+            <input type="text" id="edo-civil" placeholder="e.g. Soltero/a">
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" id="telefono" placeholder="e.g. +584123456789">
+          </div>
+          <div class="form-group">
+            <label for="profesion">Profesión</label>
+            <input type="text" id="profesion">
+          </div>
+          <div class="form-group">
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion">
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="e.g. usuario@correo.com">
+          </div>
+          <div class="form-group">
+            <label for="pais">País</label>
+            <input type="text" id="pais">
+          </div>
+          <div class="form-group">
+            <label for="ciudad">Ciudad</label>
+            <input type="text" id="ciudad">
+          </div>
+          <div class="form-group">
+            <label for="grupo-sanguineo">Grupo Sanguíneo</label>
+            <select id="grupo-sanguineo">
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestaña 2: Historia Clínica -->
+      <div id="tab2" class="tab-content">
+        <h2>Historia Clínica</h2>
+        <div class="form-group full-width">
+          <label for="antecedentes-familiares">Antecedentes Familiares</label>
+          <textarea id="antecedentes-familiares"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="antecedentes-personales">Antecedentes Personales</label>
+          <textarea id="antecedentes-personales"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="habitos">Hábitos (alimentación, ejercicio, sueño, etc.)</label>
+          <textarea id="habitos"></textarea>
+        </div>
+      </div>
+
+      <!-- Pestaña 3: Edad Biológica (Biofísica, Bioquímica, Ortomolecular, Genética) -->
+      <div id="tab3" class="tab-content">
+        <h2>Edad Biológica</h2>
+        <p>Comparación entre Edad Cronológica y Edades Biológicas:</p>
+
+        <!-- Sección con cuatro recuadros para las diferentes edades -->
+        <div class="bio-ages-grid">
+          <div class="bio-age-card">
+            <h3><i class="fas fa-dumbbell"></i> Edad Biofísica</h3>
+            <div class="bio-age-value" id="edad-biofisica">--</div>
+          </div>
+          <div class="bio-age-card">
+            <h3><i class="fas fa-vial"></i> Edad Bioquímica</h3>
+            <div class="bio-age-value" id="edad-bioquimica">--</div>
+          </div>
+          <div class="bio-age-card">
+            <h3><i class="fas fa-leaf"></i> Edad Ortomolecular</h3>
+            <div class="bio-age-value" id="edad-ortomolecular">--</div>
+          </div>
+          <div class="bio-age-card">
+            <h3><i class="fas fa-dna"></i> Edad Genética</h3>
+            <div class="bio-age-value" id="edad-genetica">--</div>
+          </div>
+        </div>
+
+        <!-- Sub-sección para exámenes relevantes -->
+        <h3 class="subtitle">Exámenes y Parámetros Clave</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="telomeros">Longitud de Telómeros</label>
+            <input type="text" id="telomeros" placeholder="e.g. 6.8 kb">
+          </div>
+          <div class="form-group">
+            <label for="colesterol">Colesterol Total</label>
+            <input type="text" id="colesterol" placeholder="mg/dL">
+          </div>
+          <div class="form-group">
+            <label for="trigliceridos">Triglicéridos</label>
+            <input type="text" id="trigliceridos" placeholder="mg/dL">
+          </div>
+          <div class="form-group">
+            <label for="glucosa">Glucosa</label>
+            <input type="text" id="glucosa" placeholder="mg/dL">
+          </div>
+          <div class="form-group">
+            <label for="vitamina-d">Vitamina D</label>
+            <input type="text" id="vitamina-d" placeholder="ng/mL">
+          </div>
+          <div class="form-group">
+            <label for="hormonas">Panel Hormonal</label>
+            <textarea id="hormonas" placeholder="Detalles de estrógenos, testosterona, DHEA, etc."></textarea>
+          </div>
+        </div>
+
+        <!-- Botón para generar informe -->
+        <div class="form-buttons center">
+          <button type="button" onclick="generarInforme()">Generar Informe</button>
+        </div>
+      </div>
+
+      <!-- Pestaña 4: Plan de Tratamiento -->
+      <div id="tab4" class="tab-content">
+        <h2>Plan de Tratamiento</h2>
+        <div class="form-group full-width">
+          <label for="objetivos">Objetivos del Paciente</label>
+          <textarea id="objetivos" placeholder="Bajar de peso, mejorar IMC, reducir estrés..."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="recomendaciones">Recomendaciones Médicas</label>
+          <textarea id="recomendaciones" placeholder="Nutrición, ejercicio, suplementación, etc."></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="seguimiento">Seguimiento / Próximas Citas</label>
+          <textarea id="seguimiento" placeholder="Fechas de control, exámenes de control, etc."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="form-buttons">
+    <button type="button" onclick="alert('Historia guardada')">Guardar</button>
+    <button type="button" onclick="alert('Regresar')">Cancelar</button>
+  </div>
+
+  <!-- Script para manejar las pestañas y la generación de informe -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = document.querySelectorAll('.tab');
+      const contents = document.querySelectorAll('.tab-content');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Quitar clase active de todas las tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          // Quitar clase active de todos los contenidos
+          contents.forEach(c => c.classList.remove('active'));
+
+          // Activar la tab actual
+          tab.classList.add('active');
+          // Mostrar el contenido correspondiente
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+    });|
+
+    function generarInforme() {
+      alert('Informe personalizado generado (simulado).');
+      // Aquí podrías implementar la lógica real de generación de PDF, etc.
+    }
+  </script>
+</body>
+</html>

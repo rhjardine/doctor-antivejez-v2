@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Edad Biofísica</title>
+  <!-- Enlaza tu CSS principal si contiene estilos generales -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Enlaza el CSS específico para esta página -->
+  <link rel="stylesheet" href="css/edad_biofisica.css">
+  <!-- FontAwesome y Google Fonts (asumiendo que están en styles.css o cargados globalmente) -->
+</head>
+<body>
+  <!-- Podrías incluir aquí el header y sidebar si esta página es parte del layout principal -->
+  <!-- Header -->
+  <header>
+    <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo">
+    </div>
+    <div class="header-search">
+      <input type="text" id="main-search-input" placeholder="Buscar paciente o historia...">
+    </div>
+    <div class="header-actions">
+      <i class="fas fa-bell" onclick="alert('Notificaciones')"></i>
+      <i class="fas fa-moon" id="theme-toggle"></i>
+      <i class="fas fa-user"></i>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+   <nav class="sidebar">
+    <!-- ... Items del menú ... -->
+    <div class="menu-item" onclick="window.location.href='index.html'"> <i class="fas fa-chart-line"></i> <span>Dashboard</span> </div>
+    <div class="menu-item" onclick="window.location.href='historias_tabs_bio.html'"> <i class="fas fa-book-medical"></i> <span>Historias</span> </div>
+    <div class="menu-item" onclick="window.location.href='profesionales.html'"> <i class="fas fa-user-md"></i> <span>Profesionales</span> </div>
+    <div class="menu-item" onclick="window.location.href='analitica.html'"> <i class="fas fa-chart-pie"></i> <span>Analítica</span> </div>
+    <div class="menu-item reports-item" id="reportes-item" tabindex="0" onclick="toggleSubmenu()"> <i class="fas fa-file-alt"></i> <span>Reportes</span> <ul class="popup-submenu" id="reportes-submenu"><li><a href="#" class="submenu-item"><i class="fas fa-users"></i> Resumen de Pacientes</a></li><li><a href="#" class="submenu-item"><i class="fas fa-user"></i> Reportes Individuales</a></li><li><a href="#" class="submenu-item"><i class="fas fa-chart-line"></i> Análisis Biomarcadores</a></li><li><a href="#" class="submenu-item"><i class="fas fa-history"></i> Consulta de Historial</a></li></ul></div>
+    <div class="menu-item" onclick="window.location.href='configuracion.html'"> <i class="fas fa-cog"></i> <span>Configuración</span> </div>
+  </nav>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <h2>Test Edad Biofísica</h2>
+
+    <div class="bio-container card"> <!-- Añadido card para estilo consistente -->
+      <form id="biofisica-form">
+        <p>Paciente ID: <span id="patient-id-display">Cargando...</span></p> <!-- Para mostrar ID -->
+
+        <div class="form-grid">
+          <!-- Género (Simplificado, podrías necesitar checkbox "Deportista") -->
+          <div class="form-group">
+            <label for="genero">Género</label>
+            <select id="genero" required>
+              <option value="" disabled selected>Seleccione...</option>
+              <option value="femenino">Femenino</option>
+              <option value="masculino">Masculino</option>
+              <!-- <option value="otro">Otro</option> --> <!-- Considerar si 'otro' es válido para los boards -->
+            </select>
+             <!-- Checkbox opcional para Deportista -->
+             <div style="margin-top: 10px;">
+                <input type="checkbox" id="deportista" name="deportista">
+                <label for="deportista" style="font-weight: normal; margin-bottom: 0;"> Deportista</label>
+             </div>
+          </div>
+
+          <!-- Edad Cronológica (Obligatoria) -->
+          <div class="form-group">
+            <label for="edad-cronologica">Edad Cronológica</label>
+            <input type="number" id="edad-cronologica" placeholder="e.g. 50" required min="1">
+          </div>
+
+          <!-- % Grasa -->
+          <div class="form-group">
+            <label for="porcentaje-grasa">% Grasa</label>
+            <input type="number" step="0.1" id="porcentaje-grasa" placeholder="e.g. 25" required>
+          </div>
+
+          <!-- IMC -->
+          <div class="form-group">
+            <label for="imc">Índice de masa corporal (IMC)</label>
+            <input type="number" step="0.1" id="imc" placeholder="e.g. 22.5" required>
+          </div>
+
+          <!-- Reflejos Digitales (Asumiendo promedio) -->
+          <div class="form-group">
+            <label for="reflejos">Reflejos Digitales - Promedio (cm)</label>
+            <input type="number" step="0.01" id="reflejos" placeholder="e.g. 15.20" required>
+             <small>Ingrese el promedio de las 3 mediciones.</small>
+          </div>
+
+          <!-- Acomodación Visual -->
+          <div class="form-group">
+            <label for="acomodacion">Acomodación Visual (cm)</label>
+            <input type="number" step="0.1" id="acomodacion" placeholder="e.g. 12.3" required>
+          </div>
+
+          <!-- Balance Estático (Asumiendo promedio) -->
+          <div class="form-group">
+            <label for="balance">Balance Estático - Promedio (seg)</label>
+            <input type="number" step="0.1" id="balance" placeholder="e.g. 30.5" required>
+             <small>Ingrese el promedio de las 3 mediciones.</small>
+          </div>
+
+          <!-- Hidratación Cutánea -->
+          <div class="form-group">
+            <label for="hidratacion">Hidratación Cutánea (seg)</label>
+            <input type="number" step="0.1" id="hidratacion" placeholder="e.g. 5.2" required>
+          </div>
+
+          <!-- Presión Sistólica -->
+          <div class="form-group">
+            <label for="sistolica">Sistólica (mmHg)</label>
+            <input type="number" id="sistolica" placeholder="e.g. 120" required>
+          </div>
+
+          <!-- Presión Diastólica -->
+          <div class="form-group">
+            <label for="diastolica">Diastólica (mmHg)</label>
+            <input type="number" id="diastolica" placeholder="e.g. 80" required>
+          </div>
+
+          <!-- --- Resultados (Readonly) --- -->
+          <div class="form-group result-group">
+            <label for="edad-biofisica">Edad Biofísica (Calculada)</label>
+            <input type="text" id="edad-biofisica" value="--" readonly>
+          </div>
+
+          <div class="form-group result-group">
+            <label for="edad-diferencial">Edad Diferencial (Calculada)</label>
+            <input type="text" id="edad-diferencial" value="--" readonly>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-buttons">
+          <button type="button" class="btn btn-primary" onclick="calcularEdadBiofisica()">Calcular</button>
+          <button type="button" class="btn btn-secondary" onclick="guardarDatosBiofisica()">Guardar</button>
+          <button type="button" class="btn btn-secondary" onclick="window.history.back()">Volver</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // --- PLACEHOLDER DE DATOS 'boards' ---
+    // ¡¡¡ IMPORTANTE: REEMPLAZAR ESTO CON LOS DATOS REALES !!!
+    // La estructura es una suposición basada en el código React.
+    // Cada prueba tiene un array de rangos. Cada rango tiene límites de medición (range.min, range.max)
+    // y límites de edad (age_min, age_max). 'inverse' indica si valores altos son mejores.
+    const placeholderBoards = {
+      // % Grasa (Ejemplo Femenino NO Deportista)
+      female_fat: [
+        { range: { min: 15, max: 20 }, age_min: 20, age_max: 30, inverse: false },
+        { range: { min: 20.1, max: 25 }, age_min: 31, age_max: 40, inverse: false },
+        { range: { min: 25.1, max: 30 }, age_min: 41, age_max: 50, inverse: false },
+        { range: { min: 30.1, max: 99 }, age_min: 51, age_max: 100, inverse: false }, // Rango abierto al final
+      ],
+      // % Grasa (Ejemplo Masculino NO Deportista)
+      male_fat: [
+        { range: { min: 8, max: 15 }, age_min: 20, age_max: 30, inverse: false },
+        { range: { min: 15.1, max: 20 }, age_min: 31, age_max: 40, inverse: false },
+        { range: { min: 20.1, max: 25 }, age_min: 41, age_max: 50, inverse: false },
+        { range: { min: 25.1, max: 99 }, age_min: 51, age_max: 100, inverse: false },
+      ],
+       // % Grasa (Ejemplo Femenino Deportista - valores más bajos)
+       sporty_female_fat: [
+        { range: { min: 12, max: 17 }, age_min: 20, age_max: 30, inverse: false },
+        { range: { min: 17.1, max: 22 }, age_min: 31, age_max: 40, inverse: false },
+        // ... más rangos
+      ],
+       // % Grasa (Ejemplo Masculino Deportista - valores más bajos)
+       sporty_male_fat: [
+        { range: { min: 5, max: 12 }, age_min: 20, age_max: 30, inverse: false },
+        { range: { min: 12.1, max: 17 }, age_min: 31, age_max: 40, inverse: false },
+        // ... más rangos
+      ],
+      body_mass: [ // IMC
+        { range: { min: 18.5, max: 24.9 }, age_min: 20, age_max: 40, inverse: false },
+        { range: { min: 25, max: 29.9 }, age_min: 41, age_max: 60, inverse: false },
+        { range: { min: 30, max: 99 }, age_min: 61, age_max: 100, inverse: false },
+      ],
+      digital_reflections: [ // Reflejos (cm) - INVERSO: menos cm es mejor
+        { range: { min: 10, max: 15 }, age_min: 20, age_max: 35, inverse: true },
+        { range: { min: 15.1, max: 20 }, age_min: 36, age_max: 50, inverse: true },
+        { range: { min: 20.1, max: 99 }, age_min: 51, age_max: 100, inverse: true },
+      ],
+      visual_accommodation: [ // Acomodación (cm) - INVERSO: menos cm es mejor (punto cercano)
+         { range: { min: 8, max: 12 }, age_min: 20, age_max: 30, inverse: true },
+         { range: { min: 12.1, max: 20 }, age_min: 31, age_max: 40, inverse: true },
+         { range: { min: 20.1, max: 40 }, age_min: 41, age_max: 50, inverse: true },
+         { range: { min: 40.1, max: 100 }, age_min: 51, age_max: 60, inverse: true },
+         { range: { min: 100.1, max: 200 }, age_min: 61, age_max: 80, inverse: true }, // Suposición
+      ],
+      static_balance: [ // Balance (seg) - INVERSO: más seg es mejor
+         { range: { min: 50, max: 60 }, age_min: 20, age_max: 30, inverse: true },
+         { range: { min: 40, max: 49.9 }, age_min: 31, age_max: 40, inverse: true },
+         { range: { min: 30, max: 39.9 }, age_min: 41, age_max: 50, inverse: true },
+         { range: { min: 15, max: 29.9 }, age_min: 51, age_max: 65, inverse: true },
+         { range: { min: 0, max: 14.9 }, age_min: 66, age_max: 100, inverse: true },
+      ],
+      quaten_hydration: [ // Hidratación (seg) - INVERSO: menos seg es mejor (pliegue vuelve rápido)
+         { range: { min: 1, max: 3 }, age_min: 20, age_max: 35, inverse: true },
+         { range: { min: 3.1, max: 6 }, age_min: 36, age_max: 50, inverse: true },
+         { range: { min: 6.1, max: 10 }, age_min: 51, age_max: 65, inverse: true },
+         { range: { min: 10.1, max: 99 }, age_min: 66, age_max: 100, inverse: true },
+      ],
+       systolic_blood_pressure: [ // Sistólica
+         { range: { min: 100, max: 129 }, age_min: 20, age_max: 50, inverse: false },
+         { range: { min: 130, max: 139 }, age_min: 51, age_max: 65, inverse: false },
+         { range: { min: 140, max: 250 }, age_min: 66, age_max: 100, inverse: false },
+       ],
+       diastolic_blood_pressure: [ // Diastólica
+         { range: { min: 60, max: 84 }, age_min: 20, age_max: 50, inverse: false },
+         { range: { min: 85, max: 89 }, age_min: 51, age_max: 65, inverse: false },
+         { range: { min: 90, max: 150 }, age_min: 66, age_max: 100, inverse: false },
+       ],
+      // Añadir más boards si es necesario (ej. sporty_male_fat, etc.)
+    };
+
+    // --- SIMULACIÓN DE FUNCIONES 'Globals' ---
+    // ¡¡¡ IMPORTANTE: REEMPLAZAR ESTO CON LA LÓGICA REAL SI ES POSIBLE !!!
+    const Globals = {
+      // Simula la generación de un array de edades (números enteros)
+      getRange: (minAge, maxAge, inverse) => {
+        const ages = [];
+        if (inverse) { // Si es inverso, el rango de edad va de mayor a menor internamente? O la relación es inversa? Asumamos que el array de edad siempre va de menor a mayor.
+             for (let i = Math.round(minAge); i <= Math.round(maxAge); i++) {
+               ages.push(i);
+             }
+        } else {
+             for (let i = Math.round(minAge); i <= Math.round(maxAge); i++) {
+                ages.push(i);
+             }
+        }
+        return ages; // Devuelve [minAge, minAge+1, ..., maxAge]
+      },
+      // Simula la obtención de la diferencia de edad del rango
+      getBoardSubtraction: (boardRange) => {
+        // Asume que el objeto boardRange tiene age_min y age_max
+        return Math.abs(boardRange.age_max - boardRange.age_min);
+      },
+      // Simula la búsqueda del rango correcto DENTRO de un board específico.
+      // Esta es la parte más crítica y difícil de simular sin ver el código original.
+      // Asumiremos que simplemente verifica si el valor está dentro de los límites min/max del rango de medición.
+      getReverse: (boardRange, value, isMeasurementInverse) => {
+          // boardRange aquí se refiere a UN rango específico dentro de la lista de rangos para una prueba
+          // (ej. { range: { min: 15, max: 20 }, age_min: 20, age_max: 30, inverse: false })
+          const measurementMin = boardRange.range.min;
+          const measurementMax = boardRange.range.max;
+
+          // Lógica simple: ¿está el valor dentro de este rango de medición?
+          // Considera bordes inclusivos/exclusivos según necesidad. Aquí usamos inclusivo en min, exclusivo en max (excepto último rango).
+          // Esta lógica podría ser más compleja en el original.
+          if (value >= measurementMin && value <= measurementMax) {
+              return true; // Sí, este es el rango aplicable
+          }
+          // Podría necesitar manejar el último rango (abierto) de forma especial
+          if (value >= measurementMin && measurementMax === 99) { // Asumiendo 99 como 'infinito'
+              return true;
+          }
+          if (value <= measurementMax && measurementMin === 0) { // Asumiendo 0 como inicio si es inverso
+              return true;
+          }
+
+          return false; // No aplica este rango
+      }
+    };
+    // --- FIN SIMULACIÓN GLOBALS ---
+
+    // --- LÓGICA PRINCIPAL ---
+    let currentPatientId = null; // Para almacenar el ID del paciente
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Obtener patientId de la URL
+        const params = new URLSearchParams(window.location.search);
+        currentPatientId = params.get('patientId');
+        const displayElement = document.getElementById('patient-id-display');
+        if (displayElement) {
+             displayElement.textContent = currentPatientId || "No especificado";
+        }
+
+        // Cargar datos del paciente si existe ID (opcional, podrías ya tenerlos)
+        if (currentPatientId) {
+            // Aquí podrías hacer una llamada fetch para obtener datos del paciente si es necesario
+            // fetch(`/api/patient/${currentPatientId}`).then(...)
+            // Por ahora, solo mostramos el ID. Los datos se introducen manualmente.
+        }
+
+         // Configurar listeners de sidebar/theme si existen en esta página
+         const sidebar = document.querySelector('.sidebar');
+         const toggleBtn = document.querySelector('.sidebar-toggle');
+         const body = document.body;
+         if (toggleBtn && sidebar && body) {
+           toggleBtn.addEventListener('click', function () {
+             body.classList.toggle('sidebar-expanded');
+             sidebar.classList.toggle('expanded');
+             // Cerrar submenu si existe y se colapsa
+             const submenu = document.getElementById('reportes-submenu');
+             if (submenu && !sidebar.classList.contains('expanded') && submenu.classList.contains('open')) {
+                 submenu.classList.remove('open');
+             }
+           });
+         }
+         const themeToggle = document.getElementById('theme-toggle');
+         if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+              document.body.classList.toggle('dark-mode');
+            });
+         }
+    });
+
+
+    // Función principal de cálculo
+    function calcularEdadBiofisica() {
+      console.log("Calculando Edad Biofísica...");
+      const resultadosParciales = []; // Almacenará las edades equivalentes [ { name: '...', value: age }, ...]
+      let calculosFallidos = 0;
+
+      // 1. Obtener Inputs
+      const generoSelect = document.getElementById('genero');
+      const deportistaCheckbox = document.getElementById('deportista');
+      const edadCronoInput = document.getElementById('edad-cronologica');
+
+      if (!generoSelect || !edadCronoInput || !deportistaCheckbox) {
+        alert("Error: Elementos del formulario no encontrados.");
+        return;
+      }
+
+      const genero = generoSelect.value;
+      const esDeportista = deportistaCheckbox.checked;
+      const edadCronologica = parseFloat(edadCronoInput.value);
+
+      if (!genero) {
+        alert("Por favor, seleccione el género.");
+        generoSelect.focus();
+        return;
+      }
+       if (isNaN(edadCronologica) || edadCronologica <= 0) {
+        alert("Por favor, ingrese una Edad Cronológica válida.");
+        edadCronoInput.focus();
+        return;
+      }
+
+      // 2. Definir las pruebas y sus IDs/Nombres según género/deportista
+      const pruebas = [
+        { id: 'porcentaje-grasa', nameKey: getFatName(genero, esDeportista), translate: '% Grasa', dimensions: false, reverse: false },
+        { id: 'imc', nameKey: 'body_mass', translate: 'IMC', dimensions: false, reverse: false },
+        { id: 'reflejos', nameKey: 'digital_reflections', translate: 'Reflejos Digitales', dimensions: true, reverse: true }, // Dimensiones=true, pero usamos input único
+        { id: 'acomodacion', nameKey: 'visual_accommodation', translate: 'Acomodación Visual', dimensions: false, reverse: true }, // Inverso
+        { id: 'balance', nameKey: 'static_balance', translate: 'Balance Estático', dimensions: true, reverse: true }, // Dimensiones=true, usamos input único, Inverso
+        { id: 'hidratacion', nameKey: 'quaten_hydration', translate: 'Hidratación Cutánea', dimensions: false, reverse: true }, // Inverso
+        { id: 'sistolica', nameKey: 'systolic_blood_pressure', translate: 'Sistólica', dimensions: false, reverse: false },
+        { id: 'diastolica', nameKey: 'diastolic_blood_pressure', translate: 'Diastólica', dimensions: false, reverse: false },
+      ];
+
+      // 3. Iterar y Calcular Edad Equivalente para cada prueba
+      for (const prueba of pruebas) {
+        const inputElement = document.getElementById(prueba.id);
+        if (!inputElement) {
+          console.error(`Elemento input no encontrado para: ${prueba.id}`);
+          calculosFallidos++;
+          continue; // Saltar esta prueba si el input no existe
+        }
+
+        const valorRelativo = parseFloat(inputElement.value);
+
+        if (isNaN(valorRelativo)) {
+          alert(`Por favor, ingrese un valor numérico para ${prueba.translate}.`);
+          inputElement.focus();
+          resultadosParciales.length = 0; // Resetear resultados si hay error
+          calculosFallidos = pruebas.length; // Marcar todos como fallidos
+          break; // Detener cálculo
+        }
+
+        // Llama a la función de cálculo (simulada/recreada)
+        // Pasamos el nombre específico (ej. 'female_fat'), el valor y si es inverso
+        const edadEquivalente = getAbsoluteResult(placeholderBoards, prueba.nameKey, valorRelativo, prueba.reverse);
+
+        console.log(`${prueba.translate} (Valor: ${valorRelativo}) -> Edad Equivalente: ${edadEquivalente}`);
+
+        if (edadEquivalente === 0 || edadEquivalente === 120) { // Suponiendo 0 o 120 como fallo/fuera de rango
+             console.warn(`Cálculo fallido o fuera de rango para ${prueba.translate}. Edad devuelta: ${edadEquivalente}`);
+             // Decidir si incluir este valor fallido en el promedio o no.
+             // Aquí lo excluimos incrementando calculosFallidos.
+             calculosFallidos++;
+             // O podrías asignarle la edad cronológica como valor neutral?
+             // resultadosParciales.push({ name: prueba.translate, value: edadCronologica });
+        } else {
+             resultadosParciales.push({ name: prueba.translate, value: edadEquivalente });
+        }
+      }
+
+      // 4. Calcular Promedio Final y Diferencial
+      if (calculosFallidos === pruebas.length) {
+          alert("No se pudo calcular la edad biofísica. Verifique los valores ingresados o los rangos de referencia.");
+          document.getElementById('edad-biofisica').value = "--";
+          document.getElementById('edad-diferencial').value = "--";
+          return;
+      }
+
+      const numeroValoresValidos = resultadosParciales.length;
+      if (numeroValoresValidos === 0) {
+           alert("No se obtuvieron resultados válidos para calcular el promedio.");
+           document.getElementById('edad-biofisica').value = "--";
+           document.getElementById('edad-diferencial').value = "--";
+           return;
+      }
+
+      const sumaEdadesEquivalentes = resultadosParciales.reduce((sum, res) => sum + res.value, 0);
+      const edadBiofisicaCalculada = Math.round(sumaEdadesEquivalentes / numeroValoresValidos); // Promedio solo de los válidos
+      const edadDiferencial = edadBiofisicaCalculada - edadCronologica;
+
+      // 5. Mostrar Resultados
+      document.getElementById('edad-biofisica').value = edadBiofisicaCalculada;
+      document.getElementById('edad-diferencial').value = `${edadDiferencial}${getSuffixForDifferential(edadDiferencial)}`; // Añadir " Más" o " Menos"
+
+      console.log("Resultados Parciales:", resultadosParciales);
+      console.log("Edad Biofísica Calculada:", edadBiofisicaCalculada);
+      console.log("Edad Diferencial:", edadDiferencial);
+    }
+
+    // --- Función Auxiliar para obtener nombre de prueba de grasa ---
+    function getFatName(genero, esDeportista) {
+        if (genero === 'femenino') {
+            return esDeportista ? 'sporty_female_fat' : 'female_fat';
+        } else if (genero === 'masculino') {
+            return esDeportista ? 'sporty_male_fat' : 'male_fat';
+        }
+        return 'female_fat'; // Default o manejar 'otro'
+    }
+
+     // --- Función Auxiliar para sufijo de edad diferencial ---
+     function getSuffixForDifferential(differential) {
+        if (differential === 0) return "";
+        return differential > 0 ? " Más" : " Menos";
+     }
+
+
+    // --- RECREACIÓN/SIMULACIÓN de getAbsoluteResult ---
+    // ¡¡¡ ESTA FUNCIÓN ES UNA APROXIMACIÓN !!!
+    function getAbsoluteResult(boardsData, testName, inputValue, isReverse = false) {
+      const boardRanges = boardsData[testName]; // Obtiene los rangos para esta prueba específica
+
+      if (!boardRanges || boardRanges.length === 0) {
+        console.error(`No se encontraron 'boards' de referencia para: ${testName}`);
+        return 0; // Indica fallo
+      }
+
+      // Encontrar el rango específico aplicable usando la simulación de Globals.getReverse
+      let applicableRange = null;
+      for (const rangeData of boardRanges) {
+          if (Globals.getReverse(rangeData, inputValue, isReverse)) { // Usamos la simulación
+              applicableRange = rangeData;
+              break;
+          }
+      }
+
+
+      if (!applicableRange) {
+        console.warn(`Valor ${inputValue} para '${testName}' fuera de los rangos definidos.`);
+        // Decidir qué hacer: devolver edad límite o 0/120?
+        // Devolver la edad límite del último/primer rango podría ser una opción.
+        // Por simplicidad, devolvemos 0 por ahora.
+        return 0; // Indica fallo o fuera de rango
+      }
+
+       console.log(`Aplicando rango para ${testName}:`, applicableRange);
+
+
+      // Extraer datos del rango aplicable
+      const measurementRange = applicableRange.range; // { min: X, max: Y }
+      const ageMin = applicableRange.age_min;
+      const ageMax = applicableRange.age_max;
+      const measurementIsInverse = applicableRange.inverse; // Si la medición es inversa (mejor valor es más bajo)
+
+
+      // Calcular pendiente (cambio de edad por unidad de medición)
+      const measurementLength = Math.abs(measurementRange.max - measurementRange.min);
+      const ageLength = Globals.getBoardSubtraction(applicableRange); // Diferencia de edad del rango
+
+      if (measurementLength === 0) {
+        console.error(`Error en board para ${testName}: Rango de medición tiene longitud cero.`);
+        return ageMin; // Devolver la edad mínima del rango si la longitud es 0
+      }
+
+      const slope = ageLength / measurementLength; // Cambio de edad por unidad de medición
+
+      // Interpolar para encontrar la edad
+      let calculatedAge;
+
+      // La interpolación depende de si la relación medición/edad es directa o inversa
+      // Y también de si el propio rango de medición está definido como inverso
+      // El parámetro 'isReverse' del React original (pasado a esta función) indica si la EDAD debe buscarse inversamente
+      // El 'applicableRange.inverse' indica si la MEDICIÓN es inversa.
+
+      // Caso 1: Relación directa (más medición = más edad) Y medición NO inversa
+      // O Relación inversa (más medición = menos edad) Y medición SÍ inversa (se cancelan)
+      if ((!isReverse && !measurementIsInverse) || (isReverse && measurementIsInverse)) {
+          // Interpolación lineal directa desde el mínimo del rango
+          const diffFromMinMeasurement = inputValue - measurementRange.min;
+          calculatedAge = ageMin + (diffFromMinMeasurement * slope);
+      }
+      // Caso 2: Relación directa (más medición = más edad) Y medición SÍ inversa
+      // O Relación inversa (más medición = menos edad) Y medición NO inversa (relación final inversa)
+      else {
+           // Interpolación lineal inversa desde el máximo del rango
+           const diffFromMaxMeasurement = measurementRange.max - inputValue;
+           calculatedAge = ageMin + (diffFromMaxMeasurement * slope); // Empezamos desde ageMin pero usamos la diferencia desde el max de medición
+           // O alternativamente: calculatedAge = ageMax - (diffFromMinMeasurement * slope);
+      }
+
+
+      // Asegurarse que la edad calculada esté dentro de los límites del rango de edad
+      calculatedAge = Math.max(ageMin, Math.min(calculatedAge, ageMax));
+
+      return Math.round(calculatedAge); // Devolver edad redondeada
+    }
+    // --- FIN getAbsoluteResult ---
+
+
+    // --- Función para Guardar Datos (Simulada) ---
+    function guardarDatosBiofisica() {
+        const patientId = currentPatientId || "desconocido";
+        const edadBioInput = document.getElementById('edad-biofisica');
+        const edadDifInput = document.getElementById('edad-diferencial');
+
+        if (!edadBioInput || !edadDifInput || edadBioInput.value === '--' || edadDifInput.value === '--') {
+            alert("Por favor, calcule la Edad Biofísica antes de guardar.");
+            return;
+        }
+
+        // Recolectar todos los datos del formulario
+        const datos = {
+            patientId: patientId,
+            genero: document.getElementById('genero')?.value,
+            esDeportista: document.getElementById('deportista')?.checked,
+            edadCronologica: document.getElementById('edad-cronologica')?.value,
+            porcentajeGrasa: document.getElementById('porcentaje-grasa')?.value,
+            imc: document.getElementById('imc')?.value,
+            reflejos: document.getElementById('reflejos')?.value,
+            acomodacion: document.getElementById('acomodacion')?.value,
+            balance: document.getElementById('balance')?.value,
+            hidratacion: document.getElementById('hidratacion')?.value,
+            sistolica: document.getElementById('sistolica')?.value,
+            diastolica: document.getElementById('diastolica')?.value,
+            // Resultados calculados
+            edadBiofisicaCalculada: edadBioInput.value,
+            edadDiferencialCalculada: edadDifInput.value,
+            // Podrías incluir las edades equivalentes individuales si las guardaste
+        };
+
+        console.log("Guardando datos (simulación):", datos);
+
+        // --- SIMULACIÓN DE LLAMADA A API ---
+        // fetch('/api/guardar-biofisica', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(datos)
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     console.log('Respuesta del servidor:', data);
+        //     alert('Datos guardados exitosamente.');
+        //     // Opcional: Redirigir o limpiar formulario
+        // })
+        // .catch(error => {
+        //     console.error('Error al guardar:', error);
+        //     alert('Error al guardar los datos.');
+        // });
+
+        alert(`Datos para paciente ${patientId} guardados (simulación).`);
+        // Opcional: redirigir a la página anterior o limpiar
+        // window.history.back();
+    }
+
+     // --- Scripts comunes Sidebar/Theme (si los necesitas aquí) ---
+     function toggleSubmenu() {
+       const submenu = document.getElementById('reportes-submenu');
+       if(submenu) submenu.classList.toggle('open');
+       // Añadir lógica de cierre al hacer clic fuera si es necesario
+     }
+     // ... (código de sidebar y theme toggle si aplica a esta página) ...
+
+  </script>
+</body>
+</html>

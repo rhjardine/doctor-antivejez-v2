@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Doctor Antivejez</title> <!-- Título específico -->
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Común y Específico -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+
+</head>
+<body>
+    <div class="app-container">
+        <!-- Placeholders para componentes comunes -->
+        <div id="sidebar-placeholder">
+            <!-- Sidebar HTML will be injected here by JS -->
+        </div>
+
+        <!-- Contenido Principal (Específico de esta página) -->
+        <div class="main-content" id="main-content-placeholder">
+            <div class="patient-header">
+                <div class="patient-avatar"><i class="fas fa-user"></i></div>
+                <div class="patient-info">
+                    <h2 class="patient-name" id="patient-name">Cargando...</h2>
+                    <div class="patient-details" id="patient-details">...</div>
+                </div>
+                <div class="health-metrics" id="health-metrics">
+                    <!-- Metrics loaded by JS -->
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-brain"></i> AI Longevity Assistant</h2>
+            </div>
+
+            <div class="assistant-container">
+                <div class="assistant-tabs" id="assistant-tabs">
+                    <!-- Tabs generadas por JS o estáticas si prefieres -->
+                    <div class="assistant-tab active" data-tab="chat"> <i class="fas fa-comments"></i> Conversational Assistant </div>
+                    <div class="assistant-tab" data-tab="documents"> <i class="fas fa-file-medical"></i> Document Analysis </div>
+                    <div class="assistant-tab" data-tab="knowledge"> <i class="fas fa-database"></i> Knowledge Base </div>
+                    <div class="assistant-tab" data-tab="analysis"> <i class="fas fa-chart-bar"></i> Analysis & Interpretation </div>
+                    <div class="assistant-tab" data-tab="recommendations"> <i class="fas fa-clipboard-check"></i> Recommendations </div>
+                    <div class="assistant-tab" data-tab="pathways"> <i class="fas fa-project-diagram"></i> Pathway Analysis </div>
+                </div>
+                <div class="assistant-content">
+                     <!-- Contenido de Tabs (JS manejará la visibilidad) -->
+                     <div class="tab-content" id="chat-tab" style="display: block;">
+                         <div class="chat-container">
+                             <div class="chat-message ai"> <div class="message-bubble"> <p>Hola. ¿En qué puedo ayudarte hoy?</p> </div> </div>
+                         </div>
+                         <div class="chat-input-container">
+                             <textarea class="chat-input" placeholder="Escribe tu pregunta..." id="chat-input" rows="1"></textarea>
+                             <div class="input-buttons-container">
+                                 <button class="voice-button" id="voice-button" title="Entrada de voz"><i class="fas fa-microphone"></i></button>
+                                 <button class="attach-button" id="attach-button" title="Adjuntar"><i class="fas fa-paperclip"></i></button>
+                             </div>
+                             <input type="file" id="file-input" class="file-input" accept=".pdf, image/*, .docx, .xlsx">
+                             <button class="send-button" id="send-button"><i class="fas fa-paper-plane"></i><span>Enviar</span></button>
+                         </div>
+                     </div>
+                     <div class="tab-content" id="documents-tab" style="display: none;">
+                          {/* ... Contenido de la pestaña de documentos ... */}
+                          <div class="document-tab">...</div>
+                     </div>
+                      {/* ... Otros placeholders de tabs ... */}
+                      <div class="tab-content" id="knowledge-tab" style="display: none;"><h3 class="tab-title">Base de Conocimiento</h3><p>...</p></div>
+                      <div class="tab-content" id="analysis-tab" style="display: none;"><h3 class="tab-title">Análisis</h3><p>...</p></div>
+                      <div class="tab-content" id="recommendations-tab" style="display: none;"><h3 class="tab-title">Recomendaciones</h3><p>...</p></div>
+                      <div class="tab-content" id="pathways-tab" style="display: none;"><h3 class="tab-title">Vías</h3><p>...</p></div>
+                </div>
+            </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End App Container -->
+
+    <!-- Elementos fuera del flujo principal -->
+    <div id="theme-toggle-placeholder"></div>
+    <div class="toast-container" id="toast-container"></div>
+    <div class="document-viewer-modal" id="document-viewer-modal">
+         {/* ... Estructura del modal ... */}
+    </div>
+
+    <!-- Scripts (Vendor/Libraries primero) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+
+    <!-- Scripts Modulares -->
+    <script src="js/modules/helpers.js"></script>
+    <script src="js/components/sidebar.js"></script>
+    <script src="js/components/themeToggle.js"></script>
+    <script src="js/layout.js"></script>    <!-- Renderiza el layout -->
+    <script src="js/main.js"></script>      <!-- Añade listeners globales -->
+    <script src="js/dashboard.js"></script> <!-- Lógica específica del Dashboard -->
+
+</body>
+</html>

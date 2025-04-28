@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis Longevity Platform (Simulación)</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        /* --- THEME & VARIABLES --- */
+        :root {
+            --font-family: 'Poppins', sans-serif;
+            --primary-color: #2c3e50; /* Azul marino oscuro */
+            --secondary-color: #1abc9c; /* Verde azulado (tipo teal) */
+            --accent-color: #3498db; /* Azul claro para énfasis */
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #34495e; /* Gris azulado */
+            --text-light: #7f8c8d;
+            --border-color: #eef2f7;
+            --shadow-color: rgba(44, 62, 80, 0.08);
+            --gradient-primary: linear-gradient(135deg, #3a5f8f, var(--primary-color));
+             --gradient-secondary: linear-gradient(135deg, #16a085, var(--secondary-color));
+
+            /* Status Colors */
+            --status-optimal: #2ecc71;
+            --status-caution: #f39c12;
+            --status-alert: #e74c3c;
+            --status-neutral: #95a5a6; /* Gris neutro */
+
+            --status-optimal-bg: rgba(46, 204, 113, 0.1);
+            --status-caution-bg: rgba(243, 156, 18, 0.1);
+            --status-alert-bg: rgba(231, 76, 60, 0.1);
+            --status-neutral-bg: rgba(149, 165, 166, 0.1);
+        }
+
+         /* --- DARK MODE VARIABLES (Optional) --- */
+         body.dark-mode {
+             --background-color: #1a1a2e;
+             --card-background: #1e1e3f;
+             --text-color: #e4e6eb;
+             --text-light: #b0b3b8;
+             --border-color: #2f3b52;
+             --shadow-color: rgba(0, 0, 0, 0.2);
+             --primary-color: #5c7eaf;
+             --secondary-color: #27d7b6;
+             --accent-color: #5fa8e3;
+         }
+
+
+        /* --- BASE & LAYOUT --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: 260px;
+            background: var(--card-background);
+            border-right: 1px solid var(--border-color);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            position: fixed; /* Fixed Sidebar */
+            height: 100%;
+            z-index: 100;
+        }
+        .sidebar-logo { text-align: center; margin-bottom: 40px; }
+        .sidebar-logo i { font-size: 2.5em; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; }
+        .sidebar-logo h1 { font-size: 1.4em; font-weight: 600; margin-top: 10px; color: var(--primary-color);}
+
+        .sidebar-nav ul { list-style: none; padding: 0; }
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .sidebar-nav li a i { width: 25px; text-align: center; margin-right: 15px; font-size: 1.1em; }
+        .sidebar-nav li a:hover { background-color: rgba(13, 110, 253, 0.05); color: var(--accent-color); }
+        .sidebar-nav li a.active { background: var(--gradient-primary); color: #fff; font-weight: 600; box-shadow: 0 4px 10px rgba(58, 95, 175, 0.3); }
+        .sidebar-nav li a.active i { color: #fff; }
+
+        .sidebar-footer { margin-top: auto; text-align: center; font-size: 0.8em; color: var(--text-light);}
+        .theme-toggle { cursor: pointer; margin-top: 15px; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px 40px;
+            margin-left: 260px; /* Offset for fixed sidebar */
+        }
+        .content-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-out;
+        }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-header h2 { font-size: 1.8em; font-weight: 600; color: var(--text-color); }
+        /* Add user profile icon/button here if needed */
+
+        /* --- CARD STYLING --- */
+        .card {
+            background-color: var(--card-background);
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .card-header { /* Optional sub-header within cards */
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); font-size: 1.1em; font-weight: 600; color: var(--primary-color);
+        }
+        .card-header i { margin-right: 5px; font-size: 1em; }
+
+        /* --- GRID LAYOUT FOR DASHBOARD/ANALYSIS --- */
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .grid-col-span-2 { grid-column: span 2; }
+
+        /* --- SPECIFIC COMPONENT STYLES --- */
+
+        /* Dashboard */
+        .metric-card { text-align: center; }
+        .metric-card .value { font-size: 2.5em; font-weight: 700; margin-bottom: 5px; color: var(--primary-color); }
+        .metric-card .value .unit { font-size: 0.5em; font-weight: 500; color: var(--text-light); margin-left: 3px; }
+        .metric-card .label { font-size: 1em; color: var(--text-light); }
+        .metric-card .status-indicator { margin-top: 10px; display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.85em; font-weight: 500; }
+        /* Status classes reused */
+        .status-optimal { background-color: var(--status-optimal-bg); color: var(--status-optimal); }
+        .status-caution { background-color: var(--status-caution-bg); color: var(--status-caution); }
+        .status-alert { background-color: var(--status-alert-bg); color: var(--status-alert); }
+
+
+        /* Data Upload */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .upload-area:hover { border-color: var(--accent-color); background-color: rgba(52, 152, 219, 0.05); }
+        .upload-area i { font-size: 3em; color: var(--accent-color); margin-bottom: 15px; }
+        .upload-area p { margin: 0; color: var(--text-light); }
+        .upload-status { margin-top: 15px; font-size: 0.9em; }
+
+        /* Analysis Results */
+        .chart-container { position: relative; min-height: 300px; margin-bottom: 20px; }
+        .report-placeholder { text-align: center; padding: 40px; color: var(--text-light); font-style: italic; }
+        /* Styles for heatmaps, PCA would need specific libraries or static images */
+        .heatmap-placeholder, .pca-placeholder { text-align: center; padding: 20px; border: 1px dashed var(--border-color); border-radius: 8px; color: var(--text-light); margin-top: 15px;}
+        .heatmap-placeholder i, .pca-placeholder i { font-size: 2em; margin-bottom: 10px; opacity: 0.5; }
+
+        /* Recommendations */
+        .recommendation-list ul { list-style: none; }
+        .recommendation-list li {
+            background-color: var(--background-color);
+            border-left: 5px solid var(--secondary-color);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 0 10px 10px 0;
+            display: flex; align-items: center; gap: 15px;
+            font-size: 0.95em;
+        }
+         .recommendation-list li i { color: var(--secondary-color); font-size: 1.3em; }
+
+        /* Gamification */
+        .achievements-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; /* For scrollbar */ }
+        .achievement-badge {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            min-width: 120px;
+             opacity: 0.6; /* Default inactive */
+             transition: opacity 0.3s ease;
+        }
+        .achievement-badge.unlocked { opacity: 1; border-left: 4px solid var(--status-optimal); }
+        .achievement-badge i { font-size: 2.5em; margin-bottom: 8px; color: var(--status-optimal); }
+        .achievement-badge p { font-size: 0.85em; margin: 0; font-weight: 500; }
+
+         /* Chatbot */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 101;
+        }
+        .chatbot-button {
+            background: var(--gradient-primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+            transition: transform 0.2s ease;
+        }
+         .chatbot-button:hover { transform: scale(1.1); }
+
+        .chatbot-window {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 100px; /* Above button */
+            right: 30px;
+            width: 350px;
+            height: 450px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.2);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+         .chatbot-header { background: var(--gradient-primary); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+         .chatbot-header h4 { font-size: 1.1em; margin: 0; font-weight: 600; }
+         .chatbot-header button { background: none; border: none; color: white; font-size: 1.2em; cursor: pointer; opacity: 0.8; }
+         .chatbot-header button:hover { opacity: 1; }
+
+         .chatbot-messages { flex-grow: 1; padding: 15px; overflow-y: auto; font-size: 0.9em; }
+         .chat-message { margin-bottom: 12px; max-width: 85%; padding: 10px 14px; border-radius: 15px; line-height: 1.4; }
+         .user-message { background-color: var(--accent-color); color: white; margin-left: auto; border-bottom-right-radius: 5px; }
+         .agent-message { background-color: #e9ecef; color: var(--text-color); margin-right: auto; border-bottom-left-radius: 5px; }
+         body.dark-mode .agent-message { background-color: #2f3b52;}
+
+         .chatbot-input { display: flex; border-top: 1px solid var(--border-color); padding: 10px;}
+         .chatbot-input input { flex-grow: 1; border: none; padding: 10px; font-size: 0.9em; background: transparent; color: var(--text-color); outline: none;}
+         .chatbot-input button { background: none; border: none; color: var(--primary-color); font-size: 1.3em; cursor: pointer; padding: 0 10px;}
+
+        /* --- Buttons --- */
+        .button {
+            display: inline-block;
+            background: var(--gradient-secondary);
+            color: #fff;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(22, 160, 133, 0.2);
+            text-align: center;
+        }
+        .button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(22, 160, 133, 0.3); }
+        .button:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
+        .button i { margin-right: 8px; }
+        .button-outline { background: transparent; border: 2px solid var(--secondary-color); color: var(--secondary-color); box-shadow: none;}
+         .button-outline:hover { background: rgba(22, 160, 133, 0.1); box-shadow: none; transform: none;}
+
+         /* --- Loading / Utility --- */
+        .loader { text-align: center; padding: 40px; color: var(--text-light); }
+        .loader .spinner { border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: var(--primary-color); border-radius: 50%; width: 35px; height: 35px; animation: spin 1s linear infinite; display: inline-block; margin-bottom: 10px;}
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .sidebar { width: 70px; padding: 30px 10px;}
+            .sidebar-logo h1, .sidebar-nav span { display: none; } /* Hide text, show icons */
+            .sidebar-nav li a { justify-content: center; }
+            .sidebar-nav li a i { margin-right: 0; }
+            .main-content { margin-left: 70px; padding: 20px;}
+            .grid-col-span-2 { grid-column: span 1; } /* Stack columns earlier */
+        }
+         @media (max-width: 768px) {
+            .sidebar { width: 100%; height: 60px; position: fixed; bottom: 0; left: 0; border-right: none; border-top: 1px solid var(--border-color); flex-direction: row; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 101;}
+            .sidebar-logo, .sidebar-footer { display: none; }
+            .sidebar-nav ul { display: flex; justify-content: space-around; width: 100%; }
+            .sidebar-nav li { flex-grow: 1; text-align: center; }
+            .sidebar-nav li a { padding: 10px 5px; margin-bottom: 0; justify-content: center;}
+            .main-content { margin-left: 0; padding: 20px 15px 80px 15px; /* Add padding bottom for nav */}
+            .page-header h2 { font-size: 1.5em; }
+             .grid-layout { grid-template-columns: 1fr; }
+             .chatbot-widget { bottom: 80px; } /* Adjust position above bottom nav */
+             .chatbot-window { width: calc(100% - 40px); right: 20px; bottom: 80px;}
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fas fa-dna"></i>
+                <h1>Aegis Longevity</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#data-upload" class="nav-link"><i class="fas fa-cloud-upload-alt"></i> <span>Cargar Datos</span></a></li>
+                    <li><a href="#analysis" class="nav-link"><i class="fas fa-chart-bar"></i> <span>Análisis</span></a></li>
+                    <li><a href="#recommendations" class="nav-link"><i class="fas fa-clipboard-list"></i> <span>Recomendaciones</span></a></li>
+                    <li><a href="#reports" class="nav-link"><i class="fas fa-file-pdf"></i> <span>Informes</span></a></li>
+                    <li><a href="#settings" class="nav-link"><i class="fas fa-cog"></i> <span>Ajustes</span></a></li>
+                </ul>
+            </nav>
+             <div class="sidebar-footer">
+                 <p>© 2024 Aegis Platform</p>
+                 <div class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Modo Oscuro</div>
+             </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="page-header"><h2>Dashboard Principal</h2> <!-- Add user icon here --></div>
+                <div class="grid-layout">
+                    <div class="card metric-card">
+                        <div class="card-header"><i class="fas fa-heartbeat"></i> Edad Biológica</div>
+                        <div class="value" id="db-bio-age">-- <span class="unit">años</span></div>
+                        <div class="status-indicator status-neutral" id="db-bio-age-status">Pendiente</div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="card-header"><i class="fas fa-running"></i> Actividad Física</div>
+                        <div class="value" id="db-activity">-- <span class="unit">pasos/día</span></div>
+                         <div class="status-indicator status-caution" id="db-activity-status">Mejorable</div>
+                    </div>
+                    <div class="card metric-card">
+                         <div class="card-header"><i class="fas fa-utensils"></i> Nutrición</div>
+                         <div class="value" id="db-nutrition">B <span class="unit">score</span></div>
+                         <div class="status-indicator status-optimal" id="db-nutrition-status">Óptimo</div>
+                    </div>
+                    <div class="card grid-col-span-2"> <!-- Longevity Markers Summary -->
+                        <div class="card-header"><i class="fas fa-shield-alt"></i> Resumen Marcadores Longevidad</div>
+                         <div class="chart-container" style="min-height: 250px;">
+                             <canvas id="longevityMarkersChart"></canvas>
+                             <div id="longevityLoader" class="loader hidden"><div class="spinner"></div></div>
+                         </div>
+                    </div>
+                    <div class="card"> <!-- Gamification / Achievements -->
+                        <div class="card-header"><i class="fas fa-trophy"></i> Logros Recientes</div>
+                        <div class="achievements-list" id="achievementsList">
+                            <div class="achievement-badge unlocked"><i class="fas fa-seedling"></i><p>Primer Análisis</p></div>
+                            <div class="achievement-badge"><i class="fas fa-bed"></i><p>Sueño Óptimo</p></div>
+                            <div class="achievement-badge"><i class="fas fa-fire"></i><p>Metabolismo Top</p></div>
+                            <div class="achievement-badge"><i class="fas fa-tint"></i><p>Hidratación Pro</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Upload Section -->
+            <section id="data-upload" class="content-section">
+                <div class="page-header"><h2>Cargar Datos</h2></div>
+                <div class="grid-layout">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-dna"></i> Datos Genómicos</div>
+                        <div class="upload-area" id="uploadGenomic">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Arrastra tu archivo (VCF, BAM, FASTQ) o haz clic para seleccionar.</p>
+                        </div>
+                         <input type="file" id="genomicFile" accept=".vcf,.bam,.fastq,.gz" style="display: none;">
+                        <div class="upload-status" id="genomicStatus">Estado: No cargado</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-flask"></i> Resultados Laboratorio</div>
+                         <div class="upload-area" id="uploadLabs">
+                            <i class="fas fa-file-pdf"></i>
+                            <p>Arrastra tu informe (PDF, CSV) o haz clic.</p>
+                        </div>
+                        <input type="file" id="labFile" accept=".pdf,.csv" style="display: none;">
+                        <div class="upload-status" id="labStatus">Estado: No cargado</div>
+                    </div>
+                     <div class="card">
+                        <div class="card-header"><i class="fas fa-watch"></i> Conectar Wearables</div>
+                        <button class="button"><i class="fab fa-google"></i> Google Fit</button>
+                        <button class="button" style="margin-top: 10px;"><i class="fab fa-apple"></i> Apple Health</button>
+                        <div class="upload-status" id="wearableStatus" style="margin-top: 15px;">Estado: No conectado</div>
+                    </div>
+                     <div class="card">
+                        <div class="card-header"><i class="fas fa-clipboard-list"></i> Cuestionarios</div>
+                        <button class="button"><i class="fas fa-pencil-alt"></i> Rellenar Cuestionario Estilo Vida</button>
+                         <div class="upload-status" id="questionnaireStatus" style="margin-top: 15px;">Estado: Pendiente</div>
+                    </div>
+                </div>
+                 <div class="card" style="margin-top: 25px;"> <!-- Security Note -->
+                     <p style="font-size: 0.9em; color: var(--text-light); text-align: center;"><i class="fas fa-lock"></i> Tus datos se procesan con cifrado AES-256 y cumpliendo normativas HIPAA/GDPR.</p>
+                 </div>
+            </section>
+
+            <!-- Analysis Section -->
+            <section id="analysis" class="content-section">
+                 <div class="page-header"><h2>Resultados del Análisis</h2><button class="button" id="runFullAnalysisBtn"><i class="fas fa-cogs"></i> Ejecutar Análisis Completo</button></div>
+                 <div id="analysisLoader" class="loader hidden"><div class="spinner"></div><p>Procesando datos multi-ómicos...</p></div>
+                 <div id="analysisResultsContent" class="hidden">
+                     <div class="grid-layout">
+                        <div class="card metric-card"> <!-- Biological Age -->
+                            <div class="card-header"><i class="fas fa-clock"></i> Edad Biológica (Epigenética)</div>
+                            <div class="value" id="analysis-bio-age">-- <span class="unit">años</span></div>
+                            <div class="status-indicator status-neutral" id="analysis-bio-age-status">Pendiente</div>
+                            <p style="font-size: 0.8em; margin-top: 5px;">Reloj: <span id="analysis-bio-age-clock">Horvath*</span></p>
+                        </div>
+                         <div class="card metric-card"> <!-- Longevity Score -->
+                            <div class="card-header"><i class="fas fa-shield-heart"></i> Score Longevidad</div>
+                            <div class="value" id="analysis-longevity-score">-- <span class="unit">/100</span></div>
+                            <div class="status-indicator status-neutral" id="analysis-longevity-status">Pendiente</div>
+                        </div>
+                         <div class="card grid-col-span-2"> <!-- Biomarker Overview Chart -->
+                            <div class="card-header"><i class="fas fa-sliders-h"></i> Vista General Biomarcadores</div>
+                            <div class="chart-container" style="min-height: 250px;"><canvas id="biomarkerOverviewChart"></canvas></div>
+                        </div>
+                        <div class="card grid-col-span-2"> <!-- Nutrigenomics Summary -->
+                             <div class="card-header"><i class="fas fa-apple-alt"></i> Insights Nutrigenómicos</div>
+                             <div id="nutrigenomicsSummary">
+                                 <p class="report-placeholder">Análisis nutrigenómico aparecerá aquí (ej: sensibilidad cafeína, metabolismo grasas, etc.).</p>
+                             </div>
+                         </div>
+                         <div class="card grid-col-span-2"> <!-- Complex Visualizations Placeholders -->
+                              <div class="card-header"><i class="fas fa-project-diagram"></i> Visualizaciones Avanzadas</div>
+                              <div class="grid-layout" style="gap: 15px;">
+                                  <div class="heatmap-placeholder"><i class="fas fa-th"></i><p>Heatmap Interacciones<br>(Gen-Metabolito)</p></div>
+                                  <div class="pca-placeholder"><i class="fas fa-braille"></i><p>Análisis Componentes Principales (PCA)</p></div>
+                              </div>
+                         </div>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- Recommendations Section -->
+            <section id="recommendations" class="content-section">
+                 <div class="page-header"><h2>Plan de Acción Personalizado</h2> <button class="button button-outline"><i class="fas fa-sliders-h"></i> Ajustar Preferencias</button></div>
+                 <div id="recommendationsLoader" class="loader hidden"><div class="spinner"></div><p>Generando recomendaciones...</p></div>
+                 <div id="recommendationsContent" class="hidden">
+                     <div class="grid-layout">
+                         <div class="card">
+                            <div class="card-header"><i class="fas fa-utensils"></i> Nutrición</div>
+                            <div class="recommendation-list" id="nutritionRecs"><ul><li>Recomendaciones dietéticas personalizadas basadas en tu genómica y metabolómica aparecerán aquí.</li></ul></div>
+                         </div>
+                          <div class="card">
+                            <div class="card-header"><i class="fas fa-dumbbell"></i> Ejercicio</div>
+                            <div class="recommendation-list" id="exerciseRecs"><ul><li>Sugerencias de actividad física optimizadas para tu perfil.</li></ul></div>
+                         </div>
+                          <div class="card">
+                            <div class="card-header"><i class="fas fa-pills"></i> Suplementación</div>
+                             <div class="recommendation-list" id="supplementRecs"><ul><li>Posibles suplementos basados en deficiencias detectadas o soporte genético.</li></ul></div>
+                         </div>
+                          <div class="card">
+                            <div class="card-header"><i class="fas fa-brain"></i> Bienestar Mental</div>
+                            <div class="recommendation-list" id="wellnessRecs"><ul><li>Estrategias para manejo del estrés y optimización del sueño.</li></ul></div>
+                         </div>
+                     </div>
+                     <!-- AR Placeholder -->
+                     <div class="card" style="margin-top: 25px; text-align: center; background-color: var(--background-color);">
+                         <p style="color: var(--text-light);"><i class="fas fa-cube"></i> Próximamente: Visualización 3D AR de tus rutas metabólicas.</p>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="page-header"><h2>Descargar Informes</h2></div>
+                <div class="card">
+                    <p style="color: var(--text-light); margin-bottom: 20px;">Selecciona y descarga informes detallados basados en tu último análisis.</p>
+                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                         <button class="button"><i class="fas fa-download"></i> Informe Genómico Completo</button>
+                         <button class="button"><i class="fas fa-download"></i> Informe Nutrigenómico</button>
+                         <button class="button"><i class="fas fa-download"></i> Informe Edad Biológica Detallado</button>
+                         <button class="button button-outline"><i class="fas fa-history"></i> Ver Historial de Informes</button>
+                     </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+             <section id="settings" class="content-section">
+                 <div class="page-header"><h2>Ajustes y Preferencias</h2></div>
+                  <div class="grid-layout">
+                     <div class="card">
+                         <div class="card-header"><i class="fas fa-user-circle"></i> Perfil</div>
+                         <p>Actualizar información personal, objetivos de salud.</p>
+                         <button class="button button-outline">Editar Perfil</button>
+                     </div>
+                      <div class="card">
+                         <div class="card-header"><i class="fas fa-shield-alt"></i> Seguridad y Privacidad</div>
+                         <p>Gestionar contraseña, autenticación de dos factores.</p>
+                          <button class="button button-outline">Ajustes Seguridad</button>
+                     </div>
+                     <div class="card">
+                         <div class="card-header"><i class="fas fa-handshake"></i> Consentimientos</div>
+                         <p>Gestionar permisos para uso de datos en investigación anonimizada.</p>
+                          <button class="button button-outline">Gestionar Consentimientos</button>
+                     </div>
+                     <div class="card">
+                         <div class="card-header"><i class="fas fa-language"></i> Idioma y Apariencia</div>
+                          <p>Seleccionar idioma, activar/desactivar modo oscuro.</p>
+                          <button class="button button-outline theme-toggle"><i class="fas fa-adjust"></i> Cambiar Tema</button> <!-- Reusing theme toggle class -->
+                     </div>
+                  </div>
+            </section>
+
+        </main>
+
+        <!-- Chatbot Widget -->
+        <div class="chatbot-widget">
+            <button class="chatbot-button" id="chatbotToggleBtn">
+                <i class="fas fa-comment-dots"></i>
+            </button>
+            <div class="chatbot-window hidden" id="chatbotWindow">
+                <div class="chatbot-header">
+                    <h4>Asistente IA</h4>
+                    <button id="closeChatbotBtn"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="chatbot-messages" id="chatbotMessages">
+                     <div class="chat-message agent-message">¡Hola! Soy tu asistente Aegis. Pregúntame sobre tus resultados o recomendaciones.</div>
+                </div>
+                <div class="chatbot-input">
+                    <input type="text" id="chatbotInput" placeholder="Escribe tu mensaje...">
+                    <button id="chatbotSendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Globals & State ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const themeToggleBtns = document.querySelectorAll('.theme-toggle');
+            const runFullAnalysisBtn = document.getElementById('runFullAnalysisBtn');
+            const analysisLoader = document.getElementById('analysisLoader');
+            const analysisResultsContent = document.getElementById('analysisResultsContent');
+            const recommendationsLoader = document.getElementById('recommendationsLoader');
+            const recommendationsContent = document.getElementById('recommendationsContent');
+            const chatbotToggleBtn = document.getElementById('chatbotToggleBtn');
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const closeChatbotBtn = document.getElementById('closeChatbotBtn');
+            const chatbotMessages = document.getElementById('chatbotMessages');
+            const chatbotInput = document.getElementById('chatbotInput');
+            const chatbotSendBtn = document.getElementById('chatbotSendBtn');
+
+            let currentSection = 'dashboard'; // Default section
+            let biologicalAgeChart = null; // To store chart instance
+            let longevityMarkersChart = null;
+
+            // --- Navigation ---
+            function setActiveSection(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+                });
+                currentSection = targetId;
+                 // Lazy load charts if needed
+                 if (targetId === 'dashboard' && !longevityMarkersChart) {
+                    initLongevityMarkersChart();
+                 }
+                 if (targetId === 'analysis' && !biologicalAgeChart) {
+                     initBiologicalAgeChart(); // Initialize analysis charts when section is shown
+                 }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    setActiveSection(targetId);
+                     // Special case for small screens where sidebar might overlay content
+                     if (window.innerWidth <= 768) {
+                         // Optional: scroll to top of content after nav change on mobile
+                         document.querySelector('.main-content').scrollTo(0, 0);
+                     }
+                });
+            });
+
+            // --- Theme Toggle ---
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                themeToggleBtns.forEach(btn => {
+                   btn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i> Modo Claro' : '<i class="fas fa-moon"></i> Modo Oscuro';
+                    // Adjust icon only if sidebar is collapsed
+                    if (window.innerWidth <= 992) {
+                         btn.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                    }
+                });
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light'); // Persist theme
+            }
+
+             themeToggleBtns.forEach(btn => btn.addEventListener('click', toggleTheme));
+
+            // Load persisted theme
+            if (localStorage.getItem('theme') === 'dark') {
+                toggleTheme(); // Apply dark mode if saved
+            }
+
+
+            // --- Data Upload Simulation ---
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            uploadAreas.forEach(area => {
+                const inputId = area.id.replace('upload', '').toLowerCase() + 'File';
+                const statusId = area.id.replace('upload', '').toLowerCase() + 'Status';
+                const fileInput = document.getElementById(inputId);
+                const statusEl = document.getElementById(statusId);
+
+                area.addEventListener('click', () => fileInput.click());
+
+                 fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        statusEl.textContent = 'Estado: Procesando...';
+                        statusEl.style.color = 'var(--status-neutral)';
+                        // Simulate upload/processing
+                        setTimeout(() => {
+                            statusEl.textContent = `Estado: Cargado (${e.target.files[0].name})`;
+                             statusEl.style.color = 'var(--status-optimal)';
+                        }, 1500);
+                    }
+                });
+
+                // Basic drag & drop simulation (visual only)
+                 area.addEventListener('dragover', (e) => { e.preventDefault(); area.style.borderColor = 'var(--accent-color)';});
+                 area.addEventListener('dragleave', () => { area.style.borderColor = 'var(--border-color)'; });
+                 area.addEventListener('drop', (e) => {
+                     e.preventDefault();
+                     area.style.borderColor = 'var(--border-color)';
+                     if (e.dataTransfer.files.length > 0) {
+                         statusEl.textContent = 'Estado: Procesando...';
+                         statusEl.style.color = 'var(--status-neutral)';
+                         setTimeout(() => {
+                            statusEl.textContent = `Estado: Cargado (${e.dataTransfer.files[0].name})`;
+                             statusEl.style.color = 'var(--status-optimal)';
+                         }, 1500);
+                     }
+                 });
+            });
+
+            // --- Analysis Simulation ---
+            runFullAnalysisBtn.addEventListener('click', () => {
+                analysisLoader.classList.remove('hidden');
+                analysisResultsContent.classList.add('hidden');
+                recommendationsLoader.classList.remove('hidden'); // Show loader in recs too
+                recommendationsContent.classList.add('hidden');
+
+                // Simulate analysis time
+                setTimeout(() => {
+                    // Generate Fake Data
+                    const bioAgeData = generateFakeBioAgeData();
+                    const longevityScore = (Math.random() * 30 + 65).toFixed(0); // Score 65-95
+                    const biomarkerData = generateFakeBiomarkerData();
+                    const nutrigenomicsText = generateFakeNutrigenomics();
+                    const recommendationsData = generateFakeRecommendations(bioAgeData.status);
+
+                    // Update Analysis UI
+                     document.getElementById('analysis-bio-age').innerHTML = `${bioAgeData.age}<span class="unit">años</span>`;
+                     const bioAgeStatusEl = document.getElementById('analysis-bio-age-status');
+                     bioAgeStatusEl.textContent = bioAgeData.statusText;
+                     bioAgeStatusEl.className = `status-indicator status-${bioAgeData.status}`;
+                     document.getElementById('analysis-bio-age-clock').textContent = bioAgeData.clock;
+
+                     document.getElementById('analysis-longevity-score').innerHTML = `${longevityScore}<span class="unit">/100</span>`;
+                      const longevityStatusEl = document.getElementById('analysis-longevity-status');
+                     let longevStatus = 'neutral';
+                     let longevText = 'Promedio';
+                     if(longevityScore > 85) { longevStatus = 'optimal'; longevText = 'Excelente';}
+                     else if (longevityScore < 70) { longevStatus = 'caution'; longevText = 'Mejorable';}
+                     longevityStatusEl.textContent = longevText;
+                     longevityStatusEl.className = `status-indicator status-${longevStatus}`;
+
+                     updateBiomarkerChart(biomarkerData); // Update chart
+                     document.getElementById('nutrigenomicsSummary').innerHTML = `<p>${nutrigenomicsText}</p>`; // Update text
+
+                     analysisLoader.classList.add('hidden');
+                     analysisResultsContent.classList.remove('hidden');
+
+                     // Update Recommendations UI
+                     updateRecommendationsUI(recommendationsData);
+                     recommendationsLoader.classList.add('hidden');
+                     recommendationsContent.classList.remove('hidden');
+
+                      // Update Dashboard Widgets (Optional)
+                     document.getElementById('db-bio-age').innerHTML = `${bioAgeData.age}<span class="unit">años</span>`;
+                     document.getElementById('db-bio-age-status').textContent = bioAgeData.statusText;
+                     document.getElementById('db-bio-age-status').className = `status-indicator status-${bioAgeData.status}`;
+                     unlockAchievement('Primer Análisis'); // Gamification
+
+
+                }, 3000); // 3 second simulation
+            });
+
+             // --- Chart Initialization & Update ---
+             function initLongevityMarkersChart() {
+                  const ctx = document.getElementById('longevityMarkersChart').getContext('2d');
+                  longevityMarkersChart = new Chart(ctx, {
+                     type: 'doughnut',
+                     data: {
+                         labels: ['Inflamación', 'Estrés Oxidativo', 'Salud Metabólica', 'Reparación ADN'],
+                         datasets: [{
+                             label: 'Nivel Marcadores Longevidad',
+                             data: [65, 75, 80, 70], // Placeholder data (0-100 scale)
+                             backgroundColor: [
+                                 'rgba(255, 159, 64, 0.7)', // Orange
+                                 'rgba(75, 192, 192, 0.7)', // Teal
+                                 'rgba(54, 162, 235, 0.7)', // Blue
+                                 'rgba(153, 102, 255, 0.7)' // Purple
+                             ],
+                             borderColor: var(--card-background),
+                             borderWidth: 2,
+                             hoverOffset: 4
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                             legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                             title: { display: true, text: 'Resumen Marcadores Clave (0-100 Óptimo)' }
+                         }
+                     }
+                 });
+             }
+
+            function initBiologicalAgeChart() {
+                const ctx = document.getElementById('biomarkerOverviewChart')?.getContext('2d'); // Check if canvas exists
+                if (!ctx) return; // Don't initialize if not in DOM
+                 biologicalAgeChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Metabolismo Glucosa', 'Inflamación Crónica', 'Lípidos', 'Función Hepática', 'Función Renal', 'Estrés Oxidativo'],
+                        datasets: [{
+                            label: 'Perfil Biomarcadores (vs. Óptimo)',
+                             data: [70, 60, 85, 90, 75, 65], // Placeholder 0-100 scale (100=optimal)
+                             fill: true,
+                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                             borderColor: 'rgb(54, 162, 235)',
+                             pointBackgroundColor: 'rgb(54, 162, 235)',
+                             pointBorderColor: '#fff',
+                             pointHoverBackgroundColor: '#fff',
+                             pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             r: {
+                                 angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                 grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                 pointLabels: { font: { size: 11 } },
+                                 suggestedMin: 0,
+                                 suggestedMax: 100
+                             }
+                         },
+                         plugins: {
+                            legend: { display: false }
+                         }
+                    }
+                });
+            }
+
+             function updateBiomarkerChart(biomarkerData) {
+                 if (!biologicalAgeChart) initBiologicalAgeChart(); // Ensure chart exists
+                 // Map your fake biomarker data to the chart labels if needed
+                 // For simplicity, just updating with random-ish data here
+                 biologicalAgeChart.data.datasets[0].data = [
+                     Math.random() * 40 + 60, // Glucose ~60-100
+                     Math.random() * 40 + 50, // Inflammation ~50-90
+                     Math.random() * 30 + 70, // Lipids ~70-100
+                     Math.random() * 20 + 80, // Liver ~80-100
+                     Math.random() * 30 + 65, // Kidney ~65-95
+                     Math.random() * 40 + 55, // Oxidative Stress ~55-95
+                 ];
+                 biologicalAgeChart.update();
+             }
+
+            // --- Recommendation UI Update ---
+             function updateRecommendationsUI(recommendations) {
+                 const map = {
+                     nutrition: document.getElementById('nutritionRecs')?.querySelector('ul'),
+                     exercise: document.getElementById('exerciseRecs')?.querySelector('ul'),
+                     supplement: document.getElementById('supplementRecs')?.querySelector('ul'),
+                     wellness: document.getElementById('wellnessRecs')?.querySelector('ul')
+                 };
+                 // Clear previous
+                 Object.values(map).forEach(ul => { if(ul) ul.innerHTML = '';});
+
+                 recommendations.forEach(rec => {
+                     const li = document.createElement('li');
+                     const iconClass = getRecommendationIcon(rec.category);
+                     li.innerHTML = `<i class="fas ${iconClass}"></i> <span>${rec.text}</span>`;
+                     if (map[rec.category]) {
+                         map[rec.category].appendChild(li);
+                     } else { // Fallback if category mismatch
+                         map.wellness?.appendChild(li);
+                     }
+                 });
+                  // Add placeholders if a category is empty
+                  Object.values(map).forEach(ul => {
+                      if(ul && ul.children.length === 0) {
+                         ul.innerHTML = '<li style="background: transparent; border: none; color: var(--text-light); font-style: italic;">No hay recomendaciones específicas en esta categoría por ahora.</li>';
+                      }
+                  });
+             }
+             function getRecommendationIcon(category) {
+                 switch(category) {
+                     case 'nutrition': return 'fa-carrot';
+                     case 'exercise': return 'fa-person-running';
+                     case 'supplement': return 'fa-pills';
+                     case 'wellness': return 'fa-spa';
+                     default: return 'fa-check';
+                 }
+             }
+
+             // --- Chatbot ---
+             chatbotToggleBtn.addEventListener('click', () => {
+                chatbotWindow.classList.toggle('hidden');
+                // Toggle icon (optional)
+                chatbotToggleBtn.innerHTML = chatbotWindow.classList.contains('hidden') ? '<i class="fas fa-comment-dots"></i>' : '<i class="fas fa-times"></i>';
+            });
+             closeChatbotBtn.addEventListener('click', () => chatbotWindow.classList.add('hidden'));
+             chatbotSendBtn.addEventListener('click', handleChatSend);
+             chatbotInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleChatSend();
+            });
+
+            function handleChatSend() {
+                 const message = chatbotInput.value.trim();
+                 if (!message) return;
+                 appendChatMessage(message, 'user');
+                 chatbotInput.value = '';
+                 // Simulate agent response
+                 setTimeout(() => {
+                     appendChatMessage(generateFakeChatResponse(message), 'agent');
+                 }, 1000);
+            }
+
+            function appendChatMessage(text, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.classList.add('chat-message', `${sender}-message`);
+                msgDiv.textContent = text;
+                chatbotMessages.appendChild(msgDiv);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // Scroll down
+            }
+
+            // --- Gamification ---
+             function unlockAchievement(name) {
+                const badges = document.querySelectorAll('.achievement-badge');
+                badges.forEach(badge => {
+                    if (badge.querySelector('p').textContent === name) {
+                         badge.classList.add('unlocked');
+                    }
+                });
+            }
+
+
+            // --- Fake Data Generation ---
+            function generateFakeBioAgeData() {
+                 const chronoAge = parseFloat(document.getElementById('chronoAgeInput')?.value || 50);
+                 const randomFactor = (Math.random() - 0.5) * 15; // +/- 7.5 years
+                 const age = Math.max(18, Math.min(100, Math.round(chronoAge + randomFactor)));
+                 const diff = age - chronoAge;
+                 let status = 'neutral';
+                 let statusText = 'Normal';
+                 if (diff <= -5) { status = 'optimal'; statusText = 'Óptima'; }
+                 else if (diff >= 5) { status = 'alert'; statusText = 'Elevada'; }
+                 else if (diff > 2) { status = 'caution'; statusText = 'Moderada'; }
+                 return { age, status, statusText, clock: Math.random() > 0.5 ? 'PhenoAge*' : 'Horvath*' };
+            }
+
+             function generateFakeBiomarkerData() { /* Returns data for radar chart */ return []; /* Handled in updateBiomarkerChart */ }
+             function generateFakeNutrigenomics() { return "Análisis inicial sugiere metabolismo normal de cafeína pero respuesta elevada a grasas saturadas. Se recomienda moderar su consumo. Predisposición a necesitar niveles más altos de Folato (gen MTHFR C677T heterocigoto detectado*). (*Simulado)"; }
+            function generateFakeRecommendations(status) {
+                 const recs = [];
+                 if (status === 'optimal') recs.push({ category: 'wellness', text: '¡Sigue así! Mantén tus hábitos saludables.'});
+                 recs.push({ category: 'nutrition', text: 'Asegura consumo adecuado de Omega-3 (pescado azul, nueces).' });
+                 recs.push({ category: 'exercise', text: 'Incorpora 2 sesiones de fuerza semanales si aún no lo haces.' });
+                 if (status === 'alert' || status === 'caution') {
+                     recs.push({ category: 'wellness', text: 'Prioriza técnicas de manejo de estrés (meditación, mindfulness).' });
+                     recs.push({ category: 'nutrition', text: 'Reduce consumo de alimentos procesados y azúcares añadidos.' });
+                     recs.push({ category: 'supplement', text: 'Consulta con tu médico sobre suplementación con Vitamina D y Magnesio.' });
+                 }
+                 recs.push({ category: 'wellness', text: 'Optimiza tu horario de sueño para 7-8 horas consistentes.' });
+                 return recs;
+            }
+            function generateFakeChatResponse(userInput) {
+                 const lowerInput = userInput.toLowerCase();
+                 if (lowerInput.includes("edad biológica")) return `Tu última edad biológica estimada es ${document.getElementById('analysis-bio-age')?.textContent || '-- años'}. Se basa en análisis epigenéticos y otros biomarcadores.`;
+                 if (lowerInput.includes("mejorar") || lowerInput.includes("recomendación")) return "Claro, basándome en tus datos, sugiero enfocarte en [Área Simulada, ej: reducir inflamación con dieta mediterránea y mejorar calidad del sueño]. ¿Quieres detalles?";
+                 if (lowerInput.includes("gen mthfr")) return "Detecté una variante heterocigota en MTHFR (C677T)*. Esto puede influir en el metabolismo del folato. Considera alimentos ricos en folato natural y consulta a tu médico sobre posible suplementación con metilfolato. (*Simulado)";
+                 return "Entendido. Estoy procesando tu consulta. ¿Hay algo más en lo que pueda ayudarte mientras tanto?";
+            }
+
+            // --- Init ---
+            setActiveSection(currentSection); // Show default section
+            // Optionally init charts visible on dashboard immediately
+            initLongevityMarkersChart();
+
+        });
+    </script>
+
+</body>
+</html>

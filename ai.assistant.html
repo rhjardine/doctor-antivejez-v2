@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente IA - Dashboard Médico</title>
+  
+  <!-- Enlazar CSS personalizado -->
+  <link rel="stylesheet" href="css/ai_assistant.css">
+  <!-- Íconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <img src="assets/logo.png" alt="Logo Doctor Antivejez" class="logo">
+    <input type="text" placeholder="Buscar paciente o historia...">
+    <div class="icons">
+      <i class="fas fa-bell" onclick="alert('Notificaciones')"></i>
+      <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+  </header>
+  
+  <!-- Contenedor principal con Sidebar y contenido principal -->
+  <div class="container">
+    <!-- Sidebar (se mantiene el estilo existente) -->
+    <div class="sidebar">
+      <div class="sidebar-item active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></div>
+      <div class="sidebar-item" onclick="window.location.href='historias.html'"><i class="fas fa-book-medical"></i><span>Historias</span></div>
+      <div class="sidebar-item"><i class="fas fa-user-md"></i><span>Profesionales</span></div>
+      <div class="sidebar-item"><i class="fas fa-chart-pie"></i><span>Reportes</span></div>
+      <div class="sidebar-item"><i class="fas fa-cog"></i><span>Configuración</span></div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+      <!-- Tarjeta para el Asistente IA -->
+      <div class="card assistant-card">
+        <h2>Asistente IA Clínico</h2>
+        <p class="subtitle">Pregunta sobre datos clínicos, informes, predicción de riesgos y más</p>
+        <div id="chat-window" class="chat-window">
+          <!-- Aquí se mostrarán los mensajes del chat -->
+        </div>
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="user-input" placeholder="Escribe tu consulta aquí..." required>
+          <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enlazar archivo JS personalizado -->
+  <script src="js/ai_assistant.js"></script>
+</body>
+</html>

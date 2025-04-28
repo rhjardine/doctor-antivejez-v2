@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI - Plan de Tratamiento y Nutrición</title>
+  <!-- Estilos principales (puedes reutilizar css/styles.css o crear uno nuevo) -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- FontAwesome para íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+      <h1>AI - Plan de Tratamiento</h1>
+    </div>
+    <!-- Botón modo oscuro -->
+    <div class="icons">
+      <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-content">
+      <!-- Tarjeta principal de la herramienta de IA -->
+      <div class="card" style="margin-top: 1rem;">
+        <h3 style="margin-bottom: 0.5rem; color: #293B64;">
+          <i class="fas fa-robot" style="color: #23BCEF;"></i>
+          Asistente de IA para Tratamiento y Nutrición
+        </h3>
+        <p style="margin-bottom: 1rem;">
+          Proporcione los datos relevantes del paciente y la IA generará sugerencias de planes de tratamiento y alimentación personalizados.
+        </p>
+
+        <!-- Formulario de datos relevantes -->
+        <form id="ai-form" class="form-grid" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label for="objetivo">Objetivo Principal</label>
+            <input type="text" id="objetivo" placeholder="p.ej. Pérdida de peso, control de diabetes...">
+          </div>
+          <div class="form-group">
+            <label for="estiloVida">Estilo de Vida / Hábitos</label>
+            <textarea id="estiloVida" placeholder="Ejercicio, nivel de estrés, horas de sueño..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="alergias">Alergias o Restricciones</label>
+            <input type="text" id="alergias" placeholder="p.ej. Intolerancia a la lactosa, alergia al gluten...">
+          </div>
+          <div class="form-group">
+            <label for="otrosDatos">Otros Datos Clínicos</label>
+            <textarea id="otrosDatos" placeholder="Presión arterial, niveles de glucosa, etc."></textarea>
+          </div>
+        </form>
+
+        <!-- Botón para generar plan con IA -->
+        <div class="form-buttons center">
+          <button type="button" onclick="generarPlanIA()">Generar Plan con IA</button>
+        </div>
+      </div>
+
+      <!-- Sección de Resultados / Respuesta de la IA -->
+      <div class="card" id="ia-results" style="display: none; margin-top: 1rem;">
+        <h3 style="color: #293B64;">
+          <i class="fas fa-file-medical-alt" style="color: #23BCEF;"></i>
+          Plan Personalizado
+        </h3>
+        <div id="ia-plan-content" style="margin-top: 1rem; color: #293B64;">
+          <!-- Aquí se mostrará la respuesta generada por la IA -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script principal -->
+  <script>
+    // Modo oscuro
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Función para generar plan con IA (simulada)
+    function generarPlanIA() {
+      const objetivo = document.getElementById('objetivo').value.trim();
+      const estiloVida = document.getElementById('estiloVida').value.trim();
+      const alergias = document.getElementById('alergias').value.trim();
+      const otrosDatos = document.getElementById('otrosDatos').value.trim();
+
+      // Simulación de una respuesta generada
+      let respuesta = `<p><strong>Objetivo Principal:</strong> ${objetivo || 'No especificado'}</p>`;
+      respuesta += `<p><strong>Estilo de Vida / Hábitos:</strong> ${estiloVida || 'No especificado'}</p>`;
+      respuesta += `<p><strong>Alergias/Restricciones:</strong> ${alergias || 'Ninguna'}</p>`;
+      respuesta += `<p><strong>Datos Clínicos Adicionales:</strong> ${otrosDatos || 'No especificado'}</p>`;
+
+      respuesta += `
+        <h4 style="margin-top: 1rem; color: #293B64;">Sugerencias de Tratamiento</h4>
+        <ul>
+          <li>Plan de actividad física: 3-5 sesiones semanales (ej. caminar 30 min diarios)</li>
+          <li>Suplementos recomendados: Omega 3, Vitamina D, complejo B</li>
+          <li>Terapias complementarias: Manejo del estrés (yoga/meditación)</li>
+        </ul>
+        <h4 style="margin-top: 1rem; color: #293B64;">Plan Nutricional</h4>
+        <ul>
+          <li>Dieta mediterránea con énfasis en vegetales, frutas y proteínas magras</li>
+          <li>Evitar alimentos procesados y azúcares refinados</li>
+          <li>Ingesta hídrica adecuada (2-3 L de agua al día)</li>
+        </ul>
+        <p style="margin-top: 1rem;">
+          <em>Nota: Estas recomendaciones son generadas de forma automatizada. 
+          Corrobore con su criterio médico y los resultados de laboratorio del paciente.</em>
+        </p>
+      `;
+
+      // Mostrar la sección de resultados
+      document.getElementById('ia-plan-content').innerHTML = respuesta;
+      document.getElementById('ia-results').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

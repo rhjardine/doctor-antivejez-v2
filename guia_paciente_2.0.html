@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Paciente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .item {
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        input[type="text"] {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 5px;
+            margin-left: 5px;
+            border-radius: 3px;
+        }
+        .add-button {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: #ccc;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .pencil {
+            background-color: #ffcc00;
+        }
+        .trash {
+            background-color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guía del Paciente</h1>
+
+    <!-- FASE DE REMOCIÓN -->
+    <div class="section">
+        <h2>FASE DE REMOCIÓN</h2>
+        <div class="item">
+            <input type="checkbox" name="cucharadas"> Cucharadas al acostarse (1 sola vez)
+            <input type="text" placeholder="Cantidad">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="detox"> Detoxificación Alcalina vegetariana a base de ensaladas, frutas, semillas y cereales y granos con aceite de oliva por
+            <input type="text" placeholder="semana(s)"> y luego
+            <input type="text" placeholder="acción adicional">
+        </div>
+        <div class="item">
+            <label>Categorías:</label><br>
+            <input type="checkbox" name="nino"> Niño<br>
+            <input type="checkbox" name="antienvejecimiento"> Antienvejecimiento<br>
+            <input type="checkbox" name="metabolica"> Metabólica<br>
+            <input type="checkbox" name="citostatica"> Citostática<br>
+            <input type="checkbox" name="renal"> Renal
+        </div>
+        <div class="item">
+            <input type="checkbox" name="noni_aloe"> Noni/Aloe Vera
+            <input type="text" placeholder="tacita 30 minutos antes de">
+            <input type="text" placeholder="Frascos">
+        </div>
+    </div>
+
+    <!-- FASE DE REVITALIZACIÓN -->
+    <div class="section">
+        <h2>FASE DE REVITALIZACIÓN</h2>
+        <div class="item">
+            <input type="checkbox" name="complejo_b"> Complejo B:
+            <input type="text" placeholder="cc+">
+            <input type="text" placeholder="cc de">
+            <input type="text" placeholder="intramuscular">
+            <input type="text" placeholder="veces por semana por">
+            <input type="text" placeholder="dosis">
+        </div>
+        <div class="item">
+            <h3>Activador Metabólico</h3>
+            <div>
+                <input type="checkbox" name="bioterapico"> Bioterápico
+                <input type="text" placeholder="gotas">
+                <input type="text" placeholder="veces al día debajo de la lengua 30 minutos antes de cada">
+                <input type="checkbox" name="emergencia_bioterapico"> o cada 15 minutos por una hora en caso de emergencia o crisis
+            </div>
+            <div>
+                <input type="checkbox" name="flores_bach"> Flores de Bach
+                <input type="text" placeholder="gotas">
+                <input type="text" placeholder="veces al día debajo de la lengua 30 minutos antes de cada">
+                <input type="checkbox" name="emergencia_bach"> o cada 15 minutos por una hora en caso de emergencia o crisis
+            </div>
+        </div>
+    </div>
+
+    <!-- Nutracéuticos -->
+    <div class="section">
+        <h2>Nutracéuticos</h2>
+        <h3>Nutracéuticos Primarios</h3>
+        <div class="item">
+            <label>Dosis</label>
+            <input type="text" placeholder="Tabletas y/o cucharaditas">
+            <input type="text" placeholder="30 minutos antes de / con">
+        </div>
+        <table>
+            <tr>
+                <td><input type="checkbox" name="megagh4"> MegaGH4</td>
+                <td>Fórmula antienvejecimiento</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="stemcell"> StemCell Enhancer</td>
+                <td>Revierte la oxidación</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="transfer"> Transfer Tri Factor</td>
+                <td>Modulador Celular</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="telomeros"> Telómeros</td>
+                <td>telomerasa</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+        </table>
+
+        <h3>Nutracéuticos Secundarios</h3>
+        <table>
+            <tr>
+                <td><input type="checkbox" name="antistress"> Anti stress</td>
+                <td>Energizante</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="cardiovascular"> Cardiovascular</td>
+                <td>Mejora la circulación</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="digestivo"> Digestivo</td>
+                <td>Gases / Estreñimiento</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="femenino"> Femenino</td>
+                <td>Precursor hormonal mujer</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="osteo_articular"> Osteo Articular</td>
+                <td>Regenerador Articular</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="inmune_booster"> Inmune Booster</td>
+                <td>Estimula las defensas</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="inmune_modulador"> Inmune Modulador</td>
+                <td>Regulador Inflamatorio</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="masculino"> Masculino</td>
+                <td>Precursor hormonal masc</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="neuro_central"> Neuro Central</td>
+                <td>Regenerador Cerebral</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="neuro_emocional"> Neuro Emocional</td>
+                <td>Restaurador Emocional</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="prostata"> Próstata</td>
+                <td>Regenerador prostático</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+        </table>
+
+        <h3>Nutracéuticos Complementarios</h3>
+        <table>
+            <tr>
+                <td><input type="checkbox" name="aloe_vera"> Aloe Vera</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="antioxidante"> Antioxidante</td>
+                <td>Revierte la oxidación</td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="colageno"> Colágeno</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="energy"> Energy</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="immune_spray"> Immune Spray</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="magnesio_quelatado"> Magnesio Quelatado</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="omega_3"> Omega 3</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="vit_c_zinc"> Vit C c/Zinc</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="vit_e_selenio"> Vit E c/Selenio</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="zinc_quelatado"> Zinc Quelatado</td>
+                <td></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+        </table>
+        <button class="add-button">Agregar Adicional +</button>
+    </div>
+
+    <!-- Cosmecéuticos -->
+    <div class="section">
+        <h2>Cosmecéuticos</h2>
+        <table>
+            <tr>
+                <td><input type="checkbox" name="conditioner"> Conditioner:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="esencial_oils"> Esencial Oils:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="exosoma_serum"> Exosoma Serum:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="protector_solar"> Protector Solar MEL 13:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="shampoo"> Shampoo:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="sheet_mask"> Sheet Mask:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="spa_body_butter"> Spa Body Butter:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="spa_body_scroob"> Spa Body Scroob:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="spa_foot"> Spa Foot:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+            <tr>
+                <td><input type="checkbox" name="spa_massage"> Spa Massage:</td>
+                <td><input type="text" placeholder="Uso"></td>
+                <td><span class="icon pencil"></span><span class="icon trash"></span></td>
+            </tr>
+        </table>
+        <button class="add-button">Agregar Adicional +</button>
+    </div>
+
+    <!-- Fórmulas Naturales -->
+    <div class="section">
+        <h2>Fórmulas Naturales</h2>
+        <div class="item">
+            <input type="checkbox" name="aceite_oliva"> Aceite de Oliva c/limón: 2 cucharadas de aceite de oliva extra virgen con el zumo de 1 limón en la mañana.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="aceite_ozono"> Aceite de ozono: Aplicar en la zona afectada
+            <input type="text" placeholder="2 veces por día">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="agua_mineral"> Agua Mineral: tomar un litro con zumo de limón y pizca de bicarbonato en ayunas.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="arcilla_bebible"> Arcilla Medicinal bebible: una cucharadita en un vaso de agua
+            <input type="text" placeholder="2 veces al día fuera de las comidas">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="arcilla_topica"> Arcilla Medicinal tópica: aplicar en la zona afectada
+            <input type="text" placeholder="veces al día">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="arnigel"> Arnigel: aplicar en la zona afectada 2 veces al día.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="desodorante"> Cambiar desodorante por borocanfor o aceites esenciales.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="amalgamas"> Cambiar o cubrir las amalgamas por resina fotocurable.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="cloruro_magnesio"> Cloruro de Magnesio: diluir un sobre en un litro de agua y tomar una tacita en el desayuno y cena. Añadir pizca de bicarbonato en cada toma.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="duchas_vaginales"> Duchas Vaginales: preparar un litro de infusión de llantén y manzanilla con agua mineral alternando diariamente con litro de agua de vinagre (2 cucharadas por litro de agua mineral) por 10 días consecutivos y luego quincenal post menstruación y ovulación.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="enema_cafe"> Enema café: Una pera rectal de café tinto tibio vía rectal acostado de lado izquierdo por 15 minutos
+            <input type="text" placeholder="veces por semana o si tiene algún malestar o dolor de cabeza, mejor antes del mediodía">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="enema_marino"> Enema marino: Una pera rectal de plasma marino vía rectal acostado de lado izquierdo por 15 minutos
+            <input type="text" placeholder="veces por semana">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="fiebre"> Fiebre: baño de agua tibia frotando el cuerpo por 20 minutos; té de tilo arropado para sudar la fiebre; té de Jamaica para rehidratar el cuerpo.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="gargarismos"> Gargarismos: una cucharada en agua oxigenada en un cuarto de vaso de agua tres veces al día fuera de las comidas.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="jugo_linaza"> Jugo de Linaza: Dejar reposar una cucharada de semillas de linaza, avena y ajonjolí y 4 ciruelas pasas en un vaso de agua por toda la noche; En la mañana licuar y tomar en ayunas.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="jugo_papa"> Jugo de Papa Cruda: pelar una papa, cortarla en trocitos, licuar con suficiente agua y tomar en caso de dolor de estómago o acidez.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="oligocell"> OLIGOCELL:
+            <input type="text" placeholder="gotas en 1/2 taza de infusión">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="plasma_marino"> Plasma Marino:
+            <input type="text" placeholder="tacita en ayunas y al acostarse">
+        </div>
+        <div class="item">
+            <input type="checkbox" name="tinte"> Utilizar tinte sin amoníaco.
+        </div>
+        <div class="item">
+            <input type="checkbox" name="lavados_nasales"> LAVADOS NASALES: Guardar en nevera y entibiar una taza todas las noches para ser aplicada con gotero o inyectadora (Nasaline) en cada fosa nasal.
+        </div>
+        <button class="add-button">Agregar Adicional +</button>
+    </div>
+
+    <!-- Sueros - Shot Antivejez -->
+    <div class="section">
+        <h2>Sueros - Shot Antivejez</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dosis</th>
+                    <th>Sueros</th>
+                    <th>Día</th>
+                    <th>Sem</th>
+                    <th>Qui</th>
+                    <th>Mes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="antianemico"> Antianémico</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="antienvejecimiento_suero"> Antienvejecimiento</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="antiviral"> Antiviral</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="bioxigenacion"> Bioxigenación</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="cardiovascular_suero"> CardioVascular</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="energizante_suero"> Energizante</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="inmuno_estimulante_suero"> Inmuno Estimulante</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="inmuno_modular_suero"> Inmuno Modular</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="mega_vitamina_c"> Mega Vitamina C</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="metabolico_suero"> Metabólico</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="osteo_articular_suero"> Osteo Articular</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="ozono_suero"> Ozono</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="pre_natal"> Pre Natal</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="quelacion"> Quelación</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Terapias Antienvejecimiento -->
+    <div class="section">
+        <h2>Terapias Antienvejecimiento</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dosis</th>
+                    <th>Terapia</th>
+                    <th>Día</th>
+                    <th>Sem</th>
+                    <th>Qui</th>
+                    <th>Mes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="autovacuna"> Autovacuna</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="biorresonancia"> Biorresonancia</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="camara_hiperbarica"> Cámara hiperbárica</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="celular_madre_adiposa"> Célular madre adiposa</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="celulas_madre_sistemic"> Celulas Madres Sistemic</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="celulas_madres_segment"> Celulas Madres Segment</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="ceragen_masajes"> CERAGEN / Masajes</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="cosmetologia_estetica"> Cosmetologia / Estetica</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="factores_autologos_prp"> Factores Autologos PRP</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="hidroterapia_colon"> Hidroterapia de Colon</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="hidroterapia_ionizante"> Hidroterapia lonizante</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="laser_rojo_infrarrojo"> Laser Rojo / Infrarrojo</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="lem"> LEM</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="nebulizacion"> Nebulización</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="neural"> Neural</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="ozono"> Ozono</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="shot_umbilical"> Shot Umbilical</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="terapia_biocelular"> Terapia BioCelular</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Terapia Bioneural -->
+    <div class="section">
+        <h2>Terapia Bioneural</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dosis</th>
+                    <th>Terapia Bioneural</th>
+                    <th>Día</th>
+                    <th>Sem</th>
+                    <th>Qui</th>
+                    <th>Mes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="adrenales"> Adrenales</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="vertigo"> Vértigo</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="articular"> Articular</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="estreptococo"> Estreptococo</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="cerebro"> Cerebro</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="placenta_embrionaria"> Placenta Embrionaria</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="circulacion_arterial"> Circulación Arterial</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="pancreas"> Páncreas</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="circulacion_micro"> Circulación Micro</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="vias_biliares"> Vías Biliares</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="circulacion_venosa"> Circulación Venosa</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="reproductivo_femenino"> Reproductivo Femenino</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="corazon"> Corazón</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="psicoestabilizante"> Psicoestabilizante</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="disco"> Disco</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="vision"> Visión</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="energetica_general"> Energética General</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="piel"> Piel</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="gastrointestinal"> Gastrointestinal</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="prostata_bioneural"> Próstata</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="higado"> Hígado</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="reproductivo_masculino"> Reproductivo Masculino</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="huesos"> Huesos</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="respiratorio"> Respiratorio</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="inmuno_estimulantes"> Inmuno Estimulantes</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="rinon"> Riñón</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="inmuno_modulador_bioneural"> Inmuno Modulador</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="sexual_femenina"> Sexual Femenina</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="linfatico"> Linfático</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="sexual_masculina"> Sexual Masculina</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="medula_espinal"> Medula Espinal</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="tiroides"> Tiroides</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="medula_osea"> Medula Ósea</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="vacuna_antivejez"> Vacuna Antivejez</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="mucosa"> Mucosa</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="vejiga"> Vejiga</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td><input type="text" placeholder="Dosis"></td>
+                    <td><input type="checkbox" name="musculatura"> Musculatura</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="checkbox"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

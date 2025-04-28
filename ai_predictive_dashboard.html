@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Análisis y Predicción Antivejez</title>
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Estilos integrados o enlazar a tu css/styles.css -->
+  <style>
+    /* Reset y tipografía */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(145deg, #f5f5f5, #e6e6e6);
+      color: #293B64;
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #23BCEF;
+      padding: 1rem 1.5rem;
+      color: #fff;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+    }
+    .header-logo img.logo {
+      height: 55px;
+      margin-right: 1rem;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+    }
+    .icons i {
+      font-size: 1.5rem;
+      margin-left: 1rem;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .main-content {
+      margin-top: 1rem;
+    }
+    /* Cards */
+    .card {
+      background-color: #fff;
+      border: 2px solid #23BCEF;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 {
+      font-size: 1.25rem;
+      color: #293B64;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* Formulario */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      position: relative; /* Para mostrar mensajes de error */
+    }
+    .form-group label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f5f6f5;
+      transition: border-color 0.3s ease;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #23BCEF;
+      outline: none;
+    }
+    .form-group.required label::after {
+      content: " *";
+      color: #FF7F50;
+      font-weight: bold;
+    }
+    /* Mensajes de error */
+    .error-msg {
+      color: #FF7F50;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      display: none; /* oculto por defecto */
+    }
+    /* Botones */
+    .form-buttons {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .form-buttons button {
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #293B64;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.3s;
+    }
+    .form-buttons button:hover {
+      background-color: #1f2a44;
+    }
+    /* Tooltip para datos genómicos */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      color: #23BCEF;
+      margin-left: 0.5rem;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 250px;
+      background-color: #293B64;
+      color: #fff;
+      text-align: left;
+      border-radius: 4px;
+      padding: 0.5rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.85rem;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    /* Sección de simulación */
+    .simulation {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .simulation label {
+      font-weight: 600;
+    }
+    .simulation input[type=range] {
+      width: 100%;
+    }
+    /* Gráficos */
+    .chart-container {
+      margin-top: 1.5rem;
+      background: #fff;
+      padding: 1rem;
+      border: 2px solid #23BCEF;
+      border-radius: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    .chart-controls label {
+      font-weight: 600;
+    }
+    .chart-type-buttons button {
+      padding: 0.5rem 1rem;
+      background-color: #293B64;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .chart-type-buttons button:hover {
+      background-color: #1f2a44;
+    }
+    /* Modo oscuro */
+    .dark body {
+      background: linear-gradient(145deg, #222, #333);
+      color: #f5f5f5;
+    }
+    .dark header {
+      background-color: #1c1c1c;
+    }
+    .dark .card {
+      background-color: #3a3a3a;
+      border-color: #23BCEF;
+      color: #f5f5f5;
+    }
+    .dark .form-group input,
+    .dark .form-group select,
+    .dark .form-group textarea {
+      background-color: #2c2c2c;
+      color: #f5f5f5;
+      border-color: #444;
+    }
+    .dark .form-group input:focus,
+    .dark .form-group select:focus,
+    .dark .form-group textarea:focus {
+      border-color: #23BCEF;
+    }
+    .dark .form-buttons button {
+      background-color: #1f2a44;
+    }
+    .dark .chart-container {
+      background: #2c2c2c;
+    }
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-logo img.logo {
+        height: 45px;
+      }
+      .header h1 {
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-logo">
+      <img src="assets/logo.png" alt="Doctor Antivejez" class="logo" />
+      <h1>Análisis y Predicción Antivejez</h1>
+    </div>
+    <div class="icons">
+      <i class="fas fa-moon" id="theme-toggle"></i>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="main-content">
+      <p style="margin-bottom: 1rem;">
+        Ingrese los datos relevantes del paciente para que nuestro sistema de IA genere un plan personalizado y un análisis predictivo de enfermedades relacionadas con la edad.
+      </p>
+
+      <!-- Card principal -->
+      <div class="card">
+        <h3>
+          <i class="fas fa-brain" style="color: #23BCEF;"></i>
+          IA - Detección Temprana y Planes de Intervención
+        </h3>
+        <p>
+          Complete los siguientes campos y obtenga un análisis predictivo del riesgo de enfermedades y recomendaciones personalizadas.
+        </p>
+
+        <!-- Formulario de entrada -->
+        <form id="ai-analysis-form" class="form-grid">
+          <!-- Telomeros -->
+          <div class="form-group required">
+            <label for="telomeres">Longitud de Telómeros</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="text" id="telomeres" placeholder="Ej.: 6.8" autocomplete="off" required style="flex:1;" />
+              <span>kb</span>
+            </div>
+            <span class="error-msg" id="telomeres-error">Por favor, introduzca un valor numérico válido.</span>
+          </div>
+          <!-- Inflamación -->
+          <div class="form-group required">
+            <label for="inflammation">Marcadores de Inflamación</label>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="text" id="inflammation" placeholder="PCR=5.0 mg/L, IL-6=8 pg/mL" autocomplete="off" required style="flex:1;" />
+            </div>
+            <span class="error-msg" id="inflammation-error">Por favor, indique los valores con sus unidades (mg/L, pg/mL, etc.).</span>
+          </div>
+          <!-- Datos Genómicos con autocompletado -->
+          <div class="form-group">
+            <label for="genData">
+              Datos Genómicos
+              <span class="tooltip"><i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">
+                  Ingrese variantes como FOXO3, ApoE4, MTHFR. 
+                  Formato: FOXO3 +/- etc.
+                </span>
+              </span>
+            </label>
+            <!-- Autocompletado con datalist -->
+            <input list="genVariants" id="genData" placeholder="Ej.: FOXO3 +/-, ApoE4 -/-" autocomplete="on" />
+            <datalist id="genVariants">
+              <option value="FOXO3 +/-"></option>
+              <option value="FOXO3 +/+"></option>
+              <option value="ApoE4 +/-"></option>
+              <option value="ApoE4 +/+"></option>
+              <option value="MTHFR +/-"></option>
+            </datalist>
+          </div>
+          <!-- Estilo de Vida -->
+          <div class="form-group">
+            <label for="lifestyleData">Estilo de Vida / Wearables</label>
+            <textarea id="lifestyleData" placeholder="Ej.: 30 min ejercicio diario, 7 hrs de sueño" autocomplete="off"></textarea>
+          </div>
+        </form>
+
+        <!-- Simulación de ajuste en actividad física -->
+        <div class="simulation">
+          <label for="exerciseSlider">Incremento de Ejercicio (%)</label>
+          <input type="range" id="exerciseSlider" min="0" max="100" value="0" 
+                 oninput="document.getElementById('exerciseValue').innerText = this.value + '%'" />
+          <span id="exerciseValue">0%</span>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" id="analyzeButton">
+            <i class="fas fa-diagnoses"></i> Analizar Riesgo
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados de la IA -->
+      <div class="card" id="results-ai" style="display: none;">
+        <h3>
+          <i class="fas fa-chart-line" style="color: #23BCEF;"></i>
+          Resultados de IA
+        </h3>
+        <div id="ai-risk-output" style="margin-top: 1rem;">
+          <!-- Aquí se mostrarán los riesgos -->
+        </div>
+        <div id="ai-recommendations" style="margin-top: 1rem;">
+          <!-- Aquí se mostrarán las recomendaciones -->
+        </div>
+      </div>
+
+      <!-- Sección de visualización avanzada -->
+      <div class="card">
+        <h3>
+          <i class="fas fa-tachometer-alt" style="color: #23BCEF;"></i>
+          Evolución de Biomarcadores
+        </h3>
+        <div class="chart-controls">
+          <label for="date-range">Rango de Fechas:</label>
+          <select id="date-range" onchange="actualizarGrafico()">
+            <option value="week">Semana</option>
+            <option value="month" selected>Mes</option>
+            <option value="quarter">Trimestre</option>
+            <option value="semester">Semestre</option>
+            <option value="year">Año</option>
+          </select>
+          <div class="chart-type-buttons">
+            <button type="button" onclick="cambiarTipoGrafico('line')">Línea</button>
+            <button type="button" onclick="cambiarTipoGrafico('bar')">Barras</button>
+            <button type="button" onclick="cambiarTipoGrafico('radar')">Radar</button>
+            <button type="button" onclick="cambiarTipoGrafico('polarArea')">Polar</button>
+            <button type="button" onclick="cambiarTipoGrafico('pie')">Pie</button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="form-buttons center">
+          <button type="button" onclick="generarInforme()">
+            <i class="fas fa-file-medical"></i> Generar Informe
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de acción generales -->
+  <div class="form-buttons">
+    <button type="button" onclick="alert('Historia guardada')">Guardar</button>
+    <button type="button" onclick="alert('Regresar')">Cancelar</button>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    let currentChartType = 'line';
+    let myChart;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Modo oscuro
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // Validación en tiempo real: Longitud de Telómeros
+      const telomeresInput = document.getElementById('telomeres');
+      const telomeresError = document.getElementById('telomeres-error');
+      telomeresInput.addEventListener('input', () => {
+        if (!isNumeric(telomeresInput.value)) {
+          telomeresError.style.display = 'block';
+        } else {
+          telomeresError.style.display = 'none';
+        }
+      });
+
+      // Validación en tiempo real: Inflamación
+      const inflammationInput = document.getElementById('inflammation');
+      const inflammationError = document.getElementById('inflammation-error');
+      inflammationInput.addEventListener('input', () => {
+        // Muy básica: si está vacío o no contiene "mg/L" o "pg/mL" en el texto
+        if (inflammationInput.value.length < 2) {
+          inflammationError.style.display = 'block';
+        } else {
+          inflammationError.style.display = 'none';
+        }
+      });
+
+      // Botón Analizar Riesgo
+      document.getElementById('analyzeButton').addEventListener('click', analizarRiesgo);
+
+      // Inicializa el gráfico
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      myChart = new Chart(ctx, getChartConfig(document.getElementById('date-range').value, currentChartType));
+    });
+
+    function isNumeric(value) {
+      return !isNaN(parseFloat(value)) && isFinite(value);
+    }
+
+    function analizarRiesgo() {
+      // Verificar si hay errores visibles
+      const hasTelomeresError = document.getElementById('telomeres-error').style.display !== 'none';
+      const hasInflammationError = document.getElementById('inflammation-error').style.display !== 'none';
+      if (hasTelomeresError || hasInflammationError) {
+        alert('Corrija los errores antes de continuar.');
+        return;
+      }
+
+      const telomeres = document.getElementById('telomeres').value.trim();
+      const inflammation = document.getElementById('inflammation').value.trim();
+      const genData = document.getElementById('genData').value.trim();
+      const lifestyleData = document.getElementById('lifestyleData').value.trim();
+      const exerciseIncrease = document.getElementById('exerciseSlider').value;
+
+      if (!telomeres || !inflammation) {
+        alert('Por favor, complete los campos obligatorios.');
+        return;
+      }
+
+      // Simulación de resultados
+      let riskHTML = `
+        <p><strong>Riesgo de Alzheimer a 5 años:</strong> <span style="color: #FF7F50;">Alto</span></p>
+        <p><strong>Riesgo Cardiovascular:</strong> Moderado</p>
+        <p><strong>Riesgo de Diabetes Tipo 2:</strong> Bajo</p>
+        <p><strong>Envejecimiento Acelerado:</strong> 35% (estimado)</p>
+      `;
+
+      let recommendationsHTML = `
+        <h4>Recomendaciones de Intervención</h4>
+        <ul>
+          <li>Considerar terapia con senolíticos y rapamicina en dosis bajas.</li>
+          <li>Aumentar ejercicio en un ${exerciseIncrease}% para reducir inflamación.</li>
+          <li>Dieta antiinflamatoria con énfasis en verduras, omega 3, y control de azúcares.</li>
+          <li>Monitorear PCR e IL-6 cada 3 meses, especialmente si PCR > 5 mg/L.</li>
+          <li>Si longitud telomérica < 6 kb, evaluar suplementación con astragalósidos.</li>
+        </ul>
+      `;
+
+      document.getElementById('ai-risk-output').innerHTML = riskHTML;
+      document.getElementById('ai-recommendations').innerHTML = recommendationsHTML;
+      document.getElementById('results-ai').style.display = 'block';
+    }
+
+    // Funciones para el gráfico
+    function getChartConfig(dateRange, chartType) {
+      let labels = [];
+      let dataset1 = [];
+      let dataset2 = [];
+
+      if (dateRange === 'week') {
+        labels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+        dataset1 = [30, 34, 28, 40, 38, 50, 45];
+        dataset2 = [10, 15, 12, 20, 18, 25, 22];
+      } else if (dateRange === 'month') {
+        labels = ['Semana 1','Semana 2','Semana 3','Semana 4'];
+        dataset1 = [80, 95, 120, 140];
+        dataset2 = [30, 40, 60, 80];
+      } else if (dateRange === 'quarter') {
+        labels = ['Mes 1','Mes 2','Mes 3'];
+        dataset1 = [200, 250, 300];
+        dataset2 = [100, 130, 180];
+      } else if (dateRange === 'semester') {
+        labels = ['1er Bimestre','2do Bimestre','3er Bimestre'];
+        dataset1 = [400, 480, 550];
+        dataset2 = [150, 200, 280];
+      } else { // year
+        labels = ['Q1','Q2','Q3','Q4'];
+        dataset1 = [70, 90, 109, 120];
+        dataset2 = [50, 60, 80, 90];
+      }
+
+      return {
+        type: chartType,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Pacientes Activos',
+              data: dataset1,
+              borderColor: '#23BCEF',
+              backgroundColor: 'rgba(35,188,239,0.2)',
+              fill: false
+            },
+            {
+              label: 'Onboarded',
+              data: dataset2,
+              borderColor: '#FF7F50',
+              backgroundColor: 'rgba(255,127,80,0.2)',
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true, labels: { color: '#293B64' } },
+            title: { display: true, text: 'Evolución de Biomarcadores', color: '#293B64', font: { size: 16 } }
+          },
+          scales: {
+            y: { beginAtZero: false, ticks: { color: '#293B64' } },
+            x: { ticks: { color: '#293B64' } }
+          }
+        }
+      };
+    }
+
+    function actualizarGrafico() {
+      const dateRange = document.getElementById('date-range').value;
+      if (window.myChart) {
+        window.myChart.destroy();
+      }
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      myChart = new Chart(ctx, getChartConfig(dateRange, currentChartType));
+    }
+
+    function cambiarTipoGrafico(tipo) {
+      currentChartType = tipo;
+      actualizarGrafico();
+    }
+
+    function generarInforme() {
+      alert('Informe personalizado generado (simulado).');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logros - App Médica</title>
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome para íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Colores definidos */
+    :root {
+      --primaryBlue: #23BCEF;     /* RGB 35-188-239 */
+      --darkBlue: #293B64;        /* RGB 41-59-100 */
+      --brightWhite: #FFFFFF;
+      --lightPearlyGray: #F0F4F8;
+    }
+    
+    /* Estilos globales */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, var(--brightWhite), var(--lightPearlyGray));
+      color: var(--darkBlue);
+    }
+    
+    /* Header */
+    header {
+      background-color: var(--primaryBlue);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--brightWhite);
+    }
+    header .logo {
+      height: 60px;
+    }
+    header .header-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    header .token-info {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    header .token-info i {
+      margin-right: 8px;
+    }
+    
+    /* Barra de progreso simulada */
+    .progress-bar {
+      width: 85%;
+      margin: 16px auto;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 100%;
+      background-color: var(--primaryBlue);
+    }
+    
+    /* Contenido principal */
+    .content {
+      padding: 16px;
+    }
+    h2.section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--darkBlue);
+      margin-bottom: 12px;
+    }
+    
+    /* Grid de Logros */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .achievement-card {
+      background: var(--brightWhite);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .achievement-card .circle-progress {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto;
+    }
+    .achievement-card .circle-progress svg {
+      transform: rotate(-90deg);
+    }
+    .achievement-card .circle-progress circle {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .achievement-card .circle-progress .bg {
+      stroke: #ddd;
+    }
+    .achievement-card .circle-progress .progress {
+      stroke: var(--primaryBlue);
+    }
+    .achievement-card .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--darkBlue);
+    }
+    .achievement-card .achievement-label {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--darkBlue);
+    }
+    .achievement-card .achievement-tokens {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--primaryBlue);
+    }
+    
+    /* Sección de Recompensas */
+    .rewards-section {
+      margin-top: 20px;
+    }
+    .reward-card {
+      background: var(--brightWhite);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .reward-card i {
+      font-size: 24px;
+      color: var(--primaryBlue);
+      margin-right: 12px;
+    }
+    .reward-card .reward-text {
+      flex-grow: 1;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--darkBlue);
+    }
+    .reward-card .reward-tokens {
+      font-size: 14px;
+      color: var(--primaryBlue);
+    }
+    .reward-card button {
+      background: var(--primaryBlue);
+      color: var(--brightWhite);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .reward-card button:hover {
+      background: #1AAFD0;
+    }
+    
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--brightWhite);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+    .bottom-nav .nav-item {
+      text-align: center;
+      color: var(--darkBlue);
+      font-size: 11px;
+    }
+    .bottom-nav .nav-item i {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <img src="assets/logo.png" alt="Logo" class="logo">
+    <div class="header-title">Logros</div>
+    <div class="token-info">
+      <i class="fas fa-token"></i>
+      <span>150 Tokens</span>
+    </div>
+  </header>
+  
+  <!-- Barra de progreso simulada -->
+  <div class="progress-bar">
+    <div class="progress-bar-inner"></div>
+  </div>
+  
+  <!-- Contenido principal -->
+  <div class="content">
+    <!-- Sección de logros -->
+    <h2 class="section-title">Tus Logros</h2>
+    <div class="achievements-grid">
+      <!-- Tarjeta de logro 1 -->
+      <div class="achievement-card">
+        <div class="circle-progress">
+          <svg width="70" height="70">
+            <circle class="bg" cx="35" cy="35" r="30"></circle>
+            <!-- Para simular 80% se calcula 80% de 2πr. Aproximadamente, stroke-dasharray=188, offset=188*0.2=38 -->
+            <circle class="progress" cx="35" cy="35" r="30" stroke-dasharray="188" stroke-dashoffset="38"></circle>
+          </svg>
+          <div class="progress-text">80%</div>
+        </div>
+        <div class="achievement-label">Completar 5 días de dieta</div>
+        <div class="achievement-tokens">+20 Tokens</div>
+      </div>
+      <!-- Tarjeta de logro 2 -->
+      <div class="achievement-card">
+        <div class="circle-progress">
+          <svg width="70" height="70">
+            <circle class="bg" cx="35" cy="35" r="30"></circle>
+            <!-- 50%: offset=188*0.5=94 -->
+            <circle class="progress" cx="35" cy="35" r="30" stroke-dasharray="188" stroke-dashoffset="94"></circle>
+          </svg>
+          <div class="progress-text">50%</div>
+        </div>
+        <div class="achievement-label">10 sesiones de ejercicio</div>
+        <div class="achievement-tokens">+15 Tokens</div>
+      </div>
+      <!-- Tarjeta de logro 3 -->
+      <div class="achievement-card">
+        <div class="circle-progress">
+          <svg width="70" height="70">
+            <circle class="bg" cx="35" cy="35" r="30"></circle>
+            <!-- 90%: offset=188*0.1=18.8 (aprox 19) -->
+            <circle class="progress" cx="35" cy="35" r="30" stroke-dasharray="188" stroke-dashoffset="19"></circle>
+          </svg>
+          <div class="progress-text">90%</div>
+        </div>
+        <div class="achievement-label">Mantener actitud positiva</div>
+        <div class="achievement-tokens">+25 Tokens</div>
+      </div>
+    </div>
+    
+    <!-- Sección de recompensas -->
+    <h2 class="section-title">Canjear Recompensas</h2>
+    <div class="rewards-section">
+      <!-- Recompensa 1 -->
+      <div class="reward-card">
+        <i class="fas fa-gift"></i>
+        <div class="reward-text">Descuento 20% Consulta</div>
+        <div class="reward-tokens">50 Tokens</div>
+        <button>Canjear</button>
+      </div>
+      <!-- Recompensa 2 -->
+      <div class="reward-card">
+        <i class="fas fa-gift"></i>
+        <div class="reward-text">Terapia Gratis</div>
+        <div class="reward-tokens">100 Tokens</div>
+        <button>Canjear</button>
+      </div>
+      <!-- Recompensa 3 -->
+      <div class="reward-card">
+        <i class="fas fa-gift"></i>
+        <div class="reward-text">10% en Suplementos</div>
+        <div class="reward-tokens">30 Tokens</div>
+        <button>Canjear</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Menú inferior -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <i class="fas fa-emoji-events"></i>
+      <div>Logros</div>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-store"></i>
+      <div>Tienda</div>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-chat"></i>
+      <div>Dr.Chat</div>
+    </div>
+  </div>
+</body>
+</html>

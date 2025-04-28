@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía del Paciente - Antienvejecimiento</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: rgb(35, 188, 239);
+      --dark-blue: rgb(41, 59, 100);
+      --bright-white: #FFFFFF;
+      --light-pearly-gray: #F0F4F8;
+      --success-color: #28a745;
+      --shadow-light-color: rgba(255, 255, 255, 0.8);
+      --shadow-dark-color: rgba(163, 177, 198, 0.6);
+      --base-font-size: 16px;
+      --border-radius: 10px;
+      --card-padding: 25px;
+      --input-padding: 12px 15px;
+      --button-padding: 12px 25px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      font-size: var(--base-font-size);
+      background: var(--light-pearly-gray);
+      color: var(--dark-blue);
+      line-height: 1.7;
+    }
+    .container {
+      width: 100%;
+      max-width: 1350px;
+      margin: 30px auto;
+      padding: 30px;
+      background: var(--bright-white);
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+    .patient-info {
+      background: var(--primary-color);
+      color: var(--bright-white);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .patient-info .form-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+    .patient-info .form-group i {
+      font-size: 1.2em;
+    }
+    .patient-info .form-group label {
+      font-weight: 600;
+      color: var(--bright-white);
+    }
+    .patient-info .form-group input {
+      background: var(--bright-white);
+      color: var(--dark-blue);
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      width: 200px;
+    }
+    .collapsible {
+      margin-bottom: 20px;
+    }
+    .collapsible legend {
+      cursor: pointer;
+      padding: 10px;
+      background: var(--dark-blue);
+      color: var(--bright-white);
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+    .collapsible legend:hover {
+      background: var(--primary-color);
+    }
+    .collapsible legend i {
+      transition: transform 0.3s ease;
+    }
+    .collapsible.collapsed legend i {
+      transform: rotate(180deg);
+    }
+    .collapsible fieldset {
+      border: none;
+      padding: 15px;
+      background: var(--light-pearly-gray);
+      border-radius: 8px;
+      transition: max-height 0.3s ease;
+      overflow: hidden;
+    }
+    .collapsible.collapsed fieldset {
+      max-height: 0;
+      padding: 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: var(--dark-blue);
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: var(--input-padding);
+      border: 1px solid var(--light-pearly-gray);
+      border-radius: 8px;
+      background: var(--bright-white);
+      box-shadow: inset 2px 2px 4px var(--shadow-dark-color);
+    }
+    input[type="checkbox"] {
+      accent-color: var(--primary-color);
+      margin-right: 10px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .checkbox-item label {
+      font-weight: 400;
+      flex-grow: 1;
+    }
+    .checkbox-item .quantity-input {
+      width: 70px;
+      padding: 6px 10px;
+    }
+    .frequency-select,
+    .custom-supplement {
+      width: 200px;
+      margin-left: 10px;
+    }
+    .action-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .btn {
+      padding: var(--button-padding);
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, var(--primary-color), var(--dark-blue));
+      color: var(--bright-white);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(145deg, var(--dark-blue), var(--primary-color));
+    }
+    .btn-success {
+      background: linear-gradient(145deg, var(--success-color), #218838);
+      color: var(--bright-white);
+    }
+    .btn-success:hover {
+      background: linear-gradient(145deg, #218838, var(--success-color));
+    }
+    #patient-preview {
+      display: none;
+      margin-top: 30px;
+      padding: var(--card-padding);
+      background: var(--light-pearly-gray);
+      border-radius: var(--border-radius);
+    }
+    /* Nuevos estilos para Activador Metabólico con Flores de Bach */
+    .activador-metabolico {
+      display: flex;
+      gap: 20px;
+    }
+    .activador-metabolico .checkbox-group {
+      flex: 1;
+    }
+    .activador-metabolico .flores-bach {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    @media (max-width: 1400px) {
+      .container {
+        max-width: 98vw;
+      }
+    }
+    @media (max-width: 900px) {
+      .container {
+        max-width: 100vw;
+        padding: 15px;
+      }
+    }
+    .btn-add {
+      background: linear-gradient(145deg, var(--success-color), #218838);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 2px 6px rgba(40, 167, 69, 0.08);
+    }
+    .btn-add:hover {
+      background: linear-gradient(145deg, #218838, var(--success-color));
+    }
+    .meal-section {
+      background: rgb(35, 188, 239);
+      border-radius: 14px;
+      padding: 22px 18px 18px 18px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(35,188,239,0.08);
+    }
+    .meal-section h4 {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .meal-section h4 i {
+      color: #fff;
+      font-size: 1.3rem;
+    }
+    .meal-options {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+    .btn-bottom-bar {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin: 40px 0 0 0;
+    }
+    .btn-send {
+      background: linear-gradient(145deg, rgb(35, 188, 239), rgb(41, 59, 100));
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 2px 6px rgba(35, 188, 239, 0.08);
+    }
+    .btn-send:hover {
+      background: linear-gradient(145deg, rgb(41, 59, 100), rgb(35, 188, 239));
+    }
+    .btn-print {
+      background: #293B64;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 2px 6px rgba(41, 59, 100, 0.08);
+    }
+    .btn-print:hover {
+      background: #1f2a44;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 28px 24px 28px;
+      box-shadow: 0 8px 32px rgba(41,59,100,0.18);
+      min-width: 320px;
+      max-width: 95vw;
+      text-align: center;
+      position: relative;
+    }
+    .modal h3 {
+      color: #293B64;
+      margin-bottom: 18px;
+      font-size: 1.2rem;
+    }
+    .modal-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .modal-btn {
+      border: none;
+      border-radius: 25px;
+      padding: 12px 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-btn.whatsapp { background: #25D366; color: #fff; }
+    .modal-btn.whatsapp:hover { background: #1ebe57; }
+    .modal-btn.email { background: #23BCEF; color: #fff; }
+    .modal-btn.email:hover { background: #1a9ec7; }
+    .modal-btn.flutter { background: #293B64; color: #fff; }
+    .modal-btn.flutter:hover { background: #1f2a44; }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 18px;
+      font-size: 1.3rem;
+      color: #888;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="patient-form">
+      <div class="patient-info">
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <label for="patient-name">Nombre del Paciente</label>
+          <input type="text" id="patient-name" name="patient_name" placeholder="Ingrese el nombre del paciente">
+        </div>
+        <div class="form-group">
+          <i class="fas fa-calendar"></i>
+          <label for="date">Fecha</label>
+          <input type="date" id="date" name="date">
+        </div>
+      </div>
+
+      <div class="collapsible">
+        <legend>Fase de Remoción <i class="fas fa-chevron-down"></i></legend>
+        <fieldset>
+          <div class="form-group">
+            <label for="remocion-cucharadas">Cucharadas al acostarse (1 sola vez)</label>
+            <textarea id="remocion-cucharadas" name="remocion_cucharadas" rows="2" placeholder="Indicar producto y dosis..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="remocion-detox">Detoxificación Alcalina Vegetariana (Semanas)</label>
+            <input type="number" id="remocion-detox" name="remocion_detox_semanas" min="0" step="1" placeholder="Ej: 1">
+          </div>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="terapia_nino"> Niño</label>
+            <label><input type="checkbox" name="terapia_antiage"> Anti-envejecimiento</label>
+            <label><input type="checkbox" name="terapia_metabolica"> Metabólica</label>
+            <label><input type="checkbox" name="terapia_citostatica"> Citostática</label>
+            <label><input type="checkbox" name="terapia_renal"> Renal</label>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="collapsible">
+        <legend>Nutracéuticos Primarios <i class="fas fa-chevron-down"></i></legend>
+        <fieldset id="nutraceuticos-primarios-fieldset">
+          <div class="checkbox-group" id="nutraceuticos-primarios-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_mega_gh4" name="nutra_mega_gh4">
+              <label for="nutra_mega_gh4">MegaGH4 (Fórmula Antienvejecimiento)</label>
+              <input type="number" class="quantity-input" name="nutra_mega_gh4_qty" min="0" placeholder="Cant.">
+              <select class="frequency-select" name="nutra_mega_gh4_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="mañana">Mañana</option>
+                <option value="noche">Noche</option>
+                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                <option value="antes_cena">30 min antes de Cena</option>
+                <option value="antes_desayuno_cena">30 min antes Desayuno y Cena</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+              <input type="text" class="custom-supplement" name="nutra_mega_gh4_supplement" placeholder="Suplemento personalizado">
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_stemcell" name="nutra_stemcell">
+              <label for="nutra_stemcell">StemCell Enhancer (Revierte la oxidación)</label>
+              <input type="number" class="quantity-input" name="nutra_stemcell_qty" min="0" placeholder="Cant.">
+              <select class="frequency-select" name="nutra_stemcell_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="mañana">Mañana</option>
+                <option value="noche">Noche</option>
+                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                <option value="antes_cena">30 min antes de Cena</option>
+                <option value="antes_desayuno_cena">30 min antes Desayuno y Cena</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+              <input type="text" class="custom-supplement" name="nutra_stemcell_supplement" placeholder="Suplemento personalizado">
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_transfer" name="nutra_transfer">
+              <label for="nutra_transfer">Transfer Tri Factor (Modulador celular)</label>
+              <input type="number" class="quantity-input" name="nutra_transfer_qty" min="0" placeholder="Cant.">
+              <select class="frequency-select" name="nutra_transfer_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="mañana">Mañana</option>
+                <option value="noche">Noche</option>
+                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                <option value="antes_cena">30 min antes de Cena</option>
+                <option value="antes_desayuno_cena">30 min antes Desayuno y Cena</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+              <input type="text" class="custom-supplement" name="nutra_transfer_supplement" placeholder="Suplemento personalizado">
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_telomeres" name="nutra_telomeres">
+              <label for="nutra_telomeres">Telomeros (Activador de la Telomerasa)</label>
+              <input type="number" class="quantity-input" name="nutra_telomeres_qty" min="0" placeholder="Cant.">
+              <select class="frequency-select" name="nutra_telomeres_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="mañana">Mañana</option>
+                <option value="noche">Noche</option>
+                <option value="antes_desayuno">30 min antes de Desayuno</option>
+                <option value="antes_cena">30 min antes de Cena</option>
+                <option value="antes_desayuno_cena">30 min antes Desayuno y Cena</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+              <input type="text" class="custom-supplement" name="nutra_telomeres_supplement" placeholder="Suplemento personalizado">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addNutraceuticoPrimario()"><i class="fas fa-plus"></i> Añadir Nutracéutico Primario</button>
+        </fieldset>
+      </div>
+
+      <!-- Activador Metabólico con Flores de Bach -->
+      <div class="collapsible">
+        <legend>Activador Metabólico <i class="fas fa-chevron-down"></i></legend>
+        <fieldset id="activador-metabolico-fieldset">
+          <div class="activador-metabolico" id="activador-metabolico-group">
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="activador_bioterapico" name="activador_bioterapico">
+                <label for="activador_bioterapico">Bioterápico + Bach (gotas, veces al día debajo de la lengua)</label>
+                <input type="number" class="quantity-input" name="activador_bioterapico_qty" min="0" placeholder="Cant.">
+                <select class="frequency-select" name="activador_bioterapico_freq">
+                  <option value="">Seleccione frecuencia...</option>
+                  <option value="mañana">Mañana</option>
+                  <option value="noche">Noche</option>
+                  <option value="antes_desayuno">30 min antes de Desayuno</option>
+                  <option value="antes_cena">30 min antes de Cena</option>
+                  <option value="antes_ejercicio">Antes del Ejercicio</option>
+                  <option value="despues_ejercicio">Después del Ejercicio</option>
+                  <option value="otros">Otros</option>
+                </select>
+                <input type="text" class="custom-supplement" name="activador_bioterapico_supplement" placeholder="Suplemento personalizado" oninput="showCustomSupplementMessage(this)">
+              </div>
+              <div class="checkbox-group" style="margin-left: 28px;">
+                <label><input type="checkbox" name="cardiovascular"> Cardiovascular</label>
+                <label><input type="checkbox" name="respiratorio"> Respiratorio</label>
+                <label><input type="checkbox" name="digestivo"> Digestivo</label>
+                <label><input type="checkbox" name="neuro"> Neuro</label>
+                <label><input type="checkbox" name="inmune"> Inmune</label>
+                <label><input type="checkbox" name="inflamacion"> Inflamación</label>
+                <label><input type="checkbox" name="glicolisis"> Glicólisis(m)</label>
+                <label><input type="checkbox" name="ciclo_krebs"> Ciclo Krebs(t)</label>
+                <label><input type="checkbox" name="cadena_resp"> Cadena Resp(n)</label>
+                <label><input type="checkbox" name="degeneracion"> Degeneración</label>
+                <label><input type="checkbox" name="humorales"> Humorales</label>
+                <label><input type="checkbox" name="excrecion"> Excreción</label>
+                <label><input type="checkbox" name="mesenquimaticos"> Mesenquimáticos</label>
+                <label><input type="checkbox" name="celulares"> Celulares</label>
+                <label><input type="checkbox" name="nervioso"> SN Central</label>
+                <label><input type="checkbox" name="sn_autonomo"> SN Autónomo</label>
+                <label><input type="checkbox" name="ansiedad"> Ansiedad</label>
+                <label><input type="checkbox" name="depresion"> Depresión</label>
+                <label><input type="checkbox" name="vision"> Visión</label>
+                <label><input type="checkbox" name="audicion"> Audición</label>
+                <label><input type="checkbox" name="olfato"> Olfato</label>
+                <label><input type="checkbox" name="gusto"> Gusto</label>
+                <label><input type="checkbox" name="sangre"> Sangre</label>
+                <label><input type="checkbox" name="corazon"> Corazón</label>
+                <label><input type="checkbox" name="superior"> Superior</label>
+                <label><input type="checkbox" name="inferior"> Inferior</label>
+                <label><input type="checkbox" name="huesos"> Huesos</label>
+                <label><input type="checkbox" name="cartilagos"> Cartílagos y Lig.</label>
+              </div>
+            </div>
+            <div class="flores-bach">
+              <h4>Flores de Bach</h4>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="bach_agrimonia"> Agrimonia</label>
+                <label><input type="checkbox" name="bach_brezo"> Brezo</label>
+                <label><input type="checkbox" name="bach_roca_agua"> Roca Agua</label>
+                <label><input type="checkbox" name="bach_aspen"> Aspen</label>
+                <label><input type="checkbox" name="bach_acebo"> Acebo</label>
+                <label><input type="checkbox" name="bach_scleranthus"> Scleranthus</label>
+                <label><input type="checkbox" name="bach_haya"> Haya</label>
+                <label><input type="checkbox" name="bach_madreselva"> Madreselva</label>
+                <label><input type="checkbox" name="bach_estrella"> Estrella</label>
+                <label><input type="checkbox" name="bach_centauro"> Centauro</label>
+                <label><input type="checkbox" name="bach_carpe"> Carpe</label>
+                <label><input type="checkbox" name="bach_castano"> Castaño</label>
+                <label><input type="checkbox" name="bach_cerato"> Cerato</label>
+                <label><input type="checkbox" name="bach_impatiens"> Impatiens</label>
+                <label><input type="checkbox" name="bach_verbena"> Verbena</label>
+                <label><input type="checkbox" name="bach_cereza_ciruela"> Cereza Ciruela</label>
+                <label><input type="checkbox" name="bach_alerce"> Alerce</label>
+                <label><input type="checkbox" name="bach_vid"> Vid</label>
+                <label><input type="checkbox" name="bach_brote_castano"> Brote de Castaño</label>
+                <label><input type="checkbox" name="bach_mimulus"> Mimulus</label>
+                <label><input type="checkbox" name="bach_nogal"> Nogal</label>
+                <label><input type="checkbox" name="bach_chycory"> Chycory</label>
+                <label><input type="checkbox" name="bach_mostardoak"> Mostardoak</label>
+                <label><input type="checkbox" name="bach_violeta_agua"> Violeta de Agua</label>
+                <label><input type="checkbox" name="bach_clematide"> Clemátide</label>
+                <label><input type="checkbox" name="bach_oliva"> Oliva</label>
+                <label><input type="checkbox" name="bach_castano_blanco"> Castaño Blanco</label>
+                <label><input type="checkbox" name="bach_manzana_silvestre"> Manzana Silvestre</label>
+                <label><input type="checkbox" name="bach_pino"> Pino</label>
+                <label><input type="checkbox" name="bach_avena_silvestre"> Avena Silvestre</label>
+                <label><input type="checkbox" name="bach_olmo"> Olmo</label>
+                <label><input type="checkbox" name="bach_castano_rojo"> Castaño Rojo</label>
+                <label><input type="checkbox" name="bach_escaramujo"> Escaramujo</label>
+                <label><input type="checkbox" name="bach_genciana"> Genciana</label>
+                <label><input type="checkbox" name="bach_jara"> Jara</label>
+                <label><input type="checkbox" name="bach_sauce"> Sauce</label>
+                <label><input type="checkbox" name="bach_tojo"> Tojo</label>
+                <label><input type="checkbox" name="bach_rescue_remedy"> Rescue Remedy</label>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addActivadorMetabolico()"><i class="fas fa-plus"></i> Añadir Activador Metabólico</button>
+        </fieldset>
+      </div>
+
+      <div class="collapsible">
+        <legend>Nutracéuticos Secundarios <i class="fas fa-chevron-down"></i></legend>
+        <fieldset id="nutraceuticos-secundarios-fieldset">
+          <div class="checkbox-group" id="nutraceuticos-secundarios-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_digestivo" name="nutra_digestivo">
+              <label for="nutra_digestivo">Digestivo (Gases / Estreñimiento)</label>
+              <input type="number" class="quantity-input" name="nutra_digestivo_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_digestivo_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_femenino" name="nutra_femenino">
+              <label for="nutra_femenino">Femenino (Precursor hormonal mujer)</label>
+              <input type="number" class="quantity-input" name="nutra_femenino_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_femenino_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_osteo_articular" name="nutra_osteo_articular">
+              <label for="nutra_osteo_articular">Osteo Articular (Regenerador Articular)</label>
+              <input type="number" class="quantity-input" name="nutra_osteo_articular_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_osteo_articular_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_inmune_booster" name="nutra_inmune_booster">
+              <label for="nutra_inmune_booster">Inmune Booster (Estimula las defensas)</label>
+              <input type="number" class="quantity-input" name="nutra_inmune_booster_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_inmune_booster_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_inmune_modulador" name="nutra_inmune_modulador">
+              <label for="nutra_inmune_modulador">Inmune Modulador (Regulador Inflamatorio)</label>
+              <input type="number" class="quantity-input" name="nutra_inmune_modulador_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_inmune_modulador_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_masculino" name="nutra_masculino">
+              <label for="nutra_masculino">Masculino (Precursor hormonal masc)</label>
+              <input type="number" class="quantity-input" name="nutra_masculino_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_masculino_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_neuro_central" name="nutra_neuro_central">
+              <label for="nutra_neuro_central">Neuro Central (Regenerador Cerebral)</label>
+              <input type="number" class="quantity-input" name="nutra_neuro_central_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_neuro_central_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_neuro_emocional" name="nutra_neuro_emocional">
+              <label for="nutra_neuro_emocional">Neuro Emocional (Restaurador Emocional)</label>
+              <input type="number" class="quantity-input" name="nutra_neuro_emocional_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_neuro_emocional_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_prostata" name="nutra_prostata">
+              <label for="nutra_prostata">Próstata (Regenerador prostático)</label>
+              <input type="number" class="quantity-input" name="nutra_prostata_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_prostata_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addNutraceuticoSecundario()"><i class="fas fa-plus"></i> Añadir Nutracéutico Secundario</button>
+        </fieldset>
+      </div>
+
+      <div class="collapsible">
+        <legend>Nutracéuticos Complementarios <i class="fas fa-chevron-down"></i></legend>
+        <fieldset id="nutraceuticos-complementarios-fieldset">
+          <div class="checkbox-group" id="nutraceuticos-complementarios-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_aloe_vera" name="nutra_aloe_vera">
+              <label for="nutra_aloe_vera">Aloe Vera</label>
+              <input type="number" class="quantity-input" name="nutra_aloe_vera_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_aloe_vera_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_antioxidante" name="nutra_antioxidante">
+              <label for="nutra_antioxidante">Antioxidante (Revierte la oxidación)</label>
+              <input type="number" class="quantity-input" name="nutra_antioxidante_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_antioxidante_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_colageno" name="nutra_colageno">
+              <label for="nutra_colageno">Colágeno</label>
+              <input type="number" class="quantity-input" name="nutra_colageno_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_colageno_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_energy" name="nutra_energy">
+              <label for="nutra_energy">Energy</label>
+              <input type="number" class="quantity-input" name="nutra_energy_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_energy_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_immune_spray" name="nutra_immune_spray">
+              <label for="nutra_immune_spray">Immune Spray</label>
+              <input type="number" class="quantity-input" name="nutra_immune_spray_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_immune_spray_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_magnesio" name="nutra_magnesio">
+              <label for="nutra_magnesio">Magnesio Quelatado</label>
+              <input type="number" class="quantity-input" name="nutra_magnesio_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_magnesio_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_vit_c" name="nutra_vit_c">
+              <label for="nutra_vit_c">Vit C c/Zinc</label>
+              <input type="number" class="quantity-input" name="nutra_vit_c_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_vit_c_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_vit_e" name="nutra_vit_e">
+              <label for="nutra_vit_e">Vit E c/Selenio</label>
+              <input type="number" class="quantity-input" name="nutra_vit_e_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_vit_e_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="nutra_zinc" name="nutra_zinc">
+              <label for="nutra_zinc">Zinc Quelatado</label>
+              <input type="number" class="quantity-input" name="nutra_zinc_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="nutra_zinc_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addNutraceuticoComplementario()"><i class="fas fa-plus"></i> Añadir Nutracéutico Complementario</button>
+        </fieldset>
+      </div>
+
+      <div class="collapsible">
+        <legend>Sueros - Shot Antivejez <i class="fas fa-chevron-down"></i></legend>
+        <fieldset id="sueros-fieldset">
+          <div class="checkbox-group" id="sueros-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_antianemico" name="suero_antianemico">
+              <label for="suero_antianemico">Antianémico</label>
+              <input type="number" class="quantity-input" name="suero_antianemico_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_antianemico_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_pro_vital" name="suero_pro_vital">
+              <label for="suero_pro_vital">Pro Vital o Antienvejecimiento</label>
+              <input type="number" class="quantity-input" name="suero_pro_vital_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_pro_vital_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_antiviral" name="suero_antiviral">
+              <label for="suero_antiviral">Antiviral c/Ozono</label>
+              <input type="number" class="quantity-input" name="suero_antiviral_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_antiviral_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_bioxigenacion" name="suero_bioxigenacion">
+              <label for="suero_bioxigenacion">Bioxigenación</label>
+              <input type="number" class="quantity-input" name="suero_bioxigenacion_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_bioxigenacion_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_cardio" name="suero_cardio">
+              <label for="suero_cardio">CardioVascular</label>
+              <input type="number" class="quantity-input" name="suero_cardio_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_cardio_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_energizante" name="suero_energizante">
+              <label for="suero_energizante">Energizante</label>
+              <input type="number" class="quantity-input" name="suero_energizante_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_energizante_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_inmuno_estimulante" name="suero_inmuno_estimulante">
+              <label for="suero_inmuno_estimulante">Inmuno Estimulante</label>
+              <input type="number" class="quantity-input" name="suero_inmuno_estimulante_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_inmuno_estimulante_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_inmuno_modular" name="suero_inmuno_modular">
+              <label for="suero_inmuno_modular">Inmuno Modular</label>
+              <input type="number" class="quantity-input" name="suero_inmuno_modular_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_inmuno_modular_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_mega_vitamina_c" name="suero_mega_vitamina_c">
+              <label for="suero_mega_vitamina_c">Mega Vitamina C</label>
+              <input type="number" class="quantity-input" name="suero_mega_vitamina_c_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_mega_vitamina_c_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_metabolico" name="suero_metabolico">
+              <label for="suero_metabolico">Metabólico</label>
+              <input type="number" class="quantity-input" name="suero_metabolico_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_metabolico_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_osteo_articular" name="suero_osteo_articular">
+              <label for="suero_osteo_articular">Osteo Articular</label>
+              <input type="number" class="quantity-input" name="suero_osteo_articular_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_osteo_articular_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_ozono" name="suero_ozono">
+              <label for="suero_ozono">Ozono</label>
+              <input type="number" class="quantity-input" name="suero_ozono_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_ozono_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_pre_natal" name="suero_pre_natal">
+              <label for="suero_pre_natal">Pre Natal</label>
+              <input type="number" class="quantity-input" name="suero_pre_natal_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_pre_natal_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suero_quelacion" name="suero_quelacion">
+              <label for="suero_quelacion">Quelación</label>
+              <input type="number" class="quantity-input" name="suero_quelacion_qty" min="0" placeholder="Dosis">
+              <select class="frequency-select" name="suero_quelacion_freq">
+                <option value="">Seleccione frecuencia...</option>
+                <option value="día">Día</option>
+                <option value="semana">Semana</option>
+                <option value="quincena">Quincena</option>
+                <option value="mes">Mes</option>
+                <option value="antes_ejercicio">Antes del Ejercicio</option>
+                <option value="despues_ejercicio">Después del Ejercicio</option>
+                <option value="otros">Otros</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addSuero()"><i class="fas fa-plus"></i> Añadir Suero</button>
+        </fieldset>
+      </div>
+
+      <section id="patient-preview">
+        <h3><i class="fas fa-eye"></i> Vista Previa de la Guía</h3>
+        <div id="preview-content">
+          <p><strong>Paciente:</strong> <span id="preview-patient-name">-</span></p>
+          <p><strong>Fecha:</strong> <span id="preview-date">-</span></p>
+          <hr>
+          <h4>Fase de Remoción:</h4>
+          <ul id="preview-remocion"></ul>
+          <h4>Nutracéuticos Primarios:</h4>
+          <ul id="preview-nutraceuticos-primarios"></ul>
+          <h4>Activador Metabólico:</h4>
+          <ul id="preview-activador-metabolico"></ul>
+          <h4>Nutracéuticos Secundarios:</h4>
+          <ul id="preview-nutraceuticos-secundarios"></ul>
+          <h4>Nutracéuticos Complementarios:</h4>
+          <ul id="preview-nutraceuticos-complementarios"></ul>
+          <h4>Sueros - Shot Antivejez:</h4>
+          <ul id="preview-sueros"></ul>
+        </div>
+      </section>
+
+      <div class="action-buttons">
+        <button type="button" class="btn btn-success" id="preview-button"><i class="fas fa-eye"></i> Vista Previa</button>
+        <button type="submit" class="btn btn-primary" id="save-send-button"><i class="fas fa-paper-plane"></i> Guardar y Enviar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal de envío -->
+  <div id="send-modal-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal">
+      <button class="modal-close" onclick="closeSendModal()"><i class="fas fa-times"></i></button>
+      <h3>Enviar Guía al Paciente</h3>
+      <div class="modal-btns">
+        <button class="modal-btn whatsapp" onclick="sendViaWhatsapp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        <button class="modal-btn email" onclick="sendViaEmail()"><i class="fas fa-envelope"></i> Email</button>
+        <button class="modal-btn flutter" onclick="sendToFlutterApp()"><i class="fas fa-mobile-alt"></i> App Paciente (Próximamente)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('date');
+      if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+    });
+
+    document.querySelectorAll('.collapsible legend').forEach(legend => {
+      legend.addEventListener('click', () => {
+        const parent = legend.parentElement;
+        parent.classList.toggle('collapsed');
+      });
+    });
+
+    let formulaNatCounter = 1;
+    function addFormula(containerId, typePrefix) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      formulaNatCounter++;
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <div class="form-group">
+          <label for="formula-${typePrefix}-${formulaNatCounter}-nombre">Fórmula #${formulaNatCounter}</label>
+          <input type="text" id="formula-${typePrefix}-${formulaNatCounter}-nombre" name="formula_${typePrefix}_nombre[]" placeholder="Ej: Infusión de Valeriana">
+        </div>
+        <div class="form-group">
+          <label for="formula-${typePrefix}-${formulaNatCounter}-instr">Instrucciones</label>
+          <textarea id="formula-${typePrefix}-${formulaNatCounter}-instr" name="formula_${typePrefix}_instr[]" rows="3" placeholder="Ej: Tomar 1 taza 1 hora antes de dormir..."></textarea>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    document.getElementById('preview-button').addEventListener('click', () => {
+      const previewSection = document.getElementById('patient-preview');
+      const previewContent = document.getElementById('preview-content');
+      let previewHTML = '';
+      const patientName = document.getElementById('patient-name')?.value || 'N/A';
+      const date = document.getElementById('date')?.value || 'N/A';
+      previewHTML += `<p><strong>Paciente:</strong> ${patientName}</p>`;
+      previewHTML += `<p><strong>Fecha:</strong> ${date}</p><hr>`;
+      previewHTML += '<h4>Fase de Remoción:</h4><ul>';
+      const cucharadas = document.getElementById('remocion-cucharadas')?.value;
+      if (cucharadas) previewHTML += `<li>Cucharadas al acostarse: ${cucharadas}</li>`;
+      const detoxSemanas = document.getElementById('remocion-detox')?.value;
+      if (detoxSemanas) previewHTML += `<li>Detoxificación Alcalina: ${detoxSemanas} semana(s)</li>`;
+      const terapias = Array.from(document.querySelectorAll('input[name^="terapia_"]:checked')).map(cb => cb.nextElementSibling.textContent);
+      if (terapias.length) previewHTML += `<li>Terapias: ${terapias.join(', ')}</li>`;
+      previewHTML += '</ul>';
+      previewHTML += '<h4>Nutracéuticos Primarios:</h4><ul>';
+      document.querySelectorAll('.collapsible:nth-child(2) input[type="checkbox"]:checked').forEach(cb => {
+        const label = cb.nextElementSibling.textContent;
+        const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+        const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+        const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+        previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ' - ' + freq : ''}${supplement ? ' - Suplemento: ' + supplement : ''}</li>`;
+      });
+      previewHTML += '</ul>';
+      previewHTML += '<h4>Activador Metabólico:</h4><ul>';
+      document.querySelectorAll('.collapsible:nth-child(3) input[type="checkbox"]:checked').forEach(cb => {
+        const label = cb.nextElementSibling.textContent;
+        const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+        const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+        const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+        previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ' - ' + freq : ''}${supplement ? ' - Suplemento: ' + supplement : ''}</li>`;
+      });
+      previewHTML += '</ul>';
+      previewHTML += '<h4>Nutracéuticos Secundarios:</h4><ul>';
+      document.querySelectorAll('.collapsible:nth-child(4) input[type="checkbox"]:checked').forEach(cb => {
+        const label = cb.nextElementSibling.textContent;
+        const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+        const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+        const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+        previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ' - ' + freq : ''}${supplement ? ' - Suplemento: ' + supplement : ''}</li>`;
+      });
+      previewHTML += '</ul>';
+      previewHTML += '<h4>Nutracéuticos Complementarios:</h4><ul>';
+      document.querySelectorAll('.collapsible:nth-child(5) input[type="checkbox"]:checked').forEach(cb => {
+        const label = cb.nextElementSibling.textContent;
+        const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+        const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+        const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+        previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ' - ' + freq : ''}${supplement ? ' - Suplemento: ' + supplement : ''}</li>`;
+      });
+      previewHTML += '</ul>';
+      previewHTML += '<h4>Sueros - Shot Antivejez:</h4><ul>';
+      document.querySelectorAll('.collapsible:nth-child(6) input[type="checkbox"]:checked').forEach(cb => {
+        const label = cb.nextElementSibling.textContent;
+        const qty = cb.parentElement.querySelector('.quantity-input')?.value || 'N/A';
+        const freq = cb.parentElement.querySelector('.frequency-select')?.value || '';
+        const supplement = cb.parentElement.querySelector('.custom-supplement')?.value || '';
+        previewHTML += `<li>${label}: ${qty !== 'N/A' ? qty : ''}${freq ? ' - ' + freq : ''}${supplement ? ' - Suplemento: ' + supplement : ''}</li>`;
+      });
+      previewHTML += '</ul>';
+      previewContent.innerHTML = previewHTML;
+      previewSection.style.display = 'block';
+      previewSection.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('patient-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert("Formulario enviado con éxito!");
+    });
+
+    function createNutraceuticoItem(prefix) {
+      const div = document.createElement('div');
+      div.className = 'checkbox-item';
+      const id = `${prefix}_${Date.now()}`;
+      div.innerHTML = `
+        <input type="checkbox" id="${id}" name="${id}">
+        <label for="${id}">Nuevo ${prefix.charAt(0).toUpperCase() + prefix.slice(1).replace('_', ' ')}</label>
+        <input type="number" class="quantity-input" name="${id}_qty" min="0" placeholder="Cant.">
+        <select class="frequency-select" name="${id}_freq">
+          <option value="">Seleccione frecuencia...</option>
+          <option value="mañana">Mañana</option>
+          <option value="noche">Noche</option>
+          <option value="antes_desayuno">30 min antes de Desayuno</option>
+          <option value="antes_cena">30 min antes de Cena</option>
+          <option value="antes_desayuno_cena">30 min antes Desayuno y Cena</option>
+          <option value="antes_ejercicio">Antes del Ejercicio</option>
+          <option value="despues_ejercicio">Después del Ejercicio</option>
+          <option value="otros">Otros</option>
+        </select>
+        <input type="text" class="custom-supplement" name="${id}_supplement" placeholder="Suplemento personalizado">
+      `;
+      return div;
+    }
+
+    function addNutraceuticoPrimario() {
+      document.getElementById('nutraceuticos-primarios-group').appendChild(createNutraceuticoItem('nutra_primario'));
+    }
+
+    function addActivadorMetabolico() {
+      document.getElementById('activador-metabolico-group').appendChild(createNutraceuticoItem('activador_metabolico'));
+    }
+
+    function addNutraceuticoSecundario() {
+      document.getElementById('nutraceuticos-secundarios-group').appendChild(createNutraceuticoItem('nutra_secundario'));
+    }
+
+    function addNutraceuticoComplementario() {
+      document.getElementById('nutraceuticos-complementarios-group').appendChild(createNutraceuticoItem('nutra_complementario'));
+    }
+
+    function addSuero() {
+      document.getElementById('sueros-group').appendChild(createNutraceuticoItem('suero'));
+    }
+
+    function openSendModal() {
+      document.getElementById('send-modal-overlay').style.display = 'flex';
+    }
+
+    function closeSendModal() {
+      document.getElementById('send-modal-overlay').style.display = 'none';
+    }
+
+    function getGuideSummary() {
+      // Puedes personalizar el resumen aquí
+      const patientName = document.getElementById('patient-name')?.value || 'Paciente';
+      let content = `Guía para ${patientName}:\n`;
+      // Ejemplo simple: solo el nombre y fecha
+      const date = document.getElementById('date')?.value || '';
+      content += `Fecha: ${date}\n`;
+      // Puedes agregar más detalles relevantes aquí
+      content += '\nConsulta la guía completa adjunta o en el enlace.';
+      return content;
+    }
+
+    function sendViaWhatsapp() {
+      const message = encodeURIComponent(getGuideSummary());
+      window.open(`https://wa.me/?text=${message}`, '_blank');
+      closeSendModal();
+    }
+
+    function sendViaEmail() {
+      const subject = encodeURIComponent('Guía del Paciente');
+      const body = encodeURIComponent(getGuideSummary());
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      closeSendModal();
+    }
+
+    function sendToFlutterApp() {
+      alert('Próximamente: Integración con la app del paciente.');
+      closeSendModal();
+    }
+  </script>
+</body>
+</html>

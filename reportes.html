@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reportes - Edad Biológica</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="reportes.css">
+
+  <!-- Íconos de FontAwesome (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Librería Plotly para gráficos 3D y barras -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Reportes - Edad Biológica</h1>
+    <p class="subtitle">Visualización 3D y Gráficos de Barras</p>
+  </header>
+
+  <nav class="sidebar">
+    <div class="sidebar-item active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></div>
+    <div class="sidebar-item"><i class="fas fa-book-medical"></i><span>Historias</span></div>
+    <div class="sidebar-item"><i class="fas fa-user-md"></i><span>Profesionales</span></div>
+    <div class="sidebar-item active"><i class="fas fa-chart-pie"></i><span>Reportes</span></div>
+    <div class="sidebar-item"><i class="fas fa-cog"></i><span>Configuración</span></div>
+  </nav>
+
+  <div class="container">
+    <!-- Filtros / Búsqueda -->
+    <section class="filters">
+      <input type="text" id="patientSearch" placeholder="Buscar paciente... (ej: 'John')" />
+      <button id="btnSearch">Buscar</button>
+    </section>
+
+    <!-- Gráfico 3D -->
+    <section class="card">
+      <h2>Gráfico 3D (Edad Cronológica vs. Edad Biológica vs. Telómeros)</h2>
+      <div id="scatter3d" style="width: 100%; height: 500px;"></div>
+    </section>
+
+    <!-- Gráfico de Barras -->
+    <section class="card">
+      <h2>Comparación de Biomarcadores (Barras)</h2>
+      <div id="barChart" style="width: 100%; height: 400px;"></div>
+    </section>
+  </div>
+
+  <!-- Script principal con la lógica y datos -->
+  <script src="reportes.js"></script>
+</body>
+</html>
